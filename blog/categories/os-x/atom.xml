@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: OS X | Gadget Habit]]></title>
+  <link href="http://michaelevans.org/blog/categories/os-x/atom.xml" rel="self"/>
+  <link href="http://michaelevans.org/"/>
+  <updated>2015-08-07T09:41:26-04:00</updated>
+  <id>http://michaelevans.org/</id>
+  <author>
+    <name><![CDATA[Michael Evans]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Building OBS Studio for OS X]]></title>
+    <link href="http://michaelevans.org/blog/2014/06/07/building-obs-studio-for-os-x/"/>
+    <updated>2014-06-07T22:59:38-04:00</updated>
+    <id>http://michaelevans.org/blog/2014/06/07/building-obs-studio-for-os-x</id>
+    <content type="html"><![CDATA[<p>Recently I&rsquo;ve been watching a bunch of streams on <a href="http://www.twitch.tv/">Twitch</a>, and was investigating the best options to stream from OS X. Sadly most of the ones I found were very expensive, until I saw that <a href="http://obsproject.com/">Open Broadcaster Software</a>, which was previously only for Windows, was <a href="https://github.com/jp9000/obs-studio">being rewritten</a> to work with OS X and Linux. However, it&rsquo;s still highly beta/under development and as a result, there&rsquo;s not a lot of documentation on how to build it.</p>
+
+<p>Here&rsquo;s how I did it:</p>
+
+<p>```</p>
+
+<pre><code>brew install ffmpeg glew cmake qt5
+git clone https://github.com/jp9000/obs-studio.git
+cd obs-studio
+mkdir cmbuild &amp;&amp; cd cmbuild
+export CMAKE_PREFIX_PATH=/usr/local/Cellar/qt5/5.2.1/lib/cmake
+cmake .. &amp;&amp; make
+cpack
+</code></pre>
+
+<p>```</p>
+
+<p>This will leave you with a disk image named <code>obs-studio-x64-&lt;sha1-hash&gt;.dmg</code>, which you can mount and install, just like any other OS X application.</p>
+
+<p>Happy Streaming!</p>
+]]></content>
+  </entry>
+  
+</feed>

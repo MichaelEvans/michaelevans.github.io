@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Glass | Gadget Habit]]></title>
+  <link href="http://michaelevans.org/blog/categories/glass/atom.xml" rel="self"/>
+  <link href="http://michaelevans.org/"/>
+  <updated>2015-08-07T09:41:26-04:00</updated>
+  <id>http://michaelevans.org/</id>
+  <author>
+    <name><![CDATA[Michael Evans]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Google's Project Glass]]></title>
+    <link href="http://michaelevans.org/blog/2013/02/20/googles-project-glass/"/>
+    <updated>2013-02-20T20:55:00-05:00</updated>
+    <id>http://michaelevans.org/blog/2013/02/20/googles-project-glass</id>
+    <content type="html"><![CDATA[<p>This morning Google put up some new details regarding Project Glass, including <a href="http://www.google.com/glass/start/how-it-feels/">a video</a> showing what it&rsquo;s like to wear Glass, and a <a href="http://www.google.com/glass/start/what-it-does/">list of things</a> that Glass can do. They are also sponsoring a new contest where anyone can <a href="http://www.google.com/glass/start/how-to-get-one/">join the Glass Explorers</a> (people who will be getting the Developer Edition). I was fortunate enough to be able to attend the Glass Foundry event in New York earlier this month, and got to experience Project Glass first hand. While I cannot say too much more than what you can gather from the Google page, I do have some exciting news!</p>
+
+<!-- more -->
+
+
+<p></p>
+
+<p>Me (and my team, which included Jacob Hilker and Ryan Warner), won the Glass Foundry Hackathon! Like I said, I cannot share much more about it, but I do have this sweet picture of me wearing them:</p>
+
+<p><img class="center" src="/images/2013/02/20/glass.jpg" width="400" height="400" title="Project Glass" ></p>
+
+<p>And the best part is the prize for the winners &ndash; a free Glass Explorer device (when they are available, of course).</p>
+]]></content>
+  </entry>
+  
+</feed>

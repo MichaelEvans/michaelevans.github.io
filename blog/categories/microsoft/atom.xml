@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Microsoft | Gadget Habit]]></title>
+  <link href="http://michaelevans.org/blog/categories/microsoft/atom.xml" rel="self"/>
+  <link href="http://michaelevans.org/"/>
+  <updated>2015-08-07T09:41:26-04:00</updated>
+  <id>http://michaelevans.org/</id>
+  <author>
+    <name><![CDATA[Michael Evans]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Microsoft Surface: Has Microsoft nailed it?]]></title>
+    <link href="http://michaelevans.org/blog/2012/06/19/microsoft-surface-has-microsoft-nailed-it/"/>
+    <updated>2012-06-19T19:44:00-04:00</updated>
+    <id>http://michaelevans.org/blog/2012/06/19/microsoft-surface-has-microsoft-nailed-it</id>
+    <content type="html"><![CDATA[<p>Last night Microsoft unveiled Surface, its entry into the already crowded tablet arena. The name, you might be thinking, sounds awfully familiar. That&rsquo;s cause <a href="http://en.wikipedia.org/wiki/Microsoft_PixelSense">it is</a>. Anyway, the hardware of this reincarnation is <em>not</em> a table, it&rsquo;s actually quite sleek.</p>
+
+<!-- more -->
+
+
+<p></p>
+
+<p>It&rsquo;s thinner and lighter than an iPad, and has a built in kickstand. But here&rsquo;s the kicker, the &ldquo;smart cover&rdquo;, doubles as a keyboard. Combine this with Microsoft Office, and I think you might have a competitor in the works. It has a stylus that can work even when your hand is on the screen, a USB port, and all the bells and whistles you&rsquo;d want to see from a mobile machine.</p>
+
+<p><img src="/images/2012/06/19/surface.jpeg" width="700" height="400" title="Microsoft Surface" ></p>
+
+<p>Unfortunately, I can&rsquo;t end the article there. Despite the fact that Microsoft blew me away by revealing a hot tablet, they still might let us down anyway. They were unable to provide a concrete release date, pricing, or battery life. Those three factors could easily change this purchase from a must-have, to a don&rsquo;t-bother.</p>
+
+<p>And then there&rsquo;s the name. You&rsquo;d <strong>think</strong> they&rsquo;d call it Microsoft Surface/Surface Pro, or something along those lines. It&rsquo;s a popular <a href="http://en.wikipedia.org/wiki/Apple_Macbook">naming scheme</a> used by a few <a href="http://www.apple.com/macbook-pro/">other companies</a>, and even in their own <a href="http://windows.microsoft.com/en-US/windows7/products/compare">product lines</a>. But alas, they went with the succinct &ldquo;Surface for Windows 8 Pro.&rdquo; Rolls right off the tongue, right?</p>
+
+<p>All in all, I&rsquo;m still impressed with what I saw yesterday. The form factor is good, and the potential is there. And when Microsoft takes the hardware and software into their own hands, the usually do a <a href="http://www.xbox.com/en-US/">good</a> <a href="http://www.xbox.com/en-US/Kinect">job</a>. Hopefully when it comes out in the fall, Microsoft won&rsquo;t let us down.</p>
+
+<p><iframe width="640" height="510" src="http://www.youtube.com/embed/dpzu3HM2CIo " frameborder="0" webkitAllowFullScreen mozallowfullscreen allowfullscreen></iframe></p>
+]]></content>
+  </entry>
+  
+</feed>

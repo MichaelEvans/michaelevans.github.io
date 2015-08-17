@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: One V | Gadget Habit]]></title>
+  <link href="http://michaelevans.org/blog/categories/one-v/atom.xml" rel="self"/>
+  <link href="http://michaelevans.org/"/>
+  <updated>2015-08-07T09:41:26-04:00</updated>
+  <id>http://michaelevans.org/</id>
+  <author>
+    <name><![CDATA[Michael Evans]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[A Guide to Unlocking and Rooting your Android Phone]]></title>
+    <link href="http://michaelevans.org/blog/2013/01/09/a-guide-to-unlocking-and-rooting-your-android-phone/"/>
+    <updated>2013-01-09T10:45:00-05:00</updated>
+    <id>http://michaelevans.org/blog/2013/01/09/a-guide-to-unlocking-and-rooting-your-android-phone</id>
+    <content type="html"><![CDATA[<p>Something that is very popular in the Android world these days is rooting and installing custom ROMs on your phone. A problem that I&rsquo;ve found however, is that information regarding the process, and the terminology involved can be quite confusing for someone getting started, and as a result might discourage them. I decided to write up a series of blog posts discussing various parts of this process, so that it might help someone who wants to get involved, but doesn&rsquo;t know how. The phone that I&rsquo;ll be using for these tutorials is an <a href="http://amzn.to/VAQwcM">HTC One V</a>, which can be used on Virgin Mobile. It&rsquo;s a fairly modern phone, comes with a 1GHz single-core CPU, 512MB RAM, and a nice 3.7 inch LCD. This process will almost identical for other HTC phones, and very similar for many other Android devices.</p>
+
+<p>Disclaimer: This may void your warranty, I take no responsibility, etc.</p>
+
+<!--more-->
+
+
+<h2>Part One: Unlocking your One V</h2>
+
+<p>The first part of the process is called &ldquo;Rooting&rdquo; your device. Rooting basically means obtaining admin access on your device, which allows you to do all sorts of fun things down the line. In order to root your device however, there are a few steps you&rsquo;ll have to take. The first thing you&rsquo;ll need to do is unlock the bootloader. The bootloader is the software that loads the operating system of your phone. Normally this is locked to only start the software that ships on the device, but we are going to unlock it so that we may install custom software.</p>
+
+<ol>
+<li>Go to <a href="http://www.htcdev.com/">HTC Dev</a> and create yourself an account.</li>
+<li>Download <a href="https://www.box.com/s/kuouqnnsjke4byd2u38n">these</a> Fastboot Files</li>
+<li>Make a new folder on your C: or home directory called fastboot.</li>
+<li>Extract the zip downloaded in step 2 to the new folder</li>
+<li>Go <a href="http://www.htcdev.com/bootloader/">here</a> and select &ldquo;All Other Supported Models&rdquo; and then &ldquo;Begin Unlock bootloader&rdquo;</li>
+<li>Check both checkboxes, and then proceed.</li>
+<li>Power off your phone by holding the power button down for 5-7 seconds (the three keys will flash a few times then it will power off)</li>
+<li>Hold the volume down button and power the device on, the device will boot to a white screen called &ldquo;HBOOT&rdquo;</li>
+<li>Select &ldquo;Fastboot&rdquo; with volume up or down then press the power button once (you&rsquo;ll be in fastboot mode)</li>
+<li>Plug your phone into your computer and open a Command Prompt.</li>
+<li>cd to your folder where we put fastboot files (i.e c:\fastboot)</li>
+<li>type this into your command prompt: <code>fastboot oem get_identifier_token</code></li>
+<li>Select &amp; copy the text as per step 9 on the HTC Dev website</li>
+<li>Paste your identifier token into the box at the bottom and submit
+You will then receive an email from HTCDev with a link to the second    part of the instructions and your &ldquo;Unlock_code.bin&rdquo; file attached.</li>
+<li>Download the &ldquo;Unlock_code.bin&rdquo; attachment from the email and save it to     the same folder that we extracted fastboot files.</li>
+<li>Type this into your command prompt window: <code>fastboot flash unlocktoken Unlock_code.bin</code></li>
+<li>The display will change on your phone, and ask you to confirm the unlock. press volume up to accept and power to confirm.</li>
+</ol>
+
+
+<p><strong>Congratulations</strong>! You have successfully unlocked the bootloader.</p>
+
+<h2>Part Two: Rooting the One V</h2>
+
+<p>The next step in this process, is actually obtaining root access. In order to do that, we will be installing an application called SuperSU, which allows you to run applications on your phone with administrative priveledges (also known as superuser or root).</p>
+
+<ol>
+<li>Download <a href="https://www.box.com/s/zli0tchzdbs6dtwgv7px">r1-primo-cdma-superboot.zip</a> to your computer and extract in any directory.</li>
+<li>Power off your phone by holding the power button down for 5-7 seconds (the three keys will flash a few times then it will power off)</li>
+<li>Hold volume down button while powering on, the device will boot to HBOOT (like we did before)</li>
+<li>Select Fastboot with volume up or down then press power once</li>
+<li>Connect your phone to PC</li>
+<li>Double click ‘install-superboot-windows.bat’ (or mac or linux, depending on your platform)</li>
+</ol>
+
+
+<p><strong>Excellent!</strong> You now have root access on your phone. When you start up Android, you&rsquo;ll see a new application in your launcher. It&rsquo;s called SuperSU, and will ask you to allow/deny applications root access if they request it. This is useful for installing things like tethering applications, or modifying system files.</p>
+
+<h2>Part Three: Installing Custom Recovery</h2>
+
+<p>The last thing we are going to do as part of this guide is install a custom recovery. A recovery is a mode of the phone that allows you to backup/restore your device, or modify device files, like installing new software. This will be important if you&rsquo;d like to backup your device before wiping it to install custom software. In order to install ClockworkMod Recovery (which is probably the most popular recovery you&rsquo;ll find):</p>
+
+<ol>
+<li>Download ClockworkMod Recovery <a href="https://www.box.com/s/vj181v9mmi5tghm1za4b">here</a>.</li>
+<li>Power off your phone by holding the power button down for 5-7 seconds (the three keys will flash a few times then it will power off)</li>
+<li>Hold the volume down button while powering on, the device will boot to HBOOT (You should be getting the hang of this by now)</li>
+<li>Select Fastboot with volume up or down then press power once</li>
+<li>Connect your phone to PC</li>
+<li>Type the following in to your command prompt: <code>adb flash recovery cwmrecovery.img</code></li>
+<li>Restart your phone, and hold the volume down button. This time, select &ldquo;recovery&rdquo; and hit the power button.</li>
+</ol>
+
+
+<p>You&rsquo;re now in recovery mode! While we&rsquo;re here, let&rsquo;s make a backup.</p>
+
+<ol>
+<li>Scroll through the list of options 2 times using volume up or volume down. (Without doing this, you won&rsquo;t be able to select an option)</li>
+<li>Use the power button to select &ldquo;Backup and restore&rdquo;</li>
+<li>Select &ldquo;Backup&rdquo;</li>
+<li>The backup process is now running. It will be a few minutes to complete.</li>
+<li>Once complete, let&rsquo;s make sure the backup is successful.</li>
+<li>Once again, select &ldquo;Backup and restore&rdquo;</li>
+<li>Choose &ldquo;Restore&rdquo;. You will see your backup files, e.g: 2013-01-12.10.13.04</li>
+<li>Pick &ldquo;Go Back&rdquo;</li>
+<li>Select &ldquo;Reboot system&rdquo;</li>
+</ol>
+
+
+<p>It&rsquo;s probably best to copy that backup folder off your SD card and onto your computer in the event something happens to your SD card.</p>
+
+<p><strong>Awesome</strong>! You&rsquo;re now all set to do all sorts of things, like installing custom roms. Be sure to check back for the next part of this series, where we will go over that.</p>
+]]></content>
+  </entry>
+  
+</feed>

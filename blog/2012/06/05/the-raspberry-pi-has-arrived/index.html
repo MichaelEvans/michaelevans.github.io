@@ -1,0 +1,336 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="msvalidate.01" content="275BF9CDA457668389C1F9916C380DD0" />
+  <title>The Raspberry Pi Has Arrived! - Gadget Habit</title>
+  <meta name="author" content="Michael Evans">
+
+  
+  <meta name="description" content="My Raspberry Pi came in, and I give a hands on review">
+  <meta name="keywords" content="Raspberry Pi, Raspberry Pi Review, Gadget Reviews">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://michaelevans.org/blog/2012/06/05/the-raspberry-pi-has-arrived/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Gadget Habit" type="application/atom+xml">
+  <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-28589266-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Gadget Habit</a></h1>
+  
+    <h2>A bunch of technobabble.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:michaelevans.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">The Raspberry Pi Has Arrived!</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-06-05T20:08:00-04:00" pubdate data-updated="true">Jun 5<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>As the title suggests, I just received my <a href="http://www.raspberrypi.org">Raspberry Pi</a> (Model B) in the mail. For those who don&rsquo;t know about the Raspberry Pi, it&rsquo;s a small little computer with 256MB of RAM, a 700MHz CPU and a GPU capable of 1080p output over HDMI. Connectivity is provided via 2 USB 2.0 ports, and a RJ45 10/100 Ethernet port. There&rsquo;s HDMI and RCA video, and a 3.5mm jack for audio. Lastly, there&rsquo;s an SD slot on the bottom for storage, and the device is powered by a microUSB port, the same one as most smartphones.</p>
+
+<p><img src="/images/2012/06/05/raspberrypi.jpg" width="700" height="200" title="Pi Box" ></p>
+
+<p>I have to say, despite looking at pictures, and seeing information about the Pi on the web, I&rsquo;m still surprised how small this thing is. It&rsquo;s so small that the box that it comes in looks like a deck of playing cards:</p>
+
+<p><img class="left" src="/images/2012/06/05/box.jpg" width="200" height="100" title="Pi Box" ></p>
+
+<p>I decided to go with the <a href="http://www.debian.org/">Debian</a> image, not only because I&rsquo;m familiar with it, but also because that is the suggested distro in the documentation. I&rsquo;m considering switching to Arch after I fiddle around with it a little bit more.  After quickly running to pick up an SD card, I hastily plugged in the Pi to my home network, and plugged in the power. A few seconds later, and I was up and running. I logged in and tried the default setup of LXDE (pictured below), and I have to say, it&rsquo;s a little sluggish. I tried out some of the included apps, like <a href="http://en.wikipedia.org/wiki/Midori_(web_browser)">Midori</a> (the default browser), and a few of the included development tools.</p>
+
+<p><img class="right" src="/images/2012/06/05/it_lives.jpg" width="400" height="200" title="Pi Box" ></p>
+
+<p>While the CPU is a little on the slow side, the GPU performance looks impressive. It plays 1080p content with no trouble, and I&rsquo;m going to try streaming some video from my NAS later. Others on the internet have reported no issues with that so far.</p>
+
+<p>Anyway, I still haven&rsquo;t figured out what I&rsquo;m going to do with it yet, but it is a pretty fun little machine. I am investigating options for cases, since I also don&rsquo;t really have a good place for it yet. I was looking at <a href="http://www.shapeways.com/model/486999/">this one</a> on Shapeways, but then the case would cost more than the computer itself! The Raspberry Pi foundation appears to be working on something though.</p>
+
+<h6>Small Computer, Huge Screen</h6>
+
+<p><img src="/images/2012/06/05/lxde.jpg" width="700" height="200" title="Pi Box" ></p>
+
+<p>Is it worth the $35? Yeah, I think so. Maybe not to the average person, since it&rsquo;s pretty underpowered for things like web browsing. The community around this thing seems huge (and probably will grow as more are shipped) which makes me feel there will be more in store for it. At this price, it&rsquo;s slightly more expensive than an <a href="http://www.arduino.cc/">Arduino</a>, and a lot more versatile (at least from a software perspective).</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Michael Evans</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-06-05T20:08:00-04:00" pubdate data-updated="true">Jun 5<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/review/'>Review</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://michaelevans.org/blog/2012/06/05/the-raspberry-pi-has-arrived/" data-via="m_evans10" data-counturl="http://michaelevans.org/blog/2012/06/05/the-raspberry-pi-has-arrived/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/06/03/everyone-should-learn-to-program/" title="Previous Post: Everyone should learn to program">&laquo; Everyone should learn to program</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/06/07/my-wwdc-2012-predictions/" title="Next Post: My WWDC 2012 Predictions">My WWDC 2012 Predictions &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/08/03/using-espresso-for-easy-ui-testing/">Using Espresso for Easy UI Testing</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/07/14/improving-your-code-with-android-support-annotations/">Improving your code with Android Support Annotations</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/05/07/android-ripples-with-rounded-corners/">Android Ripples with Rounded Corners</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/09/blurred-background-effect-for-android/">Blurred background effect for Android</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/06/07/building-obs-studio-for-os-x/">Building OBS Studio for OS X</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/MichaelEvans">@MichaelEvans</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'MichaelEvans',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/114052868601022948953?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Michael Evans -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mevans';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://michaelevans.org/blog/2012/06/05/the-raspberry-pi-has-arrived/';
+        var disqus_url = 'http://michaelevans.org/blog/2012/06/05/the-raspberry-pi-has-arrived/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

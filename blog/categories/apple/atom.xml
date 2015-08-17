@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Apple | Gadget Habit]]></title>
+  <link href="http://michaelevans.org/blog/categories/apple/atom.xml" rel="self"/>
+  <link href="http://michaelevans.org/"/>
+  <updated>2015-08-07T09:41:26-04:00</updated>
+  <id>http://michaelevans.org/</id>
+  <author>
+    <name><![CDATA[Michael Evans]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[WWDC Recap]]></title>
+    <link href="http://michaelevans.org/blog/2012/06/11/wwdc-recap/"/>
+    <updated>2012-06-11T21:55:00-04:00</updated>
+    <id>http://michaelevans.org/blog/2012/06/11/wwdc-recap</id>
+    <content type="html"><![CDATA[<p>If you remember from <a href="/blog/2012/06/07/my-wwdc-2012-predictions/">last week</a>, I made some predictions about what Apple would reveal today at WWDC. Let&rsquo;s recap what actually happened, and we can see the hits and misses.</p>
+
+<h3>New Macs</h3>
+
+<p>Yep. Refresh for the Air and Pro lines, and the introduction of the &ldquo;Super Pro&rdquo;. Yeah, I was wrong about the &ldquo;Retina&rdquo; all around, and nothing for the Mac Mini, but I&rsquo;d say I was pretty darn close. There was technically an update for the Mac Pro, but as Marco from Instapaper <a href="http://www.marco.org/2012/06/11/half-assed-mac-pro">points out</a>, they basically didn&rsquo;t do Pro owners any favors.</p>
+
+<h3>Mountain Lion</h3>
+
+<p>Got a release <em>month</em> (July). There was iCloud Tabs, and a few other iOS features (Notification Center, iMessage, etc.) coming to the desktop.</p>
+
+<h3>iOS 6</h3>
+
+<p>I was a bit disappointed. Nothing I saw made me feel like I needed to have the newest update, since most of the new features are already present in the competitor&rsquo;s latest offering, Ice Cream Sandwich. Can&rsquo;t wait to see how Google strikes back in two weeks.</p>
+
+<!-- more -->
+
+
+<p></p>
+
+<h3>Retina Displays</h3>
+
+<p>I can&rsquo;t wait to see it, but at the same time, I don&rsquo;t want to. I know that I&rsquo;ll love it, and it will make me want one and get rid of my current Macbook Air. So if you own one, please don&rsquo;t show me.</p>
+
+<h3>New Maps</h3>
+
+<p>Yawn. Android users have had the same basic experience for maybe two years now.</p>
+
+<h3>Siri Update</h3>
+
+<p>Almost there. They added some more third party support, but it&rsquo;s not yet at that API level where I think it will really shine. Maybe in iOS 7?</p>
+
+<h3>Apple TV Update</h3>
+
+<p>Nothing, called that one.</p>
+
+<h3>Facebook Integration</h3>
+
+<p>Still don&rsquo;t care.</p>
+
+<p>Yeah, I got the &ldquo;Won&rsquo;t happen stuff&rdquo; right too (Did anyone <em>really</em> think there would be a iPad Mini?).</p>
+
+<p>All in all, I was actually kind of let down. Nothing in Mountain Lion or iOS 6 really makes me get that &ldquo;gotta have it&rdquo; feeling that iOS 5, or even Lion had. I really was hoping for a Retina Macbook Air (which I&rsquo;m guessing will come with the next refresh as Apple drives prices of displays down), but I didn&rsquo;t even see hardware (minus the Superbook Pro, which costs way more than I want to pay), that made me feel jealous because I still had the current stuff. Maybe my expectations were too high. I&rsquo;m still way more excited for Google IO, since I really don&rsquo;t have any concrete idea what we&rsquo;ll be seeing. Project Glass anyone?</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[My WWDC 2012 Predictions]]></title>
+    <link href="http://michaelevans.org/blog/2012/06/07/my-wwdc-2012-predictions/"/>
+    <updated>2012-06-07T18:02:00-04:00</updated>
+    <id>http://michaelevans.org/blog/2012/06/07/my-wwdc-2012-predictions</id>
+    <content type="html"><![CDATA[<p>Since essentially all other tech blogs are writing about their predictions for Apple&rsquo;s Worldwide Developer Conference which is being held next week, I&rsquo;ve decided to throw my guesses into the ring, so we can go over them next week, and see how I did. I&rsquo;ll try to touch on all the big rumors that are going around, but if I miss one, feel free to mention it in the comments.</p>
+
+<h2>Things that I think are likely/definite:</h2>
+
+<h3>New Macs</h3>
+
+<p>As any techy will tell you, Intel has shipped some new generation CPU&rsquo;s recently (referred to as Ivy Bridge), which would be natural fits for the aging Macbook Pros, as well as the Macbook Airs, iMacs, and even the Mini/Pro. This would also confirm another rumor that&rsquo;s going around regarding USB 3.0, since the Ivy Bridge CPUs ship with USB 3.0 support. It&rsquo;s also believeable that there will be a new Mac Pro too.</p>
+
+<!-- more -->
+
+
+<p></p>
+
+<h3>Mountain Lion</h3>
+
+<p>Since WWDC really is a developer conference, I think it&rsquo;s pretty likely that Apple will be setting a release date for it&rsquo;s newest operating system release. There&rsquo;s not too much else to say about this one, since Apple has already had a small annoucement for it, and there&rsquo;s also a good bit of information on their <a href="http://www.apple.com/macosx/mountain-lion/">website</a>. There&rsquo;s rumors about &ldquo;iCloud Tabs&rdquo;, essentially browser tab sync between iOS and OS X, which also seems feasable, since Google has already done this with Chrome.</p>
+
+<h3>iOS 6 Unveiling</h3>
+
+<p>Again, this is a developer conference, and Apple has no better time to demo all their fancy new APIs and features than now. Apple has used WWDC as a time to show off previous versions of iOS, it only seems logical we&rsquo;ll get a taste of the new bits next week.</p>
+
+<h3>Retina Displays</h3>
+
+<p>Probably could have grouped this with the new Macs, but I figured the displays deserved their own section. Just as with the iPad, the interface will look the same, but the screen will be far crisper. I think this is huge, not just for Mac users, but to pressure other manufacturers to finally up the resolution on their own notebooks. Using a 15" notebook with a 1366x768 or 1280x800 resolution is a joke. If you don&rsquo;t know or aren&rsquo;t sure of the difference the retina displays make, go look at an iPhone 3GS, and then a 4 or 4S. You&rsquo;ll wonder how we lived like that.</p>
+
+<h3>New Maps for iOS</h3>
+
+<p>I&rsquo;m really surprised it took them this long. As far as I know, no other iPhone app that shipped with 1.0 has had as little work since 2007 as Maps. The signs for an upgrade have been all over. First Apple dropped Google Maps in iPhoto for iOS, and then leaked screenshots made their way onto the internet. Anyway, I hope they knock it out of the park. I&rsquo;ve been a long time Google Maps user, and having turn by turn directions and a first class maps app was one of my favorite Android features. After Google&rsquo;s update for Google Maps on Wednesday, Apple certainly has their work cut out for them.</p>
+
+<h2>Things that I think are possible</h2>
+
+<h3>Siri Update</h3>
+
+<p>Something that would make me want to use Siri! I have owned an iPhone 4S since shortly after launch, and I have never felt the need to talk to her. Opening up Siri to at least <em>some</em> third parties could go a long way. Yeah, they might even let iPad users in on the &ldquo;fun&rdquo;.</p>
+
+<h3>Apple TV Update</h3>
+
+<p>Well, the Apple TV rumor is that there will be some sort of App Store for the ATV. I&rsquo;m not sold on it. Yeah, it would probably sell Apple TVs like hotcakes, but even as the owner of a Google TV, I really don&rsquo;t see the draw to having too many apps on my TV. I guess I could be convinced otherwise with some well-polished software, but I just don&rsquo;t see it happening right now.</p>
+
+<h3>Facebook Integration</h3>
+
+<p>Meh. Might happen, might not. Don&rsquo;t really feel too strongly either way.</p>
+
+<!--##Things I think are unlikely-->
+
+
+<h2>Things that won&rsquo;t be happening</h2>
+
+<h3>iPhone 5</h3>
+
+<p>Let&rsquo;s get this one out of the way right now. It ain&rsquo;t happening. My bet is that it will ship in the fall, along with the release of iOS 6.</p>
+
+<h3>Apple&rsquo;s own TV</h3>
+
+<p>Yeah, right.</p>
+
+<h3>iPad Mini/iPad 7</h3>
+
+<p>Hahahahaha.</p>
+
+<p>Oh you weren&rsquo;t kidding? Nope.</p>
+
+<p>Well, that&rsquo;s all I have for now. If I&rsquo;m missing something, or you have different opinions, feel free to leave a comment! Unfortunately I won&rsquo;t be attending WWDC this year, but I <em>will</em> be attending Google IO later this month. So if people find this article interesting, I&rsquo;ll do another one before that, and I&rsquo;ll also do some live blogging from the conference.</p>
+]]></content>
+  </entry>
+  
+</feed>

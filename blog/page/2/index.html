@@ -1,0 +1,674 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="msvalidate.01" content="275BF9CDA457668389C1F9916C380DD0" />
+  <title>Gadget Habit</title>
+  <meta name="author" content="Michael Evans">
+
+  
+  <meta name="description" content="For a new app that I&rsquo;m working on, I wanted to use a ViewPager inside a ScrollView in order to make a simple image carousel. The only problem &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://michaelevans.org/blog/page/2/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Gadget Habit" type="application/atom+xml">
+  <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-28589266-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Gadget Habit</a></h1>
+  
+    <h2>A bunch of technobabble.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:michaelevans.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/10/13/using-a-viewpager-in-a-scrollview/">Using a ViewPager in a ScrollView</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-10-13T20:48:00-04:00" pubdate data-updated="true">Oct 13<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/10/13/using-a-viewpager-in-a-scrollview/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>For a new app that I&rsquo;m working on, I wanted to use a ViewPager inside a ScrollView in order to make a simple image carousel. The only problem is, ScrollViews don&rsquo;t seem to play nicely with horizontally swiping Views. As soon as the user moves their finger even slightly up or down, the ViewPager page change is cancelled, and the page snaps back to the current item. This can lead to an extremely frustrating user experience, because it is difficult for the user to understand why the views won&rsquo;t swipe.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/10/13/using-a-viewpager-in-a-scrollview/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/09/16/my-newest-app-bike-finder/">My Newest App: Bike Finder</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-09-16T23:11:00-04:00" pubdate data-updated="true">Sep 16<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/09/16/my-newest-app-bike-finder/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="right" src="/images/2013/09/16/map.png" width="240" height="400" title="Map" ></p>
+
+<p>Last week I released my newest Android app, <a href="https://play.google.com/store/apps/details?id=org.michaelevans.bikefinder&amp;referrer=utm_source%3Dblog">Bike Finder</a>. It&rsquo;s a fairly straight forward application that allows you to find bikes and stations for use with Washington DC&rsquo;s Capital Bikeshare system. For those of you not local to DC, Capital Bikeshare is a system that lets you use bikes that are available at docking stations all over the city, as well as parts of northern Virginia. The app is free, and I&rsquo;m looking into adding additional cities that have companies that make their bike sharing data available (currently investigating New York City, Montreal and the Bay Area). If you&rsquo;d like to get your city added, <a href="http://twitter.com/m_evans10">let me know</a>, and I&rsquo;ll see if the data is available, and add it to the to-do list.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/09/16/my-newest-app-bike-finder/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/08/20/parse-android-todo-app-tutorial-part-two-users/">Parse Android To-do App Tutorial - Part Two - Users</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-08-20T21:13:00-04:00" pubdate data-updated="true">Aug 20<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/08/20/parse-android-todo-app-tutorial-part-two-users/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Last week <a href="http://michaelevans.org/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse/">I posted a tutorial</a> on how to create a really basic Android To-do list application using <a href="http://www.parse.com">Parse</a>. It allowed a user to create tasks, and then toggle their completion status. Then, this information was synced to a server, so that the tasks will be kept up to date on multiple devices. The biggest issue with this app so far, was that there was no concept of users, so all tasks were shared among everyone. This week, we&rsquo;re going to introduce two new screens (which are very similar to one another), the registration and login screens.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/08/20/parse-android-todo-app-tutorial-part-two-users/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse/">Tutorial: Building an Android To-Do List App Using Parse</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-08-14T22:08:00-04:00" pubdate data-updated="true">Aug 14<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>For a while now I&rsquo;ve been using <a href="http://www.parse.com">Parse</a> for small apps, it allows you to iterate quickly and create a backend for an app without too much work. It also seems like a perfect jumping off point for a series of Android tutorials, where we&rsquo;ll be building a &ldquo;Todo List&rdquo; application. (This tutorial assumes that you have <a href="http://developer.android.com/tools/sdk/eclipse-adt.html">Eclipse and the ADT</a> installed already.)</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/06/12/getting-mavericks-compressed-memory-feature-in-ubuntu/">Getting Mavericks&#8217; Compressed Memory Feature in Ubuntu</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-06-12T00:16:00-04:00" pubdate data-updated="true">Jun 12<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/06/12/getting-mavericks-compressed-memory-feature-in-ubuntu/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>On Monday, Apple announced a new update for it&rsquo;s desktop operating system, which will be named OS X Mavericks. As part of the annoucement, they touched on a few performance related features, including a new power saving API, which was called App Nap, as well as a memory compression feature, which would allow compress the memory of programs that are not currently active.</p>
+
+<p>According to <a href="http://arstechnica.com/apple/2013/06/how-os-x-mavericks-works-its-power-saving-magic/">Ars Technica</a>, Apple is using a technique called Timer Coalescing to create App Nap. Apps that are not active will have their processes set to a lower priority, and therefore use less CPU/disk/etc, and thereby save power. This feature has been around on Linux for a long time, and apparently has been part of Windows as well.</p>
+
+<p>I had not heard, however, of this compressed memory technique, although apparently it had been done many years ago by a program called &ldquo;RamDoubler&rdquo;. After some quick Googling, it seems that this is available via a kernel module called &ldquo;zram&rdquo;.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/06/12/getting-mavericks-compressed-memory-feature-in-ubuntu/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/06/11/running-crouton-on-a-chromebook-pixel/">Running Crouton on a Chromebook Pixel</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-06-11T21:22:00-04:00" pubdate data-updated="true">Jun 11<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/06/11/running-crouton-on-a-chromebook-pixel/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>So a few weeks back at Google IO, Google handed out an awesome laptop to attendees, the <a href="https://play.google.com/store/devices/details?id=chromebook_pixel_wifi">Chromebook Pixel</a>. For those who aren&rsquo;t familiar with it, the Pixel is a laptop running Google&rsquo;s ChromeOS, with the highest resolution screen available on a laptop (2560x1700). Unfortunately for me (and owners of the other Chromebooks), there&rsquo;s a few things you can&rsquo;t do in Chrome, like writing software in the new Android Studio!</p>
+
+<p>In order to work around this limitation in ChromeOS, a developer at Google named David Schneider developed a set of scripts called <a href="https://github.com/dnschneid/crouton">crouton</a>. Crouton allows you to run Ubuntu inside a your ChromeOS system, so that you can easily swap back and forth between the operating systems. This is not limited to the Pixel, so if you&rsquo;re using another model Chromebook, even dating back to the CR-48, this guide should work for you.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/06/11/running-crouton-on-a-chromebook-pixel/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/04/29/hands-on-with-google-glass/">Hands on With Google Glass</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-29T16:36:00-04:00" pubdate data-updated="true">Apr 29<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/04/29/hands-on-with-google-glass/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>The Pickup</h3>
+
+<p>Last Wednesday I took the trip up to NYC, to the top floor of Chelsea Market to pick up a device that many have waited anxiously for. A device unlike anything else we&rsquo;ve seen before: Google&rsquo;s Glass. This is the Explorer Edition of the device, which is targeted towards developers, who attended Google&rsquo;s IO conference last year. I was fortunate to be invited to pick up my device on the first day of New York&rsquo;s pickups, which followed several pickup days in Mountain View the previous week.</p>
+
+<p><img class="center" src="/images/2013/04/29/s_9e3e2acb-a746-4606-a034-1df2c8e2a3cc-0.jpeg" width="500" height="500" title="The View #throughglass" ></p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/04/29/hands-on-with-google-glass/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/03/29/clickable-links-in-android-listviews/">Clickable Links in Android ListViews</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-29T00:14:00-04:00" pubdate data-updated="true">Mar 29<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/03/29/clickable-links-in-android-listviews/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>As part of my newest app (<a href="https://play.google.com/store/apps/details?id=com.evans.hackernews">Hacker News for Android</a>), I needed to add the ability to click on links in a ListView, and have them open in the browser, while maintaining the ability for the user to click on the ListView row itself, and have the row listen to the click.</p>
+
+<p>If you try using <code>Linkify</code> and <code>LinkMovementMethod</code>, which you&rsquo;d use on normal links in a TextView, you&rsquo;ll find that you can no longer use the ListView properly.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/03/29/clickable-links-in-android-listviews/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/03/28/google-plus-messenger-coming-to-chromeos/">Google Plus Messenger Coming to ChromeOS?</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-28T22:56:00-04:00" pubdate data-updated="true">Mar 28<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/03/28/google-plus-messenger-coming-to-chromeos/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>While looking through the Chromium bug tracker today, I stumbled upon an <a href="https://code.google.com/p/chromium/issues/detail?id=167513">interesting bug</a>. The interesting part I found was <a href="https://code.google.com/p/chromium/issues/detail?id=167513#c18">a screenshot posted by one of the Chromium team members</a>.</p>
+
+<p><img class="center" src="/images/2013/03/28/googlemessenger.png" width="500" height="500" title="Google Plus Messenger" ></p>
+
+<p>If you look closely, it looks like the Google+ Messenger icon on the bottom right corner of the dock. Is this finally the integration of G+ Messenger and the web that we&rsquo;ve been waiting for since G+ Messenger was introduced? Maybe we&rsquo;ll find out in a few short weeks during <a href="http://michaelevans.org/blog/2013/03/14/google-io-2013-and-google-reader/">Google IO</a> this year!</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/03/14/google-io-2013-and-google-reader/">Google IO 2013 and Google Reader</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-14T23:52:00-04:00" pubdate data-updated="true">Mar 14<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/03/14/google-io-2013-and-google-reader/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Yesterday was a bittersweet day for me in the world of Google. On the bright side, I was one of the lucky few to acquire a ticket to Google IO 2013. This will be my third Google IO, and I cannot be more excited to attend this year. The first year I went brought about the introduction to Android 3.1 (Honeycomb), which began the improvments for Android&rsquo;s Holo Theme, as well as layouts for tablets. Last year was even more groundbreaking, with the unveiling of a <a href="http://michaelevans.org/blog/2012/06/26/shots-from-outside-io-2012/">few</a> new <a href="http://michaelevans.org/blog/2012/09/07/nexus-q-review/">Nexus</a> <a href="http://michaelevans.org/blog/2012/07/03/nexus-7-review/">devices</a>, Android 4.1 (Jelly Bean), as well as <a href="http://michaelevans.org/blog/2013/02/20/googles-project-glass/">Project Glass</a>. I can&rsquo;t even imagine what they will have in store for us this year.</p>
+
+<p>Here comes the bad news though: <a href="http://googleblog.blogspot.com/2013/03/a-second-spring-of-cleaning.html">Google Reader is being shut down</a>. If you don&rsquo;t know, Google Reader is an RSS reader for the web, a hub for all your subscriptions online. This pending shutdown has caused quite a stir, leading to many users scrambling to <a href="http://www.newsblur.com/">new</a> <a href="http://www.feedly.com/">RSS</a> readers, or <a href="http://blog.digg.com/post/45355701332/were-building-a-reader">building new ones</a>. (There was even a <a href="http://mashable.com/2013/03/14/white-house-google-reader/">petition on whitehouse.org</a> for the government to intervene…)</p>
+
+<p>Google Reader was one of my favorite Google applications, so it&rsquo;s quite sad to see it go. Hopefully one of these replacements will provide a good enough experience so the switch is a bit less painful.</p>
+
+<hr />
+
+<p>Suggestions for a new RSS reader? Predictions for IO 2013? Drop me a line on <a href="https://twitter.com/m_evans10">Twitter</a> or <a href="https://plus.google.com/114052868601022948953/posts">Google Plus</a>, or leave a comment.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/3/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/08/03/using-espresso-for-easy-ui-testing/">Using Espresso for Easy UI Testing</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/07/14/improving-your-code-with-android-support-annotations/">Improving your code with Android Support Annotations</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/05/07/android-ripples-with-rounded-corners/">Android Ripples with Rounded Corners</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/09/blurred-background-effect-for-android/">Blurred background effect for Android</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/06/07/building-obs-studio-for-os-x/">Building OBS Studio for OS X</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/MichaelEvans">@MichaelEvans</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'MichaelEvans',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/114052868601022948953?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Michael Evans -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mevans';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

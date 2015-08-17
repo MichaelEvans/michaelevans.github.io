@@ -1,0 +1,788 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Tutorial | Gadget Habit]]></title>
+  <link href="http://michaelevans.org/blog/categories/tutorial/atom.xml" rel="self"/>
+  <link href="http://michaelevans.org/"/>
+  <updated>2015-08-07T09:41:26-04:00</updated>
+  <id>http://michaelevans.org/</id>
+  <author>
+    <name><![CDATA[Michael Evans]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Using a ViewPager in a ScrollView]]></title>
+    <link href="http://michaelevans.org/blog/2013/10/13/using-a-viewpager-in-a-scrollview/"/>
+    <updated>2013-10-13T20:48:00-04:00</updated>
+    <id>http://michaelevans.org/blog/2013/10/13/using-a-viewpager-in-a-scrollview</id>
+    <content type="html"><![CDATA[<p>For a new app that I&rsquo;m working on, I wanted to use a ViewPager inside a ScrollView in order to make a simple image carousel. The only problem is, ScrollViews don&rsquo;t seem to play nicely with horizontally swiping Views. As soon as the user moves their finger even slightly up or down, the ViewPager page change is cancelled, and the page snaps back to the current item. This can lead to an extremely frustrating user experience, because it is difficult for the user to understand why the views won&rsquo;t swipe.</p>
+
+<!-- more -->
+
+
+<p>A popular solution that I&rsquo;ve seen online is to use the ViewPager&rsquo;s <code>getParent().requestDisallowInterceptTouchEvent(true);</code> method to prevent the ScrollView from scrolling while the ViewPager is being touched or scrolled. The solution that I&rsquo;ve been using is a bit like this, but it provides a little bit of a &ldquo;drag threshold&rdquo;, which is a bit forgiving in the event that the user is trying to drag the ScrollView, but happens to have their finger in the ViewPager. The code I used is as follows:</p>
+
+<p>``` java PagerTouchListener.java
+mPager.setOnTouchListener(new View.OnTouchListener() {</p>
+
+<pre><code>int dragthreshold = 30;
+int downX;
+int downY;
+
+@Override 
+public boolean onTouch(View v, MotionEvent event) {
+
+    switch (event.getAction()) {
+    case MotionEvent.ACTION_DOWN:
+        downX = (int) event.getRawX();
+        downY = (int) event.getRawY();
+        break; 
+    case MotionEvent.ACTION_MOVE:
+        int distanceX = Math.abs((int) event.getRawX() - downX);
+        int distanceY = Math.abs((int) event.getRawY() - downY);
+
+        if (distanceY &gt; distanceX &amp;&amp; distanceY &gt; dragthreshold) {
+            mPager.getParent().requestDisallowInterceptTouchEvent(false); 
+            mScrollView.getParent().requestDisallowInterceptTouchEvent(true); 
+        } else if (distanceX &gt; distanceY &amp;&amp; distanceX &gt; dragthreshold) {
+            mPager.getParent().requestDisallowInterceptTouchEvent(true); 
+            mScrollView.getParent().requestDisallowInterceptTouchEvent(false); 
+        } 
+        break; 
+    case MotionEvent.ACTION_UP:
+        mScrollView.getParent().requestDisallowInterceptTouchEvent(false); 
+        mPager.getParent().requestDisallowInterceptTouchEvent(false); 
+        break; 
+    } 
+    return false; 
+} 
+</code></pre>
+
+<p>});
+```</p>
+
+<p>I found this very useful solution on <a href="http://stackoverflow.com/questions/8381697/viewpager-inside-a-scrollview-does-not-scroll-correclty/16224484#16224484">StackOverflow</a>, among many other solutions that did work (although not as nicely as this one).</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Parse Android To-do App Tutorial - Part Two - Users]]></title>
+    <link href="http://michaelevans.org/blog/2013/08/20/parse-android-todo-app-tutorial-part-two-users/"/>
+    <updated>2013-08-20T21:13:00-04:00</updated>
+    <id>http://michaelevans.org/blog/2013/08/20/parse-android-todo-app-tutorial-part-two-users</id>
+    <content type="html"><![CDATA[<p>Last week <a href="http://michaelevans.org/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse/">I posted a tutorial</a> on how to create a really basic Android To-do list application using <a href="http://www.parse.com">Parse</a>. It allowed a user to create tasks, and then toggle their completion status. Then, this information was synced to a server, so that the tasks will be kept up to date on multiple devices. The biggest issue with this app so far, was that there was no concept of users, so all tasks were shared among everyone. This week, we&rsquo;re going to introduce two new screens (which are very similar to one another), the registration and login screens.</p>
+
+<!-- more -->
+
+
+<h3>The Setup</h3>
+
+<p>The first thing we&rsquo;re have to do is two create two new activities, as I mentioned before. I called these <code>LoginActivity</code> and <code>RegisterActivity</code>. For simplicity sake, I&rsquo;ll assume that you used the New Activity Wizard, like we did last week to create the TodoActivity. You can also try the &ldquo;LoginActivity&rdquo; template from the wizard, but we&rsquo;ll skip that for this tutorial.</p>
+
+<h3>Let&rsquo;s Code</h3>
+
+<p>Once you have both those activities set up, let&rsquo;s fill up their layouts. We need to add the following items to these layouts: two <code>EditText</code> fields for a username and password, two <code>TextViews</code> to be the labels for these inputs, and two <code>Buttons</code>, one to sign in/sign up, and one to switch from the sign up to sign in screen and vice versa.</p>
+
+<p>Here&rsquo;s what my registration layout looks like:</p>
+
+<p>``` xml
+&lt;LinearLayout xmlns:android=&ldquo;<a href="http://schemas.android.com/apk/res/android">http://schemas.android.com/apk/res/android</a>&rdquo;</p>
+
+<pre><code>xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+android:paddingBottom="@dimen/activity_vertical_margin"
+android:paddingLeft="@dimen/activity_horizontal_margin"
+android:paddingRight="@dimen/activity_horizontal_margin"
+android:paddingTop="@dimen/activity_vertical_margin"
+tools:context=".RegisterActivity" &gt;
+
+&lt;LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:gravity="center_vertical"
+    android:orientation="vertical" &gt;
+
+    &lt;TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/username" /&gt;
+
+    &lt;EditText
+        android:id="@+id/register_username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="text" &gt;
+
+        &lt;requestFocus /&gt;
+    &lt;/EditText&gt;
+
+    &lt;TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Password:" /&gt;
+
+    &lt;EditText
+        android:id="@+id/register_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPassword" /&gt;
+
+    &lt;Button
+        android:id="@+id/sign_up"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:onClick="register"
+        android:text="Sign Up" /&gt;
+&lt;/LinearLayout&gt;
+
+&lt;Button
+    android:id="@+id/signInButton"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textSize="17sp"
+    android:onClick="showLogin"
+    android:text="Already Have An Account? Log In!" /&gt;
+</code></pre>
+
+<p></LinearLayout>
+```</p>
+
+<p>The login screen is very similar to that of the registration screen, with the same widgets in the same places, just different ids and labels, so we&rsquo;re just going to go over the registration screen in this tutorial and leave the login screen up as an exercise to the reader. (The code will be available on <a href="https://github.com/MichaelEvans/Parse-Android-Todo">Github</a> if you get stuck). We&rsquo;re going to want to implement that <code>register</code> function in our RegisterActivity, so let&rsquo;s do that next.</p>
+
+<p><img class="center" src="/images/2013/08/20/login.png" width="300" height="500" title="Logging In" ></p>
+
+<p>After declaring and binding variables to the two <code>EditText</code> fields (we&rsquo;ll call those <code>mUsernameField</code> and <code>mPasswordField</code>), we create our register function:</p>
+
+<p>``` java
+public void register(final View v){</p>
+
+<pre><code>if(mUsernameField.getText().length() == 0 || mPasswordField.getText().length() == 0)
+    return;
+
+v.setEnabled(false);
+ParseUser user = new ParseUser();
+user.setUsername(mUsernameField.getText().toString());
+user.setPassword(mPasswordField.getText().toString());
+
+user.signUpInBackground(new SignUpCallback() {
+    @Override
+    public void done(ParseException e) {
+        if (e == null) {
+            Intent intent = new Intent(RegisterActivity.this, TodoActivity.class);
+            startActivity(intent);
+            finish();
+        } else {
+            // Sign up didn't succeed. Look at the ParseException
+            // to figure out what went wrong
+            v.setEnabled(true);
+        }
+    }
+});
+</code></pre>
+
+<p>```</p>
+
+<p><img class="center" src="/images/2013/08/20/registering.png" width="300" height="500" title="Registering" ></p>
+
+<p>What' were doing here is a) bailing out early if the user fails to fill in one of the fields, b) disabling the button while the network request is running, so the user can&rsquo;t try to register multiple times by accident, c) creating a ParseUser object with the username and password from the <code>EditText</code> fields, and then calling <code>signUpInBackground</code>, with a callback which is run when the request is complete. If there is an error for any reason, we re-enable the registration button, so that the user can fix any issues and resubmit. (We&rsquo;ll get to error handling a little later.) If there isn&rsquo;t an error, we start the TodoActivity that we <a href="http://michaelevans.org/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse/">created last week</a>.</p>
+
+<p>Huzzah! If you sign up, you now see a users table in your Parse console!</p>
+
+<p><img class="center" src="/images/2013/08/20/users.png" width="800" height="800" title="Users Console" ></p>
+
+<h3>Making Things Belong</h3>
+
+<p>Now we need to make some changes to the TodoActivity. The first thing we need to do is make the query that fetches the data only return Tasks where the user is the same as the logged in user. We can do that by adding the following line that will modify our ParseQuery:
+<code>java
+query.whereEqualTo("user", ParseUser.getCurrentUser());
+</code></p>
+
+<p>We also need to make the Tasks belong to a user where they are created, which we can do by adding the following two statements when we are creating our new Tasks (we&rsquo;re also going to add the setters and getter for the user object on the Task model):</p>
+
+<p><code>java
+t.setACL(new ParseACL(ParseUser.getCurrentUser()));
+t.setUser(ParseUser.getCurrentUser());
+</code></p>
+
+<p>These lines will make the Task only read/writeable by the owner, and set the user associated with them to the current user. Take a peek in your Parse console, and you&rsquo;ll see the Tasks now have an owner!</p>
+
+<p><img class="center" src="/images/2013/08/20/tasks.png" width="800" height="800" title="Tasks now belong!" ></p>
+
+<p>We also want to make it possible for a user to log out. We&rsquo;ll do this by providing an option in the action bar settings menu. We can do this by adding an entry in the <code>res/menu/todo.xml</code> file like the following:</p>
+
+<p>``` xml
+&lt;item</p>
+
+<pre><code>android:id="@+id/action_logout"
+android:orderInCategory="100"
+android:showAsAction="never"
+android:title="@string/action_logout"/&gt;
+</code></pre>
+
+<p>```</p>
+
+<p>Then all we need to do is wire up this action bar item. When options items are selected, there&rsquo;s a method that will be called in your activity named <code>onOptionsItemSelected</code>. We&rsquo;ll just fill this function out like this:</p>
+
+<p>``` java
+public boolean onOptionsItemSelected(MenuItem item) {</p>
+
+<pre><code>switch (item.getItemId()) {
+case R.id.action_logout: 
+    ParseUser.logOut();
+    Intent intent = new Intent(this, LoginActivity.class);
+    startActivity(intent);
+    finish();
+    return true; 
+} 
+return false; 
+</code></pre>
+
+<p>}
+<code>``
+If the user selects the logout option, call the</code>logout()` method, and then send them back to the login screen.</p>
+
+<p>The last thing we need to do in the TodoActivity is prevent a user from accessing this class while no one is logged in. We can do that back up in the <code>onCreate</code> method:</p>
+
+<p>``` java
+ParseUser currentUser = ParseUser.getCurrentUser();
+if(currentUser == null){</p>
+
+<pre><code>Intent intent = new Intent(this, LoginActivity.class);
+startActivity(intent);
+finish();
+</code></pre>
+
+<p>}
+```</p>
+
+<p>If there is no user currenty logged in, stop the TodoActivity, and forward us to the LoginActivity.</p>
+
+<h3>Error Handling</h3>
+
+<p>As I alluded to before, we&rsquo;re also going to want to add error handling. This way, if the user puts in bad credentials, or they try to register a username that&rsquo;s already taken, they&rsquo;ll get an informative error message. Let&rsquo;s do this by adding a <code>TextView</code> in our layout to display the message: (You&rsquo;ll also want to add a <code>colors.xml</code> file that will declare what <code>@color/red</code> is.)</p>
+
+<p>``` xml
+&lt;TextView</p>
+
+<pre><code>android:id="@+id/error_messages"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:layout_gravity="center_horizontal"
+android:textColor="@color/red"
+android:textAppearance="?android:attr/textAppearanceMedium" /&gt;
+</code></pre>
+
+<p>```</p>
+
+<p>Then we&rsquo;ll bind a variable to that view, and add the following error handling to the else statement from our <code>signUpInBackground</code> call:</p>
+
+<p>``` java
+switch(e.getCode()){
+case ParseException.USERNAME_TAKEN:</p>
+
+<pre><code>mErrorField.setText("Sorry, this username has already been taken.");
+break;
+</code></pre>
+
+<p>case ParseException.USERNAME_MISSING:</p>
+
+<pre><code>mErrorField.setText("Sorry, you must supply a username to register.");
+break;
+</code></pre>
+
+<p>case ParseException.PASSWORD_MISSING:</p>
+
+<pre><code>mErrorField.setText("Sorry, you must supply a password to register.");
+break;
+</code></pre>
+
+<p>default:</p>
+
+<pre><code>mErrorField.setText(e.getLocalizedMessage());
+</code></pre>
+
+<p>}
+v.setEnabled(true);
+```</p>
+
+<p>This will set some nice messages that will explain what the error is, or fall back to the message that Parse sends us, if it&rsquo;s some other type of problem.</p>
+
+<p><img class="center" src="/images/2013/08/20/error_handling.png" width="300" height="500" title="Pretty Error Handling" ></p>
+
+<h3>Possibilities for Next Time</h3>
+
+<p>Next time we can take a look at adding some delete functionality, or maybe tabs for looking over completed/incomplete tasks. Another possiblity is adding social sign in, using Twitter and Facebook. Other suggestions are welcome!</p>
+
+<p><strong>You can find the source on Github <a href="https://github.com/MichaelEvans/Parse-Android-Todo">here</a>.</strong></p>
+
+<hr />
+
+<p>Like this post? Questions, concerns or mistakes? Any other Android tutorials you&rsquo;d like to hear about? Let me know on <a href="https://twitter.com/m_evans10">Twitter</a> or <a href="https://plus.google.com/114052868601022948953/posts">Google Plus</a>, or leave a comment below.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Tutorial: Building an Android To-Do List app using Parse]]></title>
+    <link href="http://michaelevans.org/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse/"/>
+    <updated>2013-08-14T22:08:00-04:00</updated>
+    <id>http://michaelevans.org/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse</id>
+    <content type="html"><![CDATA[<p>For a while now I&rsquo;ve been using <a href="http://www.parse.com">Parse</a> for small apps, it allows you to iterate quickly and create a backend for an app without too much work. It also seems like a perfect jumping off point for a series of Android tutorials, where we&rsquo;ll be building a &ldquo;Todo List&rdquo; application. (This tutorial assumes that you have <a href="http://developer.android.com/tools/sdk/eclipse-adt.html">Eclipse and the ADT</a> installed already.)</p>
+
+<!-- more -->
+
+
+<h2>The Setup</h2>
+
+<p>First thing you&rsquo;ll want to do is sign up for Parse, and create a new Application. I called mine &ldquo;Todo&rdquo; here, but you can call it anything you&rsquo;d like. After you pick a name, you&rsquo;ll be presented a screen like the following, which contains your API keys. Do not lose these, this is how your app will connect to the Parse services. (I have removed my keys in the screenshot below.)</p>
+
+<p><img class="center" src="/images/2013/08/14/parse_keys.png" width="300" height="500" title="Parse Keys" ></p>
+
+<p>Next, you&rsquo;ll want to download the Parse libraries from <a href="https://parse.com/downloads/android/Parse/latest">here</a>.</p>
+
+<p>Back in Eclipse, open the New Project Wizard and create a new Android application. I set the minimum SDK version to Honeycomb in the screenshot below, but feel free to pick something newer if you&rsquo;d like.</p>
+
+<p><img class="center" src="/images/2013/08/14/android_wizard.png" width="500" height="500" title="Android New Project Wizard" ></p>
+
+<p>You&rsquo;ll then be taken to a screen to create your starting activity. Choose Blank Activity, and feel free to name it whatever you like.</p>
+
+<p><img class="center" src="/images/2013/08/14/android_wizard_3.png" width="500" height="500" title="Android New Project Wizard" ></p>
+
+<p>After you complete the wizard, you&rsquo;ll have a new project in your workspace. Copy the Parse jar file that you downloaded before to the <code>libs/</code> directory, and you&rsquo;ll be all set to begin coding.</p>
+
+<h2>Let&rsquo;s Code</h2>
+
+<h3>Parse Setup</h3>
+
+<p>First thing we&rsquo;ll add is the code to set up Parse. In the onCreate method of your Activity, add the following (remember to replace APP_ID and CLIENT_ID with the keys you got from Parse earlier):
+``` java
+Parse.initialize(this, &ldquo;APP_ID&rdquo;, &ldquo;CLIENT_ID&rdquo;);
+ParseAnalytics.trackAppOpened(getIntent());</p>
+
+<p>```</p>
+
+<p>That second line is optional, but it adds analytics tracking to your app, which is a nice feature to get for free. In addition to that initializer code, we&rsquo;ll need to add get some permissions for our app. Add the following two permissions to your AndroidManifest.xml file, above the <code>&lt;application&gt;</code> tag:
+<code>
+&lt;uses-permission android:name="android.permission.INTERNET" /&gt;
+&lt;uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /&gt;
+</code></p>
+
+<h3>Data Model</h3>
+
+<p>Now we&rsquo;re able to interact with Parse using the included library. The next thing we&rsquo;ll want to do is to declare a Task model. This object will represent an individual Task Object in Parse&rsquo;s datastore. Create a new class named Task.java, and fill it out like the following:</p>
+
+<p>``` java Task.java
+import com.parse.ParseClassName;
+import com.parse.ParseObject;</p>
+
+<p>@ParseClassName(&ldquo;Task&rdquo;)
+public class Task extends ParseObject{</p>
+
+<pre><code>public Task(){
+
+}
+
+public boolean isCompleted(){
+    return getBoolean("completed");
+}
+
+public void setCompleted(boolean complete){
+    put("completed", complete);
+}
+
+public String getDescription(){
+    return getString("description");
+}
+
+public void setDescription(String description){
+    put("description", description);
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<p>The annotation tells Parse what &ldquo;table&rdquo; that our object corresponds with, and then we are providing methods to get and set two properties: a description, and a completed status. In addition to those, Parse will give us created_at and updated_at fields for free.</p>
+
+<p>Now that we&rsquo;ve declared our model, we need to register this class with our activity. Below the initialization code, add a line like this:
+<code>java
+ParseObject.registerSubclass(Task.class)
+</code></p>
+
+<h3>The Layout</h3>
+
+<p>This tells Parse to use the annotation that we declared at the top of the model. The next thing we want to do is set up the layout for our activity. This XML file will represent the UI of our application. Open up the todo_activity.xml file, and replace the contents with this:
+``` xml
+&lt;LinearLayout xmlns:android=&ldquo;<a href="http://schemas.android.com/apk/res/android">http://schemas.android.com/apk/res/android</a>&rdquo;</p>
+
+<pre><code>xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+android:paddingLeft="@dimen/activity_horizontal_margin"
+android:paddingRight="@dimen/activity_horizontal_margin"
+tools:context=".TodoActivity" &gt;
+
+&lt;LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" &gt;
+
+    &lt;EditText
+        android:id="@+id/task_input"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ems="10"
+        android:inputType="text" 
+        android:hint="Enter a Task"&gt;
+        &lt;requestFocus /&gt;
+    &lt;/EditText&gt;
+
+    &lt;Button
+        android:id="@+id/submit_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="createTask"
+        android:text="Submit" /&gt;
+&lt;/LinearLayout&gt;
+
+&lt;ListView
+    android:id="@+id/task_list"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" /&gt;
+</code></pre>
+
+<p></LinearLayout>
+```</p>
+
+<p>Here we are declaring a layout that contains an input field and a button (for creating new tasks), as well as a ListView for showing the existing tasks. If you run what we&rsquo;ve done so far, you should end up with an application on your device that looks like this:</p>
+
+<p><img class="center" src="/images/2013/08/14/step1.png" width="300" height="500" title="First Run" ></p>
+
+<p>You can type in the input box, but if you hit the submit button, you&rsquo;ll notice the app will crash. Why&rsquo;s that? Because we said in our XML that the button will perform the <code>createTask</code> method when you click on it, but we never declared that method in our activity. Let&rsquo;s do that now.</p>
+
+<p>In your onCreate method, let&rsquo;s get a reference to the EditText and ListView, since we&rsquo;ll be using these later. You can do that by declaring using the <code>findViewById()</code> method. We&rsquo;ll save the results of these calls as private variables. For example:
+<code>java
+mTaskInput = (EditText) findViewById(R.id.task_input);
+mListView = (ListView) findViewById(R.id.task_list);
+</code></p>
+
+<p>Then we can create the createTask method:
+``` java
+public void createTask(View v) {</p>
+
+<pre><code>    if (mTaskInput.getText().length() &gt; 0){
+        Task t = new Task();
+        t.setDescription(mTaskInput.getText().toString());
+        t.setCompleted(false);
+        t.saveEventually();
+        mTaskInput.setText("");
+    }
+} 
+</code></pre>
+
+<p>```</p>
+
+<p>What we are doing here is checking to see if the input has anything in it (don&rsquo;t want to create a task without a description), creating a new Task object, setting its fields, and then calling <code>saveEventually()</code>. This is a convenience method from Parse, that will queue this object to be saved. That way, if the user doesn&rsquo;t have a network connection, the task will be uploaded later when they are back online. Finally, we empty out the input field so that it&rsquo;s ready for another task.</p>
+
+<p>Now if you type in a task and hit save, the input field will be blank, but if you go to your Parse Console, you&rsquo;ll see the data in the data browser:</p>
+
+<p><img class="center" src="/images/2013/08/14/parse_console.png" width="800" height="800" title="Parse Console" ></p>
+
+<p>Now let&rsquo;s set up the app to fetch the Tasks from Parse.</p>
+
+<h3>Querying</h3>
+
+<p>First let&rsquo;s set up a TaskAdapter. An adapter is what you add to a ListView to decide what kind of behavior the list will have (layout of each row, etc.) Create a new class called TaskAdapter that extends from ArrayAdapter like the following:</p>
+
+<p>``` java
+import java.util.List;</p>
+
+<p>import android.content.Context;
+import android.graphics.Paint;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.TextView;</p>
+
+<p>public class TaskAdapter extends ArrayAdapter<Task> {</p>
+
+<pre><code>private Context mContext;
+private List&lt;Task&gt; mTasks;
+
+public TaskAdapter(Context context, List&lt;Task&gt; objects) {
+    super(context, R.layout.task_row_item, objects);
+    this.mContext = context;
+    this.mTasks = objects;
+}
+
+public View getView(int position, View convertView, ViewGroup parent){
+    if(convertView == null){
+        LayoutInflater mLayoutInflater = LayoutInflater.from(mContext);
+        convertView = mLayoutInflater.inflate(R.layout.task_row_item, null);
+    }
+
+    Task task = mTasks.get(position);
+
+    TextView descriptionView = (TextView) convertView.findViewById(R.id.task_description);
+
+    descriptionView.setText(task.getDescription());
+
+    if(task.isCompleted()){
+        descriptionView.setPaintFlags(descriptionView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+    }else{
+        descriptionView.setPaintFlags(descriptionView.getPaintFlags() &amp; (~Paint.STRIKE_THRU_TEXT_FLAG));
+    }
+
+    return convertView;
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<p>This class will take an array of Tasks, and for each row in the ListView, set a TextView with the id <code>task_description</code> to the description value, and set a paint flag for Strikethrough if the task is completed. You&rsquo;ll also notice that this class inflates a layout called <code>task_row_item</code>, which we can create now.</p>
+
+<p>In the <code>res/layouts/</code> folder, create a file called &lsquo;task_row_item.xml&rsquo;, and fill it with the following content:
+``` xml
+&lt;?xml version=&ldquo;1.0&rdquo; encoding=&ldquo;utf-8&rdquo;?>
+&lt;LinearLayout xmlns:android=&ldquo;<a href="http://schemas.android.com/apk/res/android">http://schemas.android.com/apk/res/android</a>&rdquo;</p>
+
+<pre><code>android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:paddingTop="@dimen/activity_vertical_margin"
+android:paddingBottom="@dimen/activity_vertical_margin"
+android:orientation="horizontal" &gt;
+
+&lt;TextView
+    android:id="@+id/task_description"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_vertical"
+    android:layout_weight="1"
+    android:textAppearance="?android:attr/textAppearanceMedium" /&gt;
+</code></pre>
+
+<p></LinearLayout>
+```</p>
+
+<p>This is just a basic TextView which will hold the description of the item. Now that we have the adapter set up, let&rsquo;s create one and apply it to our ListView. Back in the onCreate method of our Activity, create an instance of our TaskAdapter, and set its initial contents to a new ArrayList of Tasks, and then set the adapter of our ListView to this adapter.
+<code>java
+mAdapter = new TaskAdapter(this, new ArrayList&lt;Task&gt;());
+mListView.setAdapter(mAdapter);
+</code></p>
+
+<p>You&rsquo;ll notice that nothing happens if you run the application again, since we didn&rsquo;t yet fetch any data from Parse. Create a new method called <code>updateData()</code> and put in the following code: (be sure to make a call to this method at the end of <code>onCreate()</code>)
+``` java
+public void updateData(){</p>
+
+<pre><code>ParseQuery&lt;Task&gt; query = ParseQuery.getQuery(Task.class);
+query.findInBackground(new FindCallback&lt;Task&gt;() {
+
+    @Override
+    public void done(List&lt;Task&gt; tasks, ParseException error) {
+        if(tasks != null){
+            mAdapter.clear();
+            mAdapter.addAll(tasks);
+        }
+    }
+});
+</code></pre>
+
+<p>}
+```</p>
+
+<p>This will query Parse for all the Task objects, and return a list of them. Then we will clear the existing set of Tasks from our adapter, and replace the existing list with those. Now if you run the app, you&rsquo;ll be greeted with something like the following:</p>
+
+<p><img class="center" src="/images/2013/08/14/step2.png" width="300" height="500" title="Step 2" ></p>
+
+<p>Let&rsquo;s also add this to our <code>createTask()</code> method, to insert the Task we just created at the top of the list:
+<code>java
+mAdapter.insert(t, 0);
+</code></p>
+
+<p>This will provide the user with an immediate hint of what happened, rather than uploading it, and waiting to resync the data or something.</p>
+
+<p>Now we&rsquo;re starting to have a functional app! Let&rsquo;s add one more feature though. When you tap on a ListView row, the &ldquo;completed&rdquo; status of the task should toggle.</p>
+
+<h3>Let&rsquo;s Toggle!</h3>
+
+<p>Let&rsquo;s register an OnItemClickListener for our class, so that we&rsquo;ll get a callback whenever a list item is clicked. We can do that with a call to
+<code>java
+mListView.setOnItemClickListener(this);
+</code></p>
+
+<p>Then we just make our Activity implement the <code>OnItemClickListener</code> interface, and override the <code>onItemClick</code> method. We can use some code like this:
+``` java
+@Override
+public void onItemClick(AdapterView&lt;?> parent, View view, int position, long id) {</p>
+
+<pre><code>Task task = mAdapter.getItem(position);
+TextView taskDescription = (TextView) view.findViewById(R.id.task_description);
+
+task.setCompleted(!task.isCompleted());
+
+if(task.isCompleted()){
+    taskDescription.setPaintFlags(taskDescription.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+}else{
+    taskDescription.setPaintFlags(taskDescription.getPaintFlags() &amp; (~Paint.STRIKE_THRU_TEXT_FLAG));
+}
+
+task.saveEventually();
+</code></pre>
+
+<p>}
+```</p>
+
+<p>This will toggle the completion status of the clicked item, and then update the strikethrough, just as we did in the ArrayAdapter before. Then we&rsquo;ll make another call to <code>saveEventually()</code>, to update that task on Parse&rsquo;s servers, when a network connection is available.</p>
+
+<p>That&rsquo;s it! Now you should be able to launch the application, and create, complete and un-complete tasks as you wish!</p>
+
+<p><img class="center" src="/images/2013/08/14/step3.png" width="300" height="500" title="Step 2" ></p>
+
+<h2>Optimizations/Improvements</h2>
+
+<p>Let&rsquo;s make some quick improvements to the app. First, let&rsquo;s extract the hardcoded strings in our layout to a strings.xml file, so that we can support other languages. Change the text in the <code>android:text=</code> attributes to something like <code>@string/submit_text</code>, and create a <code>strings.xml</code> file in <code>res/values</code> where these strings will live. This allows you to create other values folders for quick localization.</p>
+
+<p>The other optimization that we&rsquo;ll make is regarding the caching. You&rsquo;ll notice that if you leave the application and come back, you&rsquo;re left with a blank white screen while the Tasks are loaded from Parse. This is a bit ugly, and leaves a bad user experience. We can mitigate that by adding caching, where the results of our query will be saved locally so that we have results instantly, and then we can request the updated tasks from the network. With Parse, this is dead simple. Add the following snippet to your <code>query</code> object before you do a findInBackground:
+<code>java
+query.setCachePolicy(CachePolicy.CACHE_THEN_NETWORK);
+</code>
+Now when you load up the app, you&rsquo;ll see the tasks from last time in the list, while the network is being queried.</p>
+
+<h2>Possibilities for Next Time</h2>
+
+<p>Next time we can take a look at adding multi-user support (so that not everyone shares a task list), and possibly some fancier UI, like a swipe-to-remove feature. Feel free to make other suggestions of things you&rsquo;d like to see!</p>
+
+<p><strong>You can download the APK for this tutorial <a href="https://app.box.com/s/e79stk16p1b92w937e6q">here</a>, and find the source on Github <a href="https://github.com/MichaelEvans/Parse-Android-Todo">here</a>.</strong></p>
+
+<hr />
+
+<p>Like this post? Questions, concerns or mistakes? Any other Android tutorials you&rsquo;d like to hear about? Let me know on <a href="https://twitter.com/m_evans10">Twitter</a> or <a href="https://plus.google.com/114052868601022948953/posts">Google Plus</a>, or leave a comment below.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Getting Mavericks' Compressed Memory Feature in Ubuntu]]></title>
+    <link href="http://michaelevans.org/blog/2013/06/12/getting-mavericks-compressed-memory-feature-in-ubuntu/"/>
+    <updated>2013-06-12T00:16:00-04:00</updated>
+    <id>http://michaelevans.org/blog/2013/06/12/getting-mavericks-compressed-memory-feature-in-ubuntu</id>
+    <content type="html"><![CDATA[<p>On Monday, Apple announced a new update for it&rsquo;s desktop operating system, which will be named OS X Mavericks. As part of the annoucement, they touched on a few performance related features, including a new power saving API, which was called App Nap, as well as a memory compression feature, which would allow compress the memory of programs that are not currently active.</p>
+
+<p>According to <a href="http://arstechnica.com/apple/2013/06/how-os-x-mavericks-works-its-power-saving-magic/">Ars Technica</a>, Apple is using a technique called Timer Coalescing to create App Nap. Apps that are not active will have their processes set to a lower priority, and therefore use less CPU/disk/etc, and thereby save power. This feature has been around on Linux for a long time, and apparently has been part of Windows as well.</p>
+
+<p>I had not heard, however, of this compressed memory technique, although apparently it had been done many years ago by a program called &ldquo;RamDoubler&rdquo;. After some quick Googling, it seems that this is available via a kernel module called &ldquo;zram&rdquo;.</p>
+
+<!-- more -->
+
+
+<p>Wanna try it out? If you&rsquo;re running Precise or newer (12.04 or later), you&rsquo;re in luck. Just apt-get zram with</p>
+
+<p><code>
+sudo apt-get install zram-config
+</code></p>
+
+<p>and you&rsquo;re all set.</p>
+
+<p>To see the effects of zram, just run <code>free -m</code> and you&rsquo;ll notice an increase in memory/swap space. I haven&rsquo;t thoroughly tested to see the performance gains, but it&rsquo;s interesting to see that some of the new OS X features are already available elsewhere.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Clickable Links in Android ListViews]]></title>
+    <link href="http://michaelevans.org/blog/2013/03/29/clickable-links-in-android-listviews/"/>
+    <updated>2013-03-29T00:14:00-04:00</updated>
+    <id>http://michaelevans.org/blog/2013/03/29/clickable-links-in-android-listviews</id>
+    <content type="html"><![CDATA[<p>As part of my newest app (<a href="https://play.google.com/store/apps/details?id=com.evans.hackernews">Hacker News for Android</a>), I needed to add the ability to click on links in a ListView, and have them open in the browser, while maintaining the ability for the user to click on the ListView row itself, and have the row listen to the click.</p>
+
+<p>If you try using <code>Linkify</code> and <code>LinkMovementMethod</code>, which you&rsquo;d use on normal links in a TextView, you&rsquo;ll find that you can no longer use the ListView properly.</p>
+
+<!-- more -->
+
+
+<p>The solution I&rsquo;m using is slightly modified from this answer on StackOverflow <a href="http://stackoverflow.com/a/7327332/458603">here</a>.</p>
+
+<p>``` java LinkifiedTextView.java
+import android.content.Context;
+import android.text.Layout;
+import android.text.Selection;
+import android.text.Spannable;
+import android.text.Spanned;
+import android.text.style.ClickableSpan;
+import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.widget.TextView;</p>
+
+<p>public class LinkifiedTextView extends TextView {</p>
+
+<pre><code>public LinkifiedTextView(Context context, AttributeSet attrs) {
+    super(context, attrs);
+}
+
+@Override
+public boolean onTouchEvent(MotionEvent event) {
+    TextView widget = (TextView) this;
+    Object text = widget.getText();
+    if (text instanceof Spanned) {
+        Spannable buffer = (Spannable) text;
+
+        int action = event.getAction();
+
+        if (action == MotionEvent.ACTION_UP
+                || action == MotionEvent.ACTION_DOWN) {
+            int x = (int) event.getX();
+            int y = (int) event.getY();
+
+            x -= widget.getTotalPaddingLeft();
+            y -= widget.getTotalPaddingTop();
+
+            x += widget.getScrollX();
+            y += widget.getScrollY();
+
+            Layout layout = widget.getLayout();
+            int line = layout.getLineForVertical(y);
+            int off = layout.getOffsetForHorizontal(line, x);
+
+            ClickableSpan[] link = buffer.getSpans(off, off,
+                    ClickableSpan.class);
+
+            if (link.length != 0) {
+                if (action == MotionEvent.ACTION_UP) {
+                    link[0].onClick(widget);
+                } else if (action == MotionEvent.ACTION_DOWN) {
+                    Selection.setSelection(buffer,
+                            buffer.getSpanStart(link[0]),
+                            buffer.getSpanEnd(link[0]));
+                }
+                return true;
+            }
+        }
+
+    }
+
+    return false;
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Just drop this in as a replacement for your normal TextView, and you&rsquo;ll have the clicks on links in your text intercepted. Hope this helps a fellow developer!</p>
+
+<hr />
+
+<p>Like this post? Any other Android tips you&rsquo;d like to hear about? Let me know on <a href="https://twitter.com/m_evans10">Twitter</a> or <a href="https://plus.google.com/114052868601022948953/posts">Google Plus</a>, or leave a comment.</p>
+]]></content>
+  </entry>
+  
+</feed>

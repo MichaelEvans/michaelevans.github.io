@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Android | Gadget Habit]]></title>
+  <link href="http://michaelevans.org/blog/categories/android/atom.xml" rel="self"/>
+  <link href="http://michaelevans.org/"/>
+  <updated>2015-08-07T09:41:26-04:00</updated>
+  <id>http://michaelevans.org/</id>
+  <author>
+    <name><![CDATA[Michael Evans]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Using Espresso for Easy UI Testing]]></title>
+    <link href="http://michaelevans.org/blog/2015/08/03/using-espresso-for-easy-ui-testing/"/>
+    <updated>2015-08-03T22:16:49-04:00</updated>
+    <id>http://michaelevans.org/blog/2015/08/03/using-espresso-for-easy-ui-testing</id>
+    <content type="html"><![CDATA[<p>One thing that I notice when I talk to Android developers is that a lot of them don&rsquo;t put an emphasis on testing. They say that it&rsquo;s too hard to write them or that they are too hard to integrate and set up, or give a bunch of other reasons why they don&rsquo;t. But it&rsquo;s actually pretty simple to write <a href="https://code.google.com/p/android-test-kit/wiki/Espresso">Espresso</a> tests, and they really aren&rsquo;t that hard to integrate with your code base.</p>
+
+<!-- more -->
+
+
+<h2>Easy to write</h2>
+
+<p>Espresso tests are dead simple to write. They come in three parts.</p>
+
+<ol>
+<li>ViewMatchers &ndash; something to find the view to act upon/assert something about</li>
+<li>ViewActions &ndash; something to perform an action (type text, click a button)</li>
+<li>ViewAssertions &ndash; something to verify what you expect</li>
+</ol>
+
+
+<p>For example, the following test would type the name &ldquo;Steve&rdquo; into an EditText with the id <code>name_field</code>, click a Button with the id <code>greet_button</code> and then verify that the text &ldquo;Hello Steve!&rdquo; appears on the screen:</p>
+
+<p><code>java
+@Test
+public void testSayHello() {
+  onView(withId(R.id.name_field)).perform(typeText("Steve"));
+  onView(withId(R.id.greet_button)).perform(click());
+  onView(withText("Hello Steve!")).check(matches(isDisplayed()));
+}
+</code></p>
+
+<p>Seems simple enough right? But what about when other threads are involved?</p>
+
+<h2>Integration</h2>
+
+<p>From the Espresso documentation:</p>
+
+<p><blockquote><p>The centerpiece of Espresso is its ability to seamlessly synchronize all test operations with the application under test. By default, Espresso waits for UI events in the current message queue to process and default AsyncTasks* to complete before it moves on to the next test operation. This should address the majority of application/test synchronization in your application.&ldquo;</p></blockquote></p>
+
+<p>But if you&rsquo;re like me, you&rsquo;re not writing AsyncTasks to handle your background operations. My go-to tool for making HTTP requests (probably one of the most common uses of AsyncTask) is <a href="http://square.github.io/retrofit/">Retrofit</a>. So what can we do? Espresso has an API called <code>registerIdlingResource</code>, which allows you to synchronize your custom logic with Espresso.</p>
+
+<p>With this knowledge, one way you might approach this is to implement a mock version of your Retrofit interface, and then use something like this:</p>
+
+<p>```java
+public class MockApiService implements ApiService, IdlingResource {</p>
+
+<pre><code>private final ApiService api;
+private final AtomicInteger counter;
+private final List&lt;ResourceCallback&gt; callbacks;
+
+public MockApiService(ApiService api) {
+    this.api = api;
+    this.callbacks = new ArrayList&lt;&gt;(); 
+    this.counter = new AtomicInteger(0);
+}
+
+@Override
+public Response doWork() {
+    counter.incrementAndGet();
+    return decrementAndNotify(api.doWork());
+}
+
+@Override
+public String getName() {
+    return this.getClass().getName();
+}
+
+@Override
+public boolean isIdleNow() {
+    return counter.get() == 0;
+}
+
+@Override
+public void registerIdleTransitionCallback(ResourceCallback resourceCallback) {
+    callbacks.add(resourceCallback);
+}
+
+private &lt;T&gt; T decrementAndNotify(T data) {
+    counter.decrementAndGet();
+    notifyIdle();
+    return data;
+}
+
+private void notifyIdle() {
+    if (counter.get() == 0) {
+        for (ResourceCallback cb : callbacks) {
+            cb.onTransitionToIdle();
+        }
+    }
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<p>This tells Espresso that your app is idle after the methods are called. But you should immediately see the problem here &ndash; you&rsquo;ll end up writing a TON of boilerplate. As you have more methods in your interface, and lot of repeated increment and decrement code&hellip;there must be a better way. (There is!)</p>
+
+<p>The &ldquo;trick&rdquo; lies right in the selling point in the Espresso documentation, &ldquo;Espresso waits for UI events&hellip; and default <em><strong>AsyncTasks</strong></em> to complete&rdquo;. If we could somehow execute our Retrofit requests on the AsyncTasks' ThreadPoolExecutor, we&rsquo;d get sychronization for free!</p>
+
+<p>Fortunately, Retrofit&rsquo;s <code>RestAdapter.Builder</code> class has just such a method!</p>
+
+<p><code>java
+new RestAdapter.Builder()
+   .setExecutors(AsyncTask.THREAD_POOL_EXECUTOR, new MainThreadExecutor())
+   .build();
+</code></p>
+
+<p>And it&rsquo;s that simple &ndash; Now you have no excuse not to write some Espresso tests!</p>
+
+<h4>More Resources</h4>
+
+<ul>
+<li><a href="https://code.google.com/p/android-test-kit/wiki/EspressoV2CheatSheet">The Espresso V2 Cheatsheet</a></li>
+<li><a href="http://blog.sqisland.com/2015/04/espresso-custom-idling-resource.html">Read more about writing custom idling resources</a></li>
+</ul>
+
+
+<p>Thanks to <a href="https://twitter.com/queencodemonkey">Huyen Tue Dao</a> for editing this post!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Improving your code with Android Support Annotations]]></title>
+    <link href="http://michaelevans.org/blog/2015/07/14/improving-your-code-with-android-support-annotations/"/>
+    <updated>2015-07-14T22:46:56-04:00</updated>
+    <id>http://michaelevans.org/blog/2015/07/14/improving-your-code-with-android-support-annotations</id>
+    <content type="html"><![CDATA[<p>If you haven&rsquo;t heard of the Android Support Annotations library yet, you&rsquo;re missing out on a neat new package that will help you catch bugs in your apps. Included in the library is a number of Java annotations, that will help Android Studio check your code for possible errors and report them to you. There are quite a few of them, so I only plan to go over a few of them here, but you should definitely <a href="http://tools.android.com/tech-docs/support-annotations">check out the docs</a> for more info about the rest.</p>
+
+<h2>@NonNull / @Nullable</h2>
+
+<p><code>@NonNull</code> and <code>@Nullable</code> are probably the most basic of the support annotations, but also some of the most helpful! Annotate a parameter or method with either of these to denote if the parameter or method&rsquo;s return value can be null or not, and voila, now Android Studio can give us a nice warning that we&rsquo;re doing something unsafe.</p>
+
+<!-- more -->
+
+
+<p>Turn this:</p>
+
+<p><img class="center" src="/images/2015/07/14/no-annotations.png" width="600" height="300" title="Method with no annotations" ></p>
+
+<p>into this:</p>
+
+<p><img class="center" src="/images/2015/07/14/nonnull.png" width="600" height="250" title="with @NonNull" ></p>
+
+<p>Bonus points: We can even take this example one step further with the <code>@CheckResult</code> annotation, to tell us know that the return type of this method is something that we are expected to use, rather than the method having a side effect.</p>
+
+<p><img class="center" src="/images/2015/07/14/checkreturn.png" width="600" height="300" title="Check that return type!" ></p>
+
+<h2>@StringRes / @DrawableRes / etc.</h2>
+
+<p>Have you ever attempted to call <code>setText</code> on a TextView, and gotten a somewhat mysterious <code>android.content.res.Resources$NotFoundException: String resource ID #0x3039</code> exception? If you pass an integer to setText, TextView assumes it&rsquo;s a String resource id, and will look it up in order to set the text. If only there were a way to denote that integers are not valid ids for this method&hellip;<code>@StringRes</code> to the rescue!</p>
+
+<p>```
+public void setText(@StringRes int id) {</p>
+
+<pre><code>// Do something like getString(id), etc.
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Now if you try to pass a non-String resource id to this method, you get something like this:</p>
+
+<p><img class="center" src="/images/2015/07/14/stringres.png" width="500" height="200" title="Method takes a @StringRes id, not an int" ></p>
+
+<p>(There are resouce annotations for all resoruce types, <code>@DrawableRes</code>, <code>@ColorRes</code>, <code>@InterpolatorRes</code>, etc.)</p>
+
+<h2>@Keep</h2>
+
+<p>Today I discovered a new support annotation <code>@Keep</code>. According to the support annotation docs, this annotation hasn&rsquo;t been hooked up to the Gradle plugin yet<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>, but it will let you annotate methods and classes that should be retained when minimizing the app.</p>
+
+<p>If you&rsquo;ve ever messed around with the cryptic <code>-keep class com.foo.bar { public static &lt;methods&gt; }</code> incantations that you need to use to summon the Proguard Gods, you&rsquo;ll know how painful it is to rip your hair out, while trying to exclude a particular method or class from being optimized away. This handy annotation will tell Proguard to leave the method or class alone &ndash; like so:</p>
+
+<p>```
+public class Example {</p>
+
+<pre><code>@Keep
+public void doSomething() {
+    // hopefully this method does something
+}
+...
+</code></pre>
+
+<p>}
+```</p>
+
+<p>The best part is &ndash; if you&rsquo;re using <code>appcompat-v7</code>, you&rsquo;re already including <code>support-annotations</code>, so just start using them already!</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p><a href="https://android-review.googlesource.com/#/c/152983/">Looks like this is merged</a> into the 1.3 version of the plugin<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Android Ripples with Rounded Corners]]></title>
+    <link href="http://michaelevans.org/blog/2015/05/07/android-ripples-with-rounded-corners/"/>
+    <updated>2015-05-07T22:55:36-04:00</updated>
+    <id>http://michaelevans.org/blog/2015/05/07/android-ripples-with-rounded-corners</id>
+    <content type="html"><![CDATA[<p>So recently I was trying to add a ripple to a view that had rounded corners. Simple enough right? Let&rsquo;s just say I have a FrameLayout with the background similar to this one:</p>
+
+<p>```
+&lt;?xml version=&ldquo;1.0&rdquo; encoding=&ldquo;utf-8&rdquo;?>
+&lt;shape xmlns:android=&ldquo;<a href="http://schemas.android.com/apk/res/android">http://schemas.android.com/apk/res/android</a>&rdquo;</p>
+
+<pre><code>android:shape="rectangle"&gt;
+&lt;solid android:color="@android:color/transparent"/&gt;
+&lt;corners android:radius="15dp" /&gt;
+&lt;stroke
+    android:width="1px"
+    android:color="#000000" /&gt;
+</code></pre>
+
+<p></shape>
+```</p>
+
+<p>It&rsquo;s not quite as simple as setting the foreground to <code>?attr/selectableItemBackground</code>, or else you&rsquo;ll see the ripple surpasses the corners (which doesn&rsquo;t look <em>so</em> bad when your border radius is small, but this would look terrible with a circlular view):</p>
+
+<p><img class="center" src="/images/2015/05/07/before.gif" width="600" height="600" title="Rounded Corner Fail!" ></p>
+
+<p>The solution for this lies in the special mask layer of the <a href="https://developer.android.com/reference/android/graphics/drawable/RippleDrawable.html">RippleDrawable</a>. You specify the mask layer via the <code>android:id</code> value set to <code>@android:id/mask</code>. For the example above, you can set the mask to the same size/shape as the view you&rsquo;re masking, and then the ripple will only show for that area. For something like our example above, you&rsquo;d use something like this:</p>
+
+<p>```
+&lt;?xml version=&ldquo;1.0&rdquo; encoding=&ldquo;utf-8&rdquo;?>
+&lt;ripple xmlns:android=&ldquo;<a href="http://schemas.android.com/apk/res/android">http://schemas.android.com/apk/res/android</a>&rdquo;</p>
+
+<pre><code>android:color="?android:attr/colorControlHighlight"&gt;
+&lt;item android:id="@android:id/mask"&gt;
+    &lt;shape android:shape="rectangle"&gt;
+        &lt;solid android:color="#000000" /&gt;
+        &lt;corners android:radius="15dp" /&gt;
+    &lt;/shape&gt;
+&lt;/item&gt;
+&lt;item android:drawable="@drawable/rounded_corners" /&gt;
+</code></pre>
+
+<p></ripple>
+```</p>
+
+<p>Now when you tap on the view, you&rsquo;ll see something like this:</p>
+
+<p><img class="center" src="/images/2015/05/07/after.gif" width="600" height="600" title="Rounded Corners!" ></p>
+
+<p><em>Huzzah!</em></p>
+
+<p>Another tip: if you don&rsquo;t set a click listener for a FrameLayout (like we used in this example), the pressed state will never be used!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Blurred background effect for Android]]></title>
+    <link href="http://michaelevans.org/blog/2014/07/09/blurred-background-effect-for-android/"/>
+    <updated>2014-07-09T23:04:46-04:00</updated>
+    <id>http://michaelevans.org/blog/2014/07/09/blurred-background-effect-for-android</id>
+    <content type="html"><![CDATA[<p>A few months ago, the Android design team reviewed apps that they thought were good-looking, and were referred to as the &ldquo;<a href="https://play.google.com/store/apps/collection/promotion_3000235_beautiful_apps?hl=en">Beautiful Design Collection</a>&rdquo;, as part of their <a href="https://www.youtube.com/playlist?list=PLWz5rJ2EKKc8j2B95zGMb8muZvrIy-wcF">Android Design in Action</a> series.</p>
+
+<p>One of these apps was <a href="https://play.google.com/store/apps/details?id=com.etsy.android&amp;hl=en">Etsy</a>, which had a very cool fading blur background effect, which you can see here:</p>
+
+<p><img class="center" src="/images/2014/07/09/2014-07-09-23_25_40.gif" width="600" height="600" title="Etsy Example" ></p>
+
+<p>As a learning experiment, I set off to replicate this behavior. I had seen a library by Manuel Peinado called <a href="https://github.com/ManuelPeinado/GlassActionBar">GlassActionBar</a> which demonstrated a similar glass-like blur effect on the ActionBar, so I decided to use that code for blurring my background.</p>
+
+<p>The code itself is pretty interesting, specifically the bit for versions on Jelly Bean or higher. If you&rsquo;re using API version 16 and up, you can use <a href="http://android-developers.blogspot.com/2013/08/renderscript-intrinsics.html">Renderscript Intrinsics</a>, which are a set of built-in functions that require very little code to use, but are optimized for high-performance.</p>
+
+<p>In my sample tests, using Renderscript to blur the image took on average about ~175ms, vs ~2 seconds doing the blur using Java code. (The required code is also only a tiny fraction of the length of the Renderscript one).</p>
+
+<p>Renderscript is extremely easy to add to your project, just throw
+```</p>
+
+<pre><code>    renderscriptTargetApi 19
+    renderscriptSupportMode true
+</code></pre>
+
+<p><code>``
+in your</code>build.gradle` and you should be ready to roll.</p>
+
+<p>Once you have the blurring, the rest of the process is fairly straight forward. When you plan to leave an activity, create a bitmap of the current view and write it to disk. When you start your new activity (which should have a transparent background), you override the transition (otherwise you&rsquo;ll get the default zoom), and set the background to the blurred image you saved earlier. Add a fade in for the alpha and you get a nice little effect!</p>
+
+<p><img class="center" src="/images/2014/07/09/2014-07-09-23_34_05.gif" width="600" height="600" title="My Example" ></p>
+
+<p>If you&rsquo;d like to see how this looks in a sample project, you can find it on Github <a href="https://github.com/MichaelEvans/EtsyBlurExample">here</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ColorArt: a library to do iTunes 11-style color matching for Android]]></title>
+    <link href="http://michaelevans.org/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android/"/>
+    <updated>2013-12-12T00:02:34-05:00</updated>
+    <id>http://michaelevans.org/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android</id>
+    <content type="html"><![CDATA[<p>Last week I open sourced an Android library called <a href="https://github.com/MichaelEvans/ColorArt">ColorArt</a>, which is a port of the popular OS X library written by the guys over at <a href="http://www.panic.com/blog/itunes-11-and-colors/">Panic</a>. It allows you to use a source image to create a themed image/text display, very similar to the effect which is done in iTunes 11.</p>
+
+<p><img class="center" src="/images/2013/12/12/itunes-11.png" width="600" height="600" title="iTunes Example" ></p>
+
+<!-- more -->
+
+
+<h3>Using the Library</h3>
+
+<p>ColorArt is pretty easy to use, and can add a cool effect to any app. In order to add it to your project, add the dependency to your <code>build.gradle</code> file:</p>
+
+<p><code>
+compile 'org.michaelevans.colorart:library:0.0.1'﻿
+</code></p>
+
+<p>The next thing you need is to take a Bitmap that you want to use, and pass it to a ColorArt object:</p>
+
+<p><code>
+Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.album);
+ColorArt colorArt = new ColorArt(bitmap);
+</code></p>
+
+<p>After that, it&rsquo;s as simple as calling some getter methods in order to get the colors that make up the image:</p>
+
+<p><code>
+colorArt.getBackgroundColor()
+colorArt.getPrimaryColor()
+colorArt.getSecondaryColor()
+colorArt.getDetailColor()
+</code></p>
+
+<p>Voilà! Now you can make cool themed image/text display using Bitmaps as part of your application.</p>
+
+<p><img class="center" src="/images/2013/12/12/sample.png" width="300" height="300" title="Sample" ></p>
+
+<h3>Bonus: FadingImageView</h3>
+
+<p>I also added a class that extends ImageView, which will allow you to add a subtle gradient from the image, to the background color, similar to what you see in the iTunes display. It&rsquo;s also extremely easy to use:</p>
+
+<ol>
+<li>Replace the ImageView that you are presently using with a <code>FadingImageView</code>.</li>
+<li>Call
+<code>
+mFadingImageView.setBackgroundColor(colorArt.getBackgroundColor(), FadingImageView.FadeSide.LEFT);
+</code>
+to set the background color to fade to, and which side gets the gradient.</li>
+</ol>
+
+
+<p>That&rsquo;s it!</p>
+
+<p>You can also toggle that gradient with a call to <code>mImageView.setFadeEnabled(true/false);</code>.</p>
+
+<hr />
+
+<p>Are you using this library in your app? Please let me know so I can add a link to it on the <a href="https://github.com/MichaelEvans/ColorArt">GitHub project page</a>! Also, feel free to send pull requests!</p>
+]]></content>
+  </entry>
+  
+</feed>

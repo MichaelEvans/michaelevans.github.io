@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Github | Gadget Habit]]></title>
+  <link href="http://michaelevans.org/blog/categories/github/atom.xml" rel="self"/>
+  <link href="http://michaelevans.org/"/>
+  <updated>2015-08-07T09:41:26-04:00</updated>
+  <id>http://michaelevans.org/</id>
+  <author>
+    <name><![CDATA[Michael Evans]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Blurred background effect for Android]]></title>
+    <link href="http://michaelevans.org/blog/2014/07/09/blurred-background-effect-for-android/"/>
+    <updated>2014-07-09T23:04:46-04:00</updated>
+    <id>http://michaelevans.org/blog/2014/07/09/blurred-background-effect-for-android</id>
+    <content type="html"><![CDATA[<p>A few months ago, the Android design team reviewed apps that they thought were good-looking, and were referred to as the &ldquo;<a href="https://play.google.com/store/apps/collection/promotion_3000235_beautiful_apps?hl=en">Beautiful Design Collection</a>&rdquo;, as part of their <a href="https://www.youtube.com/playlist?list=PLWz5rJ2EKKc8j2B95zGMb8muZvrIy-wcF">Android Design in Action</a> series.</p>
+
+<p>One of these apps was <a href="https://play.google.com/store/apps/details?id=com.etsy.android&amp;hl=en">Etsy</a>, which had a very cool fading blur background effect, which you can see here:</p>
+
+<p><img class="center" src="/images/2014/07/09/2014-07-09-23_25_40.gif" width="600" height="600" title="Etsy Example" ></p>
+
+<p>As a learning experiment, I set off to replicate this behavior. I had seen a library by Manuel Peinado called <a href="https://github.com/ManuelPeinado/GlassActionBar">GlassActionBar</a> which demonstrated a similar glass-like blur effect on the ActionBar, so I decided to use that code for blurring my background.</p>
+
+<p>The code itself is pretty interesting, specifically the bit for versions on Jelly Bean or higher. If you&rsquo;re using API version 16 and up, you can use <a href="http://android-developers.blogspot.com/2013/08/renderscript-intrinsics.html">Renderscript Intrinsics</a>, which are a set of built-in functions that require very little code to use, but are optimized for high-performance.</p>
+
+<p>In my sample tests, using Renderscript to blur the image took on average about ~175ms, vs ~2 seconds doing the blur using Java code. (The required code is also only a tiny fraction of the length of the Renderscript one).</p>
+
+<p>Renderscript is extremely easy to add to your project, just throw
+```</p>
+
+<pre><code>    renderscriptTargetApi 19
+    renderscriptSupportMode true
+</code></pre>
+
+<p><code>``
+in your</code>build.gradle` and you should be ready to roll.</p>
+
+<p>Once you have the blurring, the rest of the process is fairly straight forward. When you plan to leave an activity, create a bitmap of the current view and write it to disk. When you start your new activity (which should have a transparent background), you override the transition (otherwise you&rsquo;ll get the default zoom), and set the background to the blurred image you saved earlier. Add a fade in for the alpha and you get a nice little effect!</p>
+
+<p><img class="center" src="/images/2014/07/09/2014-07-09-23_34_05.gif" width="600" height="600" title="My Example" ></p>
+
+<p>If you&rsquo;d like to see how this looks in a sample project, you can find it on Github <a href="https://github.com/MichaelEvans/EtsyBlurExample">here</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ColorArt: a library to do iTunes 11-style color matching for Android]]></title>
+    <link href="http://michaelevans.org/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android/"/>
+    <updated>2013-12-12T00:02:34-05:00</updated>
+    <id>http://michaelevans.org/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android</id>
+    <content type="html"><![CDATA[<p>Last week I open sourced an Android library called <a href="https://github.com/MichaelEvans/ColorArt">ColorArt</a>, which is a port of the popular OS X library written by the guys over at <a href="http://www.panic.com/blog/itunes-11-and-colors/">Panic</a>. It allows you to use a source image to create a themed image/text display, very similar to the effect which is done in iTunes 11.</p>
+
+<p><img class="center" src="/images/2013/12/12/itunes-11.png" width="600" height="600" title="iTunes Example" ></p>
+
+<!-- more -->
+
+
+<h3>Using the Library</h3>
+
+<p>ColorArt is pretty easy to use, and can add a cool effect to any app. In order to add it to your project, add the dependency to your <code>build.gradle</code> file:</p>
+
+<p><code>
+compile 'org.michaelevans.colorart:library:0.0.1'﻿
+</code></p>
+
+<p>The next thing you need is to take a Bitmap that you want to use, and pass it to a ColorArt object:</p>
+
+<p><code>
+Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.album);
+ColorArt colorArt = new ColorArt(bitmap);
+</code></p>
+
+<p>After that, it&rsquo;s as simple as calling some getter methods in order to get the colors that make up the image:</p>
+
+<p><code>
+colorArt.getBackgroundColor()
+colorArt.getPrimaryColor()
+colorArt.getSecondaryColor()
+colorArt.getDetailColor()
+</code></p>
+
+<p>Voilà! Now you can make cool themed image/text display using Bitmaps as part of your application.</p>
+
+<p><img class="center" src="/images/2013/12/12/sample.png" width="300" height="300" title="Sample" ></p>
+
+<h3>Bonus: FadingImageView</h3>
+
+<p>I also added a class that extends ImageView, which will allow you to add a subtle gradient from the image, to the background color, similar to what you see in the iTunes display. It&rsquo;s also extremely easy to use:</p>
+
+<ol>
+<li>Replace the ImageView that you are presently using with a <code>FadingImageView</code>.</li>
+<li>Call
+<code>
+mFadingImageView.setBackgroundColor(colorArt.getBackgroundColor(), FadingImageView.FadeSide.LEFT);
+</code>
+to set the background color to fade to, and which side gets the gradient.</li>
+</ol>
+
+
+<p>That&rsquo;s it!</p>
+
+<p>You can also toggle that gradient with a call to <code>mImageView.setFadeEnabled(true/false);</code>.</p>
+
+<hr />
+
+<p>Are you using this library in your app? Please let me know so I can add a link to it on the <a href="https://github.com/MichaelEvans/ColorArt">GitHub project page</a>! Also, feel free to send pull requests!</p>
+]]></content>
+  </entry>
+  
+</feed>

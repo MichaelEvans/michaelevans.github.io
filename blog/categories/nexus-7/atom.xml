@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Nexus 7 | Gadget Habit]]></title>
+  <link href="http://michaelevans.org/blog/categories/nexus-7/atom.xml" rel="self"/>
+  <link href="http://michaelevans.org/"/>
+  <updated>2015-08-07T09:41:26-04:00</updated>
+  <id>http://michaelevans.org/</id>
+  <author>
+    <name><![CDATA[Michael Evans]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Nexus 7 Review]]></title>
+    <link href="http://michaelevans.org/blog/2012/07/03/nexus-7-review/"/>
+    <updated>2012-07-03T13:39:00-04:00</updated>
+    <id>http://michaelevans.org/blog/2012/07/03/nexus-7-review</id>
+    <content type="html"><![CDATA[<p>So by now you&rsquo;ve probably heard about the Nexus 7. We heard it was coming <a href="/blog/2012/06/26/shots-from-outside-io-2012/">last week</a>, and now after using it for a few days, here&rsquo;s my review.</p>
+
+<p><img src="/images/2012/07/03/nexus.jpg" width="400" height="200" title="Nexus 7" ></p>
+
+<!-- more -->
+
+
+<p></p>
+
+<p>As a backstory, you should know that prior to recieving the Nexus 7 at Google IO, I already owned a Motorola Xoom, a Samsung Galaxy 10.1 (from IO 2011), and an HP Touchpad. Surprising as it might seem for someone with all these gadgets, I actually don&rsquo;t really <em>get</em> tablets. I have a laptop, and a smartphone, and there just really isn&rsquo;t a whole lot of use for a tablet that I&rsquo;ve found. I&rsquo;ve tried them all, including the iPad, and I just haven&rsquo;t found a way to fit it into the collection of things I use on a daily basis.</p>
+
+<p>But, I don&rsquo;t give up trying so easily. Nor has Google it seems, because slowly but surely, Google has finally put together a combination of software and hardware that is an absolute pleasure to use. Not only that, but at $200, it&rsquo;s a steal compared to <a href="http://www.apple.com/ipad/">other popular options</a>.</p>
+
+<p>The best way to review the Nexus however, is by breaking it down into the two main components that it&rsquo;s comprised of: software and hardware.</p>
+
+<h2>Software</h2>
+
+<p>The core of the Nexus 7 is Android 4.1, codenamed &ldquo;Jelly Bean&rdquo;. Jelly Bean was not a revolutionary update like its predessesor, Ice Cream Sandwich, but an evolutionary one. It includes three main changes, as well as some small ones. The main changes were &ldquo;Project Butter&rdquo;, Google Search, and Google Now.</p>
+
+<h4>Project Butter</h4>
+
+<p><a href="http://www.youtube.com/watch?v=VuC0i4xTyrI#t=6m15s">Project Butter</a> has probably made the most significant impact for me on the overall feel of Android. Prior to IO, my main complaint with Android was how occasionally laggy it was. However, in Jelly Bean, Google has smoothed out the experience with faster response to touch, animations, and even has the CPU ramp up faster as a response to touch events. Speaking of touch events, Google has apparently devised a way to predict where your fingers will be, and allows the system to respond more quickly as a result. The sum of these changes results in a much smoother feel to the entire operating system.</p>
+
+<h4>Google Search</h4>
+
+<p>Google&rsquo;s new voice search is their strike back against Siri. Powered by Google&rsquo;s Knowledge Graph, it can do a lot more than Apple&rsquo;s offering.</p>
+
+<p><img class="left" src="/images/2012/07/03/voice.jpg" width="375" height="200" title="Voice Search Demo" ></p>
+
+<p>The speech-to-text seems to be significantly more accurate than Apple&rsquo;s, as well as much quicker. I imagine this is because Google has moved the speech-to-text engine onto the device, as this is another feature of the new keyboard (more on that below).</p>
+
+<p>Instead of just listing off a whole bunch of things that I&rsquo;ve tried, here&rsquo;s a video from <a href="http://www.youtube.com/watch?v=fHkhp6BwnGo">JLishere</a>, who has compiled 41 queries against knoweledge graph. He demonstrates the wide variety of what Knowledge Graph allows the device to respond to, like local queries, transit directions, and what seems to just be tidbits from Wikipedia.</p>
+
+<p>What&rsquo;s most interesting to me, however, is the preview of the possibile ability to access core hardware functions, like turning on and off Wifi or Bluetooth. Another interesting feature is how this new voice search seems to fit in well with another new platform feature: Google Now.</p>
+
+<h4>Google Now</h4>
+
+<p>Google Now is a new card based system introduced in the new version of Android. It tells you about the weather, traffic information, sports scores, and other tidbits of information you&rsquo;re likely to look up during your day. It&rsquo;s quite convenient to have information about an upcoming flight available without having to keep checking it, or traffic information regarding my daily commute delivered right to my handset or tablet. Right now the number of available &lsquo;cards&rsquo; is limited, but as the number of uses expands, the functionality will continue to grow.</p>
+
+<h4>Other features</h4>
+
+<p>In addition to the fancy speech-to-text features, as well as the speed improvements, Google has added rich notifications that allow you to perform actions without opening the app. You can control the music player, or reply to a SMS message, all from the notification tray. Another addition is a new keyboard, which does text prediction. If you&rsquo;ve ever used Swiftkey, you&rsquo;ll feel right at home with the new stock keyboard. Also included is the offline speech-to-text engine, which allows for speedy transcription, if you&rsquo;re into that.</p>
+
+<p>Other changes include some fancy new camera and gallery improvements, and now Chrome is the standard browser. Combined with tab sync from other machines, this is the best mobile browsing experience I&rsquo;ve had so far.</p>
+
+<h2>Hardware</h2>
+
+<p>At 340 grams (compared to the Kindle Fire’s 413 grams), the Nexus 7 feels extremely light. It measures 10.45mm thick, which is just shy of the thickness of the Kindle Fire. The front of the tablet is an IPS 7-inch 1280 x 800 display, which is powered by an NVIDIA Tegra 3 quad-core processor, with 12 GPU cores, and 1GB of RAM. As for storage, it comes in 8GB ($199) and 16GB ($249) capacities.</p>
+
+<p><img class="right" src="/images/2012/07/03/chrome.jpg" width="375" height="200" title="Chrome" ></p>
+
+<p>In addition to that serious computing power, the Nexus 7 has plenty of sensors and radios. Under the hood, there&rsquo;s Bluetooth and NFC, not to mention GPS, an accelerometer, a digital compass and a gyroscope. All this is paired with a battery that managed to last me around eight hours. Based on other reviews I&rsquo;ve seen, the battery seems to last between seven and nine hours, depending on usage.</p>
+
+<p>This all sounds fantastic, but there&rsquo;s a few things that could have been added/improved as well. First, since there&rsquo;s a lack of a rear camera, no camera app has been included. This is most certainly not a deal breaker, but it&rsquo;s worth noting, if you&rsquo;re into self portraits. There&rsquo;s also no HDMI/MHL output, nor a MicroSD slot. The only other gripe that I have is that the speakers are fairly inadiquite, so you&rsquo;ll be reaching for your headphones.</p>
+
+<p>The Nexus 7 is a great deal for a tablet that costs just under $200. It has a great display, smooth performance and all the bells and whistles of Jelly Bean. In my opinion, this is the best Android tablet available.</p>
+
+<p>And for the first time, I&rsquo;m actually excited about using a tablet.</p>
+
+<p>Oh yeah, if you were wondering: I did preorder Project Glass.</p>
+]]></content>
+  </entry>
+  
+</feed>

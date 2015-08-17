@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Guides | Gadget Habit]]></title>
+  <link href="http://michaelevans.org/blog/categories/guides/atom.xml" rel="self"/>
+  <link href="http://michaelevans.org/"/>
+  <updated>2015-08-07T09:41:26-04:00</updated>
+  <id>http://michaelevans.org/</id>
+  <author>
+    <name><![CDATA[Michael Evans]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Building OBS Studio for OS X]]></title>
+    <link href="http://michaelevans.org/blog/2014/06/07/building-obs-studio-for-os-x/"/>
+    <updated>2014-06-07T22:59:38-04:00</updated>
+    <id>http://michaelevans.org/blog/2014/06/07/building-obs-studio-for-os-x</id>
+    <content type="html"><![CDATA[<p>Recently I&rsquo;ve been watching a bunch of streams on <a href="http://www.twitch.tv/">Twitch</a>, and was investigating the best options to stream from OS X. Sadly most of the ones I found were very expensive, until I saw that <a href="http://obsproject.com/">Open Broadcaster Software</a>, which was previously only for Windows, was <a href="https://github.com/jp9000/obs-studio">being rewritten</a> to work with OS X and Linux. However, it&rsquo;s still highly beta/under development and as a result, there&rsquo;s not a lot of documentation on how to build it.</p>
+
+<p>Here&rsquo;s how I did it:</p>
+
+<p>```</p>
+
+<pre><code>brew install ffmpeg glew cmake qt5
+git clone https://github.com/jp9000/obs-studio.git
+cd obs-studio
+mkdir cmbuild &amp;&amp; cd cmbuild
+export CMAKE_PREFIX_PATH=/usr/local/Cellar/qt5/5.2.1/lib/cmake
+cmake .. &amp;&amp; make
+cpack
+</code></pre>
+
+<p>```</p>
+
+<p>This will leave you with a disk image named <code>obs-studio-x64-&lt;sha1-hash&gt;.dmg</code>, which you can mount and install, just like any other OS X application.</p>
+
+<p>Happy Streaming!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Running Crouton on a Chromebook Pixel]]></title>
+    <link href="http://michaelevans.org/blog/2013/06/11/running-crouton-on-a-chromebook-pixel/"/>
+    <updated>2013-06-11T21:22:00-04:00</updated>
+    <id>http://michaelevans.org/blog/2013/06/11/running-crouton-on-a-chromebook-pixel</id>
+    <content type="html"><![CDATA[<p>So a few weeks back at Google IO, Google handed out an awesome laptop to attendees, the <a href="https://play.google.com/store/devices/details?id=chromebook_pixel_wifi">Chromebook Pixel</a>. For those who aren&rsquo;t familiar with it, the Pixel is a laptop running Google&rsquo;s ChromeOS, with the highest resolution screen available on a laptop (2560x1700). Unfortunately for me (and owners of the other Chromebooks), there&rsquo;s a few things you can&rsquo;t do in Chrome, like writing software in the new Android Studio!</p>
+
+<p>In order to work around this limitation in ChromeOS, a developer at Google named David Schneider developed a set of scripts called <a href="https://github.com/dnschneid/crouton">crouton</a>. Crouton allows you to run Ubuntu inside a your ChromeOS system, so that you can easily swap back and forth between the operating systems. This is not limited to the Pixel, so if you&rsquo;re using another model Chromebook, even dating back to the CR-48, this guide should work for you.</p>
+
+<!-- more -->
+
+
+<h3>Installing Crouton</h3>
+
+<h4>Step One: Enable Developer Mode (This might vary slightly depending on your model)</h4>
+
+<p><em>Warning: Switching into or out of developer mode will wipe all the user data on the ChromeOS machine.</em></p>
+
+<ol>
+<li>Shutdown your machine.</li>
+<li>Press and hold esc + refresh, and push the power button to turn on your computer.</li>
+<li>Push Ctrl+D to be prompted to enable developer mode.</li>
+<li>Hit enter, and watch the progress bar at the top of the screen as the system is wiped.</li>
+<li>When the machine boots up again, either wait til it boots, or you can hit Ctrl+D again to start faster.</li>
+</ol>
+
+
+<h4>Step Two: Install Crouton</h4>
+
+<ol>
+<li>Download crouton <a href="http://goo.gl/fd3zc">here</a>.</li>
+<li>Open a shell (Ctrl+Alt+T, type shell and hit enter) and run <code>sudo sh -e ~/Downloads/crouton -t xfce,touch</code>.</li>
+<li>Go get a drink, come back and answer some questions.</li>
+<li>Done! Start up an XFCE session with <code>sudo startxfce4</code>.</li>
+</ol>
+
+
+<h4>Step Three: Enjoy Ubuntu on your Chromebook!</h4>
+
+<p>To switch back and forth between ChromeOS and Crouton, swap with Ctrl+Alt+Back and the sequence Ctrl+Alt+Forward followed by Ctrl+Alt+Refresh.</p>
+
+<p>Pro tip: Increase the font size under the display settings, so that the text is a little more readable!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Boot Ubuntu from an SD Card on your Macbook Air (or Pro)]]></title>
+    <link href="http://michaelevans.org/blog/2013/01/15/boot-ubuntu-from-an-sd-card-on-your-macbook-air/"/>
+    <updated>2013-01-15T22:26:00-05:00</updated>
+    <id>http://michaelevans.org/blog/2013/01/15/boot-ubuntu-from-an-sd-card-on-your-macbook-air</id>
+    <content type="html"><![CDATA[<p>Recently I was trying to find a way to run Ubuntu off an SD card, so that I could use Linux on my Macbook Air (I&rsquo;d have dual booted, but my Air has the 128GB SSD, which doesn&rsquo;t leave much space after partitioning). Scouring the web, there&rsquo;s not that many resources indicating how, or if this is even possible. Fortunately for you, dear reader, it is!</p>
+
+<p>Like I said, I&rsquo;m using a Macbook Air, so there&rsquo;s two steps to this process: creating a bootable flash drive with the Ubuntu image, and the actual installation.</p>
+
+<!-- more -->
+
+
+<h3>Creating a bootable install image</h3>
+
+<p>This is pretty standard stuff, if you&rsquo;re reading this, it&rsquo;s likely you already know it. Heck, if you have an external DVD drive, you can skip this all together.</p>
+
+<ol>
+<li>Download the image from <a href="http://www.ubuntu.com/">Ubuntu</a></li>
+<li>Hit up your terminal and use the following command to convert that image <code>hdiutil convert -format UDRW -o ~/path/to/target.img ~/path/to/ubuntu.iso</code></li>
+<li>More terminal goodness: <code>diskutil list</code> to find which disk is your flash drive</li>
+<li><code>diskutil unmountDisk /dev/diskN</code> where N is the disk number you found in step 3.</li>
+<li><code>sudo dd if=/path/to/converted.img of=/dev/diskN bs=1m</code> to copy that image over to the flash drive.</li>
+<li><code>diskutil eject /dev/diskN</code> to EJECT!</li>
+</ol>
+
+
+<h3>Setup the SD Card</h3>
+
+<p>Now we&rsquo;re ready to install Ubuntu on the SD card (SD card must be at least 8 Gigs). I used a Class 10 card, and performance was…not terrible. I can&rsquo;t speak for any of the slower cards.</p>
+
+<ol>
+<li>Download rEFIt from the <a href="http://refit.sourceforge.net/">rEFIt website</a>. You should grab the .dmg version)</li>
+<li>Open up Disk Utility (in /Applications/Utilities) and create a partition of 50 MB formatted &ldquo;Mac OS Extended Journaled&rdquo;</li>
+<li>Fill up the rest of the card with a partition of MSDOS-FAT.</li>
+<li>Before writing the Partition Table, hit the options button and select &ldquo;GUID Partition Table&rdquo;</li>
+<li>Copy the &lsquo;efi&rsquo; directory onto the root of the 50MB partition created in step 2.</li>
+<li>Get back to that trusty terminal <code>cd /Volumes/partition1/efi/refit</code> (where &lsquo;partition1&rsquo; is the name of that same parition) followed by <code>./enable.sh</code></li>
+<li>Reboot your machine, and press and hold the option key to select a boot device. You should see ones for your main HD, the SD card, and the Live CD image. Select the Live CD image, and let&rsquo;s get installing.</li>
+<li>During installation, you&rsquo;ll want to select the advanced partitioning setup. Select the /dev/sdb3 device (Should match the size of the SD card) for formatting and give them the mount point &ldquo;/&rdquo;. Device for boot loader installation must be also /dev/sdb3 (not /dev/sdb!). Ubuntu is going to give you a warning about no swap partition. That&rsquo;s alright, you don&rsquo;t need it.</li>
+<li>This is going to take a while. Seriously, it&rsquo;s not gonna be fast. Go get a coffee.</li>
+<li>Reboot when the install is complete, and hold option again to select that SD card. <em>Ta-da</em>!</li>
+</ol>
+
+
+<h5>Bonus Step:</h5>
+
+<p>After you remove the SD card and try to boot normally, you&rsquo;ll likely hit this error &ldquo;grub error: no such device&rdquo;</p>
+
+<p>You can fix this by booting into OS X and selecting your hard drive as the Startup Disk, which can be found in the System Preferences.</p>
+
+<p><strong>Did you find this useful? Feel free to comment below, or follow me on <a href="http://www.twitter.com/m_evans10">Twitter</a> and let me know if you have any questions, or would like to suggest things for me to talk in the future.</strong></p>
+]]></content>
+  </entry>
+  
+</feed>

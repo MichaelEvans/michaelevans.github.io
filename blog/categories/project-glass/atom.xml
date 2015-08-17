@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Project Glass | Gadget Habit]]></title>
+  <link href="http://michaelevans.org/blog/categories/project-glass/atom.xml" rel="self"/>
+  <link href="http://michaelevans.org/"/>
+  <updated>2015-08-07T09:41:26-04:00</updated>
+  <id>http://michaelevans.org/</id>
+  <author>
+    <name><![CDATA[Michael Evans]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Hands On with Google Glass]]></title>
+    <link href="http://michaelevans.org/blog/2013/04/29/hands-on-with-google-glass/"/>
+    <updated>2013-04-29T16:36:00-04:00</updated>
+    <id>http://michaelevans.org/blog/2013/04/29/hands-on-with-google-glass</id>
+    <content type="html"><![CDATA[<h3>The Pickup</h3>
+
+<p>Last Wednesday I took the trip up to NYC, to the top floor of Chelsea Market to pick up a device that many have waited anxiously for. A device unlike anything else we&rsquo;ve seen before: Google&rsquo;s Glass. This is the Explorer Edition of the device, which is targeted towards developers, who attended Google&rsquo;s IO conference last year. I was fortunate to be invited to pick up my device on the first day of New York&rsquo;s pickups, which followed several pickup days in Mountain View the previous week.</p>
+
+<p><img class="center" src="/images/2013/04/29/s_9e3e2acb-a746-4606-a034-1df2c8e2a3cc-0.jpeg" width="500" height="500" title="The View #throughglass" ></p>
+
+<!-- more -->
+
+
+<p>The pickup experience was very exciting, it included an informative one-on-one experience with a Glass Guide, who helped walk me through the device (which I had gotten some previous experience <a href="http://michaelevans.org/blog/2013/02/20/googles-project-glass/">a few months back</a>) and fit it to my face. The top floor of Chelsea Market allowed me to break in the camera of the device with a nice view of lower Manhattan.</p>
+
+<p>I was able to try on all five colors that were available, but I ended up choosing charcoal (also known as black.) Other options included Cotton, Shale, Tangerine, and Sky (white, grey, orange and light blue, respectively.)</p>
+
+<p>Configuring Glass was a snap, I opted to use the <a href="https://play.google.com/store/apps/details?id=com.google.glass.companion">MyGlass app</a> for Android, although users without the app, can use a web based utility to set up their device. After my scheduled pickup apoinment, another Explorer and myself walked up towards Times Square, and were greeted with several people giving us a look for wearing at our new eyeware.</p>
+
+<p>So far people have either thought they look ridiculous, which might be the nature of the device, or the fact that I&rsquo;ve been wearing them overtop of my prescription glasses. This hasn&rsquo;t stopped anyone, however, from asking me to try them on and get a demo of the features.</p>
+
+<h3>What&rsquo;s in the box?</h3>
+
+<p>Included in the box is Glass (obviously), a micro USB cable and a AC adapter for it, a microfiber bag for storing Glass when it&rsquo;s not in use, and two visor attachments, one polarized for sun, and the other clear.</p>
+
+<p><img class="center" src="/images/2013/04/29/IMG_1235.jpg" width="350" height="350" title="Bag o' goodies" ></p>
+
+<p><img class="center" src="/images/2013/04/29/IMG_1238.jpg" width="350" height="350" title="What&rsquo;s in the bag" ></p>
+
+<p><img class="center" src="/images/2013/04/29/IMG_1237.jpg" width="350" height="350" title="Nice simple box" ></p>
+
+<p><img class="center" src="/images/2013/04/29/IMG_1231.jpg" width="350" height="350" title="Sweet Shades" ></p>
+
+<h3>Thoughts so far</h3>
+
+<p>Since I&rsquo;ve only had the device for a few days, I&rsquo;ll need to post a review after I&rsquo;ve used it for a little longer. So far I&rsquo;ve enjoyed the hands-free navigation for wandering around DC, as well as taking some snapshots. I&rsquo;ve always thought it was a little awkward to reply to text messages and emails using your voice (which is why I never really did it on my phone), but maybe I&rsquo;ll warm up to it with Glass. The battery life has been pretty decent, even with the heavy usage of showing it off to excited friends.</p>
+
+<p><img class="center" src="/images/2013/04/29/20130426_122245_854.jpg" width="400" height="400" title="#throughglass" ></p>
+
+<h3>But wait&hellip;there&rsquo;s more!</h3>
+
+<p>A few days after I returned with Glass, I was interviewed by The Fold, a flagship video series by The Washington Post! You can check out the video here:</p>
+
+<p><iframe width="640" height="510" src="http://www.youtube.com/embed/iBrbVaY99kA " frameborder="0" webkitAllowFullScreen mozallowfullscreen allowfullscreen></iframe></p>
+
+<p>Got any questions you&rsquo;d like answered? Drop me a line below in the comments, on <a href="https://twitter.com/m_evans10">Twitter</a> or on <a href="https://plus.google.com/114052868601022948953/posts">Google Plus</a>!</p>
+
+<p><img class="center" src="/images/2013/04/29/IMG_1246.jpg" width="350" height="350" title="Selfie." ></p>
+
+<p>Obligatory selfie.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Google's Project Glass]]></title>
+    <link href="http://michaelevans.org/blog/2013/02/20/googles-project-glass/"/>
+    <updated>2013-02-20T20:55:00-05:00</updated>
+    <id>http://michaelevans.org/blog/2013/02/20/googles-project-glass</id>
+    <content type="html"><![CDATA[<p>This morning Google put up some new details regarding Project Glass, including <a href="http://www.google.com/glass/start/how-it-feels/">a video</a> showing what it&rsquo;s like to wear Glass, and a <a href="http://www.google.com/glass/start/what-it-does/">list of things</a> that Glass can do. They are also sponsoring a new contest where anyone can <a href="http://www.google.com/glass/start/how-to-get-one/">join the Glass Explorers</a> (people who will be getting the Developer Edition). I was fortunate enough to be able to attend the Glass Foundry event in New York earlier this month, and got to experience Project Glass first hand. While I cannot say too much more than what you can gather from the Google page, I do have some exciting news!</p>
+
+<!-- more -->
+
+
+<p></p>
+
+<p>Me (and my team, which included Jacob Hilker and Ryan Warner), won the Glass Foundry Hackathon! Like I said, I cannot share much more about it, but I do have this sweet picture of me wearing them:</p>
+
+<p><img class="center" src="/images/2013/02/20/glass.jpg" width="400" height="400" title="Project Glass" ></p>
+
+<p>And the best part is the prize for the winners &ndash; a free Glass Explorer device (when they are available, of course).</p>
+]]></content>
+  </entry>
+  
+</feed>
