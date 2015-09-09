@@ -4,7 +4,7 @@
   <title><![CDATA[Gadget Habit]]></title>
   <link href="http://michaelevans.org/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2015-08-07T09:41:26-04:00</updated>
+  <updated>2015-09-09T19:56:03-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -12,6 +12,23 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Droidcon NYC 2015: @AnnotationProcessors("ByExample")]]></title>
+    <link href="http://michaelevans.org/blog/2015/09/09/droidcon-nyc-2015-at-annotationprocessors-byexample/"/>
+    <updated>2015-09-09T16:30:48-04:00</updated>
+    <id>http://michaelevans.org/blog/2015/09/09/droidcon-nyc-2015-at-annotationprocessors-byexample</id>
+    <content type="html"><![CDATA[<p>Here are slides and the video for my talk from Droidcon NYC 2015 on writing your own Annotation Processor:</p>
+
+<iframe width="640" height="510" src="http://www.youtube.com/embed/dBUAqPs0TB0 " frameborder="0" webkitAllowFullScreen mozallowfullscreen allowfullscreen></iframe>
+
+
+<p></p>
+
+<script async="true" class="speakerdeck-embed" data-id="95e696d902d845dcb5079e0691eb5f3f" src="//speakerdeck.com/assets/embed.js"> </script>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Using Espresso for Easy UI Testing]]></title>
@@ -1868,23 +1885,6 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
 <p><img class="center" src="http://michaelevans.org/images/2013/03/28/googlemessenger.png" width="500" height="500" title="Google Plus Messenger" ></p>
 
 <p>If you look closely, it looks like the Google+ Messenger icon on the bottom right corner of the dock. Is this finally the integration of G+ Messenger and the web that we&rsquo;ve been waiting for since G+ Messenger was introduced? Maybe we&rsquo;ll find out in a few short weeks during <a href="http://michaelevans.org/blog/2013/03/14/google-io-2013-and-google-reader/">Google IO</a> this year!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Google IO 2013 and Google Reader]]></title>
-    <link href="http://michaelevans.org/blog/2013/03/14/google-io-2013-and-google-reader/"/>
-    <updated>2013-03-14T23:52:00-04:00</updated>
-    <id>http://michaelevans.org/blog/2013/03/14/google-io-2013-and-google-reader</id>
-    <content type="html"><![CDATA[<p>Yesterday was a bittersweet day for me in the world of Google. On the bright side, I was one of the lucky few to acquire a ticket to Google IO 2013. This will be my third Google IO, and I cannot be more excited to attend this year. The first year I went brought about the introduction to Android 3.1 (Honeycomb), which began the improvments for Android&rsquo;s Holo Theme, as well as layouts for tablets. Last year was even more groundbreaking, with the unveiling of a <a href="http://michaelevans.org/blog/2012/06/26/shots-from-outside-io-2012/">few</a> new <a href="http://michaelevans.org/blog/2012/09/07/nexus-q-review/">Nexus</a> <a href="http://michaelevans.org/blog/2012/07/03/nexus-7-review/">devices</a>, Android 4.1 (Jelly Bean), as well as <a href="http://michaelevans.org/blog/2013/02/20/googles-project-glass/">Project Glass</a>. I can&rsquo;t even imagine what they will have in store for us this year.</p>
-
-<p>Here comes the bad news though: <a href="http://googleblog.blogspot.com/2013/03/a-second-spring-of-cleaning.html">Google Reader is being shut down</a>. If you don&rsquo;t know, Google Reader is an RSS reader for the web, a hub for all your subscriptions online. This pending shutdown has caused quite a stir, leading to many users scrambling to <a href="http://www.newsblur.com/">new</a> <a href="http://www.feedly.com/">RSS</a> readers, or <a href="http://blog.digg.com/post/45355701332/were-building-a-reader">building new ones</a>. (There was even a <a href="http://mashable.com/2013/03/14/white-house-google-reader/">petition on whitehouse.org</a> for the government to intervene…)</p>
-
-<p>Google Reader was one of my favorite Google applications, so it&rsquo;s quite sad to see it go. Hopefully one of these replacements will provide a good enough experience so the switch is a bit less painful.</p>
-
-<hr />
-
-<p>Suggestions for a new RSS reader? Predictions for IO 2013? Drop me a line on <a href="https://twitter.com/m_evans10">Twitter</a> or <a href="https://plus.google.com/114052868601022948953/posts">Google Plus</a>, or leave a comment.</p>
 ]]></content>
   </entry>
   
