@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Project Glass | Gadget Habit]]></title>
-  <link href="http://MichaelEvans.github.io/blog/categories/project-glass/atom.xml" rel="self"/>
-  <link href="http://MichaelEvans.github.io/"/>
-  <updated>2015-09-09T19:43:18-04:00</updated>
-  <id>http://MichaelEvans.github.io/</id>
+  <link href="http://michaelevans.org/blog/categories/project-glass/atom.xml" rel="self"/>
+  <link href="http://michaelevans.org/"/>
+  <updated>2015-08-07T09:41:26-04:00</updated>
+  <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Hands On with Google Glass]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2013/04/29/hands-on-with-google-glass/"/>
+    <link href="http://michaelevans.org/blog/2013/04/29/hands-on-with-google-glass/"/>
     <updated>2013-04-29T16:36:00-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2013/04/29/hands-on-with-google-glass</id>
+    <id>http://michaelevans.org/blog/2013/04/29/hands-on-with-google-glass</id>
     <content type="html"><![CDATA[<h3>The Pickup</h3>
 
 <p>Last Wednesday I took the trip up to NYC, to the top floor of Chelsea Market to pick up a device that many have waited anxiously for. A device unlike anything else we&rsquo;ve seen before: Google&rsquo;s Glass. This is the Explorer Edition of the device, which is targeted towards developers, who attended Google&rsquo;s IO conference last year. I was fortunate to be invited to pick up my device on the first day of New York&rsquo;s pickups, which followed several pickup days in Mountain View the previous week.</p>
@@ -69,9 +69,9 @@
   
   <entry>
     <title type="html"><![CDATA[Google's Project Glass]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2013/02/20/googles-project-glass/"/>
+    <link href="http://michaelevans.org/blog/2013/02/20/googles-project-glass/"/>
     <updated>2013-02-20T20:55:00-05:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2013/02/20/googles-project-glass</id>
+    <id>http://michaelevans.org/blog/2013/02/20/googles-project-glass</id>
     <content type="html"><![CDATA[<p>This morning Google put up some new details regarding Project Glass, including <a href="http://www.google.com/glass/start/how-it-feels/">a video</a> showing what it&rsquo;s like to wear Glass, and a <a href="http://www.google.com/glass/start/what-it-does/">list of things</a> that Glass can do. They are also sponsoring a new contest where anyone can <a href="http://www.google.com/glass/start/how-to-get-one/">join the Glass Explorers</a> (people who will be getting the Developer Edition). I was fortunate enough to be able to attend the Glass Foundry event in New York earlier this month, and got to experience Project Glass first hand. While I cannot say too much more than what you can gather from the Google page, I do have some exciting news!</p>
 
 <!-- more -->

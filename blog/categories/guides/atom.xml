@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Guides | Gadget Habit]]></title>
-  <link href="http://MichaelEvans.github.io/blog/categories/guides/atom.xml" rel="self"/>
-  <link href="http://MichaelEvans.github.io/"/>
-  <updated>2015-09-09T19:43:18-04:00</updated>
-  <id>http://MichaelEvans.github.io/</id>
+  <link href="http://michaelevans.org/blog/categories/guides/atom.xml" rel="self"/>
+  <link href="http://michaelevans.org/"/>
+  <updated>2015-08-07T09:41:26-04:00</updated>
+  <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Building OBS Studio for OS X]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2014/06/07/building-obs-studio-for-os-x/"/>
+    <link href="http://michaelevans.org/blog/2014/06/07/building-obs-studio-for-os-x/"/>
     <updated>2014-06-07T22:59:38-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2014/06/07/building-obs-studio-for-os-x</id>
+    <id>http://michaelevans.org/blog/2014/06/07/building-obs-studio-for-os-x</id>
     <content type="html"><![CDATA[<p>Recently I&rsquo;ve been watching a bunch of streams on <a href="http://www.twitch.tv/">Twitch</a>, and was investigating the best options to stream from OS X. Sadly most of the ones I found were very expensive, until I saw that <a href="http://obsproject.com/">Open Broadcaster Software</a>, which was previously only for Windows, was <a href="https://github.com/jp9000/obs-studio">being rewritten</a> to work with OS X and Linux. However, it&rsquo;s still highly beta/under development and as a result, there&rsquo;s not a lot of documentation on how to build it.</p>
 
 <p>Here&rsquo;s how I did it:</p>
@@ -43,9 +43,9 @@ cpack
   
   <entry>
     <title type="html"><![CDATA[Running Crouton on a Chromebook Pixel]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2013/06/11/running-crouton-on-a-chromebook-pixel/"/>
+    <link href="http://michaelevans.org/blog/2013/06/11/running-crouton-on-a-chromebook-pixel/"/>
     <updated>2013-06-11T21:22:00-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2013/06/11/running-crouton-on-a-chromebook-pixel</id>
+    <id>http://michaelevans.org/blog/2013/06/11/running-crouton-on-a-chromebook-pixel</id>
     <content type="html"><![CDATA[<p>So a few weeks back at Google IO, Google handed out an awesome laptop to attendees, the <a href="https://play.google.com/store/devices/details?id=chromebook_pixel_wifi">Chromebook Pixel</a>. For those who aren&rsquo;t familiar with it, the Pixel is a laptop running Google&rsquo;s ChromeOS, with the highest resolution screen available on a laptop (2560x1700). Unfortunately for me (and owners of the other Chromebooks), there&rsquo;s a few things you can&rsquo;t do in Chrome, like writing software in the new Android Studio!</p>
 
 <p>In order to work around this limitation in ChromeOS, a developer at Google named David Schneider developed a set of scripts called <a href="https://github.com/dnschneid/crouton">crouton</a>. Crouton allows you to run Ubuntu inside a your ChromeOS system, so that you can easily swap back and forth between the operating systems. This is not limited to the Pixel, so if you&rsquo;re using another model Chromebook, even dating back to the CR-48, this guide should work for you.</p>
@@ -88,9 +88,9 @@ cpack
   
   <entry>
     <title type="html"><![CDATA[Boot Ubuntu from an SD Card on your Macbook Air (or Pro)]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2013/01/15/boot-ubuntu-from-an-sd-card-on-your-macbook-air/"/>
+    <link href="http://michaelevans.org/blog/2013/01/15/boot-ubuntu-from-an-sd-card-on-your-macbook-air/"/>
     <updated>2013-01-15T22:26:00-05:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2013/01/15/boot-ubuntu-from-an-sd-card-on-your-macbook-air</id>
+    <id>http://michaelevans.org/blog/2013/01/15/boot-ubuntu-from-an-sd-card-on-your-macbook-air</id>
     <content type="html"><![CDATA[<p>Recently I was trying to find a way to run Ubuntu off an SD card, so that I could use Linux on my Macbook Air (I&rsquo;d have dual booted, but my Air has the 128GB SSD, which doesn&rsquo;t leave much space after partitioning). Scouring the web, there&rsquo;s not that many resources indicating how, or if this is even possible. Fortunately for you, dear reader, it is!</p>
 
 <p>Like I said, I&rsquo;m using a Macbook Air, so there&rsquo;s two steps to this process: creating a bootable flash drive with the Ubuntu image, and the actual installation.</p>

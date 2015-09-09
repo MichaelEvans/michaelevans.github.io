@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Nexus Q | Gadget Habit]]></title>
-  <link href="http://MichaelEvans.github.io/blog/categories/nexus-q/atom.xml" rel="self"/>
-  <link href="http://MichaelEvans.github.io/"/>
-  <updated>2015-09-09T19:43:18-04:00</updated>
-  <id>http://MichaelEvans.github.io/</id>
+  <link href="http://michaelevans.org/blog/categories/nexus-q/atom.xml" rel="self"/>
+  <link href="http://michaelevans.org/"/>
+  <updated>2015-08-07T09:41:26-04:00</updated>
+  <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Nexus Q Review]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2012/09/07/nexus-q-review/"/>
+    <link href="http://michaelevans.org/blog/2012/09/07/nexus-q-review/"/>
     <updated>2012-09-07T20:11:00-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2012/09/07/nexus-q-review</id>
+    <id>http://michaelevans.org/blog/2012/09/07/nexus-q-review</id>
     <content type="html"><![CDATA[<p>It’s a <em>what</em>? Ever since I returned from Google I/O, this is what people have been saying when they see the newest addition to my TV setup, the Nexus Q. It’s hard to blame them though, since it just looks so different, for a home theatre device. unlike those bland, black boxes that most living rooms are filled with, the Nexus Q is a heavy (about two pounds) sphere, which is lit by a ring of 32 LEDs. The top side of the Q spins freely to function as a volume knob, and can be tapped to mute.</p>
 
 <p><img src="/images/2012/09/07/q.jpeg" width="400" height="400" title="Nexus Q" ></p>

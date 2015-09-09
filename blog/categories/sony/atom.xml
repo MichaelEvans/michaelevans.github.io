@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Sony | Gadget Habit]]></title>
-  <link href="http://MichaelEvans.github.io/blog/categories/sony/atom.xml" rel="self"/>
-  <link href="http://MichaelEvans.github.io/"/>
-  <updated>2015-09-09T19:43:18-04:00</updated>
-  <id>http://MichaelEvans.github.io/</id>
+  <link href="http://michaelevans.org/blog/categories/sony/atom.xml" rel="self"/>
+  <link href="http://michaelevans.org/"/>
+  <updated>2015-08-07T09:41:26-04:00</updated>
+  <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Sony unveils the PlayStation 4]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2013/02/20/sony-unveils-the-playstation-4/"/>
+    <link href="http://michaelevans.org/blog/2013/02/20/sony-unveils-the-playstation-4/"/>
     <updated>2013-02-20T22:21:00-05:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2013/02/20/sony-unveils-the-playstation-4</id>
+    <id>http://michaelevans.org/blog/2013/02/20/sony-unveils-the-playstation-4</id>
     <content type="html"><![CDATA[<p>Last week Sony confirmed the launch of the PlayStation 4 for 2013. They held a two hour announcement where they showed off some of the hardware, had developers speak about games that are in the pipeline, and touched on release info. There&rsquo;s definitely things that I liked, as well as a handful that I didn&rsquo;t. Here are some of the takeaways:</p>
 
 <!-- more -->

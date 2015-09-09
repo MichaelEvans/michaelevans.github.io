@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: App | Gadget Habit]]></title>
-  <link href="http://MichaelEvans.github.io/blog/categories/app/atom.xml" rel="self"/>
-  <link href="http://MichaelEvans.github.io/"/>
-  <updated>2015-09-09T19:43:18-04:00</updated>
-  <id>http://MichaelEvans.github.io/</id>
+  <link href="http://michaelevans.org/blog/categories/app/atom.xml" rel="self"/>
+  <link href="http://michaelevans.org/"/>
+  <updated>2015-08-07T09:41:26-04:00</updated>
+  <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[My Newest App: Bike Finder]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2013/09/16/my-newest-app-bike-finder/"/>
+    <link href="http://michaelevans.org/blog/2013/09/16/my-newest-app-bike-finder/"/>
     <updated>2013-09-16T23:11:00-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2013/09/16/my-newest-app-bike-finder</id>
+    <id>http://michaelevans.org/blog/2013/09/16/my-newest-app-bike-finder</id>
     <content type="html"><![CDATA[<p><img class="right" src="/images/2013/09/16/map.png" width="240" height="400" title="Map" ></p>
 
 <p>Last week I released my newest Android app, <a href="https://play.google.com/store/apps/details?id=org.michaelevans.bikefinder&amp;referrer=utm_source%3Dblog">Bike Finder</a>. It&rsquo;s a fairly straight forward application that allows you to find bikes and stations for use with Washington DC&rsquo;s Capital Bikeshare system. For those of you not local to DC, Capital Bikeshare is a system that lets you use bikes that are available at docking stations all over the city, as well as parts of northern Virginia. The app is free, and I&rsquo;m looking into adding additional cities that have companies that make their bike sharing data available (currently investigating New York City, Montreal and the Bay Area). If you&rsquo;d like to get your city added, <a href="http://twitter.com/m_evans10">let me know</a>, and I&rsquo;ll see if the data is available, and add it to the to-do list.</p>

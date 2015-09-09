@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Tablet | Gadget Habit]]></title>
-  <link href="http://MichaelEvans.github.io/blog/categories/tablet/atom.xml" rel="self"/>
-  <link href="http://MichaelEvans.github.io/"/>
-  <updated>2015-09-09T19:43:18-04:00</updated>
-  <id>http://MichaelEvans.github.io/</id>
+  <link href="http://michaelevans.org/blog/categories/tablet/atom.xml" rel="self"/>
+  <link href="http://michaelevans.org/"/>
+  <updated>2015-08-07T09:41:26-04:00</updated>
+  <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Nexus 7 Review]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2012/07/03/nexus-7-review/"/>
+    <link href="http://michaelevans.org/blog/2012/07/03/nexus-7-review/"/>
     <updated>2012-07-03T13:39:00-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2012/07/03/nexus-7-review</id>
+    <id>http://michaelevans.org/blog/2012/07/03/nexus-7-review</id>
     <content type="html"><![CDATA[<p>So by now you&rsquo;ve probably heard about the Nexus 7. We heard it was coming <a href="/blog/2012/06/26/shots-from-outside-io-2012/">last week</a>, and now after using it for a few days, here&rsquo;s my review.</p>
 
 <p><img src="/images/2012/07/03/nexus.jpg" width="400" height="200" title="Nexus 7" ></p>

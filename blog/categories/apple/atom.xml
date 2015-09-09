@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Apple | Gadget Habit]]></title>
-  <link href="http://MichaelEvans.github.io/blog/categories/apple/atom.xml" rel="self"/>
-  <link href="http://MichaelEvans.github.io/"/>
-  <updated>2015-09-09T19:43:18-04:00</updated>
-  <id>http://MichaelEvans.github.io/</id>
+  <link href="http://michaelevans.org/blog/categories/apple/atom.xml" rel="self"/>
+  <link href="http://michaelevans.org/"/>
+  <updated>2015-08-07T09:41:26-04:00</updated>
+  <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[WWDC Recap]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2012/06/11/wwdc-recap/"/>
+    <link href="http://michaelevans.org/blog/2012/06/11/wwdc-recap/"/>
     <updated>2012-06-11T21:55:00-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2012/06/11/wwdc-recap</id>
+    <id>http://michaelevans.org/blog/2012/06/11/wwdc-recap</id>
     <content type="html"><![CDATA[<p>If you remember from <a href="/blog/2012/06/07/my-wwdc-2012-predictions/">last week</a>, I made some predictions about what Apple would reveal today at WWDC. Let&rsquo;s recap what actually happened, and we can see the hits and misses.</p>
 
 <h3>New Macs</h3>
@@ -65,9 +65,9 @@
   
   <entry>
     <title type="html"><![CDATA[My WWDC 2012 Predictions]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2012/06/07/my-wwdc-2012-predictions/"/>
+    <link href="http://michaelevans.org/blog/2012/06/07/my-wwdc-2012-predictions/"/>
     <updated>2012-06-07T18:02:00-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2012/06/07/my-wwdc-2012-predictions</id>
+    <id>http://michaelevans.org/blog/2012/06/07/my-wwdc-2012-predictions</id>
     <content type="html"><![CDATA[<p>Since essentially all other tech blogs are writing about their predictions for Apple&rsquo;s Worldwide Developer Conference which is being held next week, I&rsquo;ve decided to throw my guesses into the ring, so we can go over them next week, and see how I did. I&rsquo;ll try to touch on all the big rumors that are going around, but if I miss one, feel free to mention it in the comments.</p>
 
 <h2>Things that I think are likely/definite:</h2>

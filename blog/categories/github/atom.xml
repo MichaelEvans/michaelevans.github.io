@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Github | Gadget Habit]]></title>
-  <link href="http://MichaelEvans.github.io/blog/categories/github/atom.xml" rel="self"/>
-  <link href="http://MichaelEvans.github.io/"/>
-  <updated>2015-09-09T19:43:18-04:00</updated>
-  <id>http://MichaelEvans.github.io/</id>
+  <link href="http://michaelevans.org/blog/categories/github/atom.xml" rel="self"/>
+  <link href="http://michaelevans.org/"/>
+  <updated>2015-08-07T09:41:26-04:00</updated>
+  <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Blurred background effect for Android]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2014/07/09/blurred-background-effect-for-android/"/>
+    <link href="http://michaelevans.org/blog/2014/07/09/blurred-background-effect-for-android/"/>
     <updated>2014-07-09T23:04:46-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2014/07/09/blurred-background-effect-for-android</id>
+    <id>http://michaelevans.org/blog/2014/07/09/blurred-background-effect-for-android</id>
     <content type="html"><![CDATA[<p>A few months ago, the Android design team reviewed apps that they thought were good-looking, and were referred to as the &ldquo;<a href="https://play.google.com/store/apps/collection/promotion_3000235_beautiful_apps?hl=en">Beautiful Design Collection</a>&rdquo;, as part of their <a href="https://www.youtube.com/playlist?list=PLWz5rJ2EKKc8j2B95zGMb8muZvrIy-wcF">Android Design in Action</a> series.</p>
 
 <p>One of these apps was <a href="https://play.google.com/store/apps/details?id=com.etsy.android&amp;hl=en">Etsy</a>, which had a very cool fading blur background effect, which you can see here:</p>
@@ -50,9 +50,9 @@ in your</code>build.gradle` and you should be ready to roll.</p>
   
   <entry>
     <title type="html"><![CDATA[ColorArt: a library to do iTunes 11-style color matching for Android]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android/"/>
+    <link href="http://michaelevans.org/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android/"/>
     <updated>2013-12-12T00:02:34-05:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android</id>
+    <id>http://michaelevans.org/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android</id>
     <content type="html"><![CDATA[<p>Last week I open sourced an Android library called <a href="https://github.com/MichaelEvans/ColorArt">ColorArt</a>, which is a port of the popular OS X library written by the guys over at <a href="http://www.panic.com/blog/itunes-11-and-colors/">Panic</a>. It allows you to use a source image to create a themed image/text display, very similar to the effect which is done in iTunes 11.</p>
 
 <p><img class="center" src="/images/2013/12/12/itunes-11.png" width="600" height="600" title="iTunes Example" ></p>

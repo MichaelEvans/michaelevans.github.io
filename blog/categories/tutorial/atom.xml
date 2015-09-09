@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Tutorial | Gadget Habit]]></title>
-  <link href="http://MichaelEvans.github.io/blog/categories/tutorial/atom.xml" rel="self"/>
-  <link href="http://MichaelEvans.github.io/"/>
-  <updated>2015-09-09T19:43:18-04:00</updated>
-  <id>http://MichaelEvans.github.io/</id>
+  <link href="http://michaelevans.org/blog/categories/tutorial/atom.xml" rel="self"/>
+  <link href="http://michaelevans.org/"/>
+  <updated>2015-08-07T09:41:26-04:00</updated>
+  <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Using a ViewPager in a ScrollView]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2013/10/13/using-a-viewpager-in-a-scrollview/"/>
+    <link href="http://michaelevans.org/blog/2013/10/13/using-a-viewpager-in-a-scrollview/"/>
     <updated>2013-10-13T20:48:00-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2013/10/13/using-a-viewpager-in-a-scrollview</id>
+    <id>http://michaelevans.org/blog/2013/10/13/using-a-viewpager-in-a-scrollview</id>
     <content type="html"><![CDATA[<p>For a new app that I&rsquo;m working on, I wanted to use a ViewPager inside a ScrollView in order to make a simple image carousel. The only problem is, ScrollViews don&rsquo;t seem to play nicely with horizontally swiping Views. As soon as the user moves their finger even slightly up or down, the ViewPager page change is cancelled, and the page snaps back to the current item. This can lead to an extremely frustrating user experience, because it is difficult for the user to understand why the views won&rsquo;t swipe.</p>
 
 <!-- more -->
@@ -70,9 +70,9 @@ public boolean onTouch(View v, MotionEvent event) {
   
   <entry>
     <title type="html"><![CDATA[Parse Android To-do App Tutorial - Part Two - Users]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2013/08/20/parse-android-todo-app-tutorial-part-two-users/"/>
+    <link href="http://michaelevans.org/blog/2013/08/20/parse-android-todo-app-tutorial-part-two-users/"/>
     <updated>2013-08-20T21:13:00-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2013/08/20/parse-android-todo-app-tutorial-part-two-users</id>
+    <id>http://michaelevans.org/blog/2013/08/20/parse-android-todo-app-tutorial-part-two-users</id>
     <content type="html"><![CDATA[<p>Last week <a href="http://michaelevans.org/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse/">I posted a tutorial</a> on how to create a really basic Android To-do list application using <a href="http://www.parse.com">Parse</a>. It allowed a user to create tasks, and then toggle their completion status. Then, this information was synced to a server, so that the tasks will be kept up to date on multiple devices. The biggest issue with this app so far, was that there was no concept of users, so all tasks were shared among everyone. This week, we&rsquo;re going to introduce two new screens (which are very similar to one another), the registration and login screens.</p>
 
 <!-- more -->
@@ -332,9 +332,9 @@ v.setEnabled(true);
   
   <entry>
     <title type="html"><![CDATA[Tutorial: Building an Android To-Do List app using Parse]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse/"/>
+    <link href="http://michaelevans.org/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse/"/>
     <updated>2013-08-14T22:08:00-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse</id>
+    <id>http://michaelevans.org/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse</id>
     <content type="html"><![CDATA[<p>For a while now I&rsquo;ve been using <a href="http://www.parse.com">Parse</a> for small apps, it allows you to iterate quickly and create a backend for an app without too much work. It also seems like a perfect jumping off point for a series of Android tutorials, where we&rsquo;ll be building a &ldquo;Todo List&rdquo; application. (This tutorial assumes that you have <a href="http://developer.android.com/tools/sdk/eclipse-adt.html">Eclipse and the ADT</a> installed already.)</p>
 
 <!-- more -->
@@ -674,9 +674,9 @@ Now when you load up the app, you&rsquo;ll see the tasks from last time in the l
   
   <entry>
     <title type="html"><![CDATA[Getting Mavericks' Compressed Memory Feature in Ubuntu]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2013/06/12/getting-mavericks-compressed-memory-feature-in-ubuntu/"/>
+    <link href="http://michaelevans.org/blog/2013/06/12/getting-mavericks-compressed-memory-feature-in-ubuntu/"/>
     <updated>2013-06-12T00:16:00-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2013/06/12/getting-mavericks-compressed-memory-feature-in-ubuntu</id>
+    <id>http://michaelevans.org/blog/2013/06/12/getting-mavericks-compressed-memory-feature-in-ubuntu</id>
     <content type="html"><![CDATA[<p>On Monday, Apple announced a new update for it&rsquo;s desktop operating system, which will be named OS X Mavericks. As part of the annoucement, they touched on a few performance related features, including a new power saving API, which was called App Nap, as well as a memory compression feature, which would allow compress the memory of programs that are not currently active.</p>
 
 <p>According to <a href="http://arstechnica.com/apple/2013/06/how-os-x-mavericks-works-its-power-saving-magic/">Ars Technica</a>, Apple is using a technique called Timer Coalescing to create App Nap. Apps that are not active will have their processes set to a lower priority, and therefore use less CPU/disk/etc, and thereby save power. This feature has been around on Linux for a long time, and apparently has been part of Windows as well.</p>
@@ -700,9 +700,9 @@ sudo apt-get install zram-config
   
   <entry>
     <title type="html"><![CDATA[Clickable Links in Android ListViews]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2013/03/29/clickable-links-in-android-listviews/"/>
+    <link href="http://michaelevans.org/blog/2013/03/29/clickable-links-in-android-listviews/"/>
     <updated>2013-03-29T00:14:00-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2013/03/29/clickable-links-in-android-listviews</id>
+    <id>http://michaelevans.org/blog/2013/03/29/clickable-links-in-android-listviews</id>
     <content type="html"><![CDATA[<p>As part of my newest app (<a href="https://play.google.com/store/apps/details?id=com.evans.hackernews">Hacker News for Android</a>), I needed to add the ability to click on links in a ListView, and have them open in the browser, while maintaining the ability for the user to click on the ListView row itself, and have the row listen to the click.</p>
 
 <p>If you try using <code>Linkify</code> and <code>LinkMovementMethod</code>, which you&rsquo;d use on normal links in a TextView, you&rsquo;ll find that you can no longer use the ListView properly.</p>

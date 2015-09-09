@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Review | Gadget Habit]]></title>
-  <link href="http://MichaelEvans.github.io/blog/categories/review/atom.xml" rel="self"/>
-  <link href="http://MichaelEvans.github.io/"/>
-  <updated>2015-09-09T19:43:18-04:00</updated>
-  <id>http://MichaelEvans.github.io/</id>
+  <link href="http://michaelevans.org/blog/categories/review/atom.xml" rel="self"/>
+  <link href="http://michaelevans.org/"/>
+  <updated>2015-08-07T09:41:26-04:00</updated>
+  <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Hands On with Google Glass]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2013/04/29/hands-on-with-google-glass/"/>
+    <link href="http://michaelevans.org/blog/2013/04/29/hands-on-with-google-glass/"/>
     <updated>2013-04-29T16:36:00-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2013/04/29/hands-on-with-google-glass</id>
+    <id>http://michaelevans.org/blog/2013/04/29/hands-on-with-google-glass</id>
     <content type="html"><![CDATA[<h3>The Pickup</h3>
 
 <p>Last Wednesday I took the trip up to NYC, to the top floor of Chelsea Market to pick up a device that many have waited anxiously for. A device unlike anything else we&rsquo;ve seen before: Google&rsquo;s Glass. This is the Explorer Edition of the device, which is targeted towards developers, who attended Google&rsquo;s IO conference last year. I was fortunate to be invited to pick up my device on the first day of New York&rsquo;s pickups, which followed several pickup days in Mountain View the previous week.</p>
@@ -69,9 +69,9 @@
   
   <entry>
     <title type="html"><![CDATA[Nexus Q Review]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2012/09/07/nexus-q-review/"/>
+    <link href="http://michaelevans.org/blog/2012/09/07/nexus-q-review/"/>
     <updated>2012-09-07T20:11:00-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2012/09/07/nexus-q-review</id>
+    <id>http://michaelevans.org/blog/2012/09/07/nexus-q-review</id>
     <content type="html"><![CDATA[<p>It’s a <em>what</em>? Ever since I returned from Google I/O, this is what people have been saying when they see the newest addition to my TV setup, the Nexus Q. It’s hard to blame them though, since it just looks so different, for a home theatre device. unlike those bland, black boxes that most living rooms are filled with, the Nexus Q is a heavy (about two pounds) sphere, which is lit by a ring of 32 LEDs. The top side of the Q spins freely to function as a volume knob, and can be tapped to mute.</p>
 
 <p><img src="/images/2012/09/07/q.jpeg" width="400" height="400" title="Nexus Q" ></p>
@@ -96,9 +96,9 @@
   
   <entry>
     <title type="html"><![CDATA[Nexus 7 Review]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2012/07/03/nexus-7-review/"/>
+    <link href="http://michaelevans.org/blog/2012/07/03/nexus-7-review/"/>
     <updated>2012-07-03T13:39:00-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2012/07/03/nexus-7-review</id>
+    <id>http://michaelevans.org/blog/2012/07/03/nexus-7-review</id>
     <content type="html"><![CDATA[<p>So by now you&rsquo;ve probably heard about the Nexus 7. We heard it was coming <a href="/blog/2012/06/26/shots-from-outside-io-2012/">last week</a>, and now after using it for a few days, here&rsquo;s my review.</p>
 
 <p><img src="/images/2012/07/03/nexus.jpg" width="400" height="200" title="Nexus 7" ></p>
@@ -164,9 +164,9 @@
   
   <entry>
     <title type="html"><![CDATA[The Raspberry Pi Has Arrived!]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2012/06/05/the-raspberry-pi-has-arrived/"/>
+    <link href="http://michaelevans.org/blog/2012/06/05/the-raspberry-pi-has-arrived/"/>
     <updated>2012-06-05T20:08:00-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2012/06/05/the-raspberry-pi-has-arrived</id>
+    <id>http://michaelevans.org/blog/2012/06/05/the-raspberry-pi-has-arrived</id>
     <content type="html"><![CDATA[<p>As the title suggests, I just received my <a href="http://www.raspberrypi.org">Raspberry Pi</a> (Model B) in the mail. For those who don&rsquo;t know about the Raspberry Pi, it&rsquo;s a small little computer with 256MB of RAM, a 700MHz CPU and a GPU capable of 1080p output over HDMI. Connectivity is provided via 2 USB 2.0 ports, and a RJ45 10/100 Ethernet port. There&rsquo;s HDMI and RCA video, and a 3.5mm jack for audio. Lastly, there&rsquo;s an SD slot on the bottom for storage, and the device is powered by a microUSB port, the same one as most smartphones.</p>
 
 <p><img src="/images/2012/06/05/raspberrypi.jpg" width="700" height="200" title="Pi Box" ></p>

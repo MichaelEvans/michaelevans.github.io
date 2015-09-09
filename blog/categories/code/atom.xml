@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Code | Gadget Habit]]></title>
-  <link href="http://MichaelEvans.github.io/blog/categories/code/atom.xml" rel="self"/>
-  <link href="http://MichaelEvans.github.io/"/>
-  <updated>2015-09-09T19:43:18-04:00</updated>
-  <id>http://MichaelEvans.github.io/</id>
+  <link href="http://michaelevans.org/blog/categories/code/atom.xml" rel="self"/>
+  <link href="http://michaelevans.org/"/>
+  <updated>2015-08-07T09:41:26-04:00</updated>
+  <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Using Espresso for Easy UI Testing]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2015/08/03/using-espresso-for-easy-ui-testing/"/>
+    <link href="http://michaelevans.org/blog/2015/08/03/using-espresso-for-easy-ui-testing/"/>
     <updated>2015-08-03T22:16:49-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2015/08/03/using-espresso-for-easy-ui-testing</id>
+    <id>http://michaelevans.org/blog/2015/08/03/using-espresso-for-easy-ui-testing</id>
     <content type="html"><![CDATA[<p>One thing that I notice when I talk to Android developers is that a lot of them don&rsquo;t put an emphasis on testing. They say that it&rsquo;s too hard to write them or that they are too hard to integrate and set up, or give a bunch of other reasons why they don&rsquo;t. But it&rsquo;s actually pretty simple to write <a href="https://code.google.com/p/android-test-kit/wiki/Espresso">Espresso</a> tests, and they really aren&rsquo;t that hard to integrate with your code base.</p>
 
 <!-- more -->
@@ -137,9 +137,9 @@ new RestAdapter.Builder()
   
   <entry>
     <title type="html"><![CDATA[Improving your code with Android Support Annotations]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2015/07/14/improving-your-code-with-android-support-annotations/"/>
+    <link href="http://michaelevans.org/blog/2015/07/14/improving-your-code-with-android-support-annotations/"/>
     <updated>2015-07-14T22:46:56-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2015/07/14/improving-your-code-with-android-support-annotations</id>
+    <id>http://michaelevans.org/blog/2015/07/14/improving-your-code-with-android-support-annotations</id>
     <content type="html"><![CDATA[<p>If you haven&rsquo;t heard of the Android Support Annotations library yet, you&rsquo;re missing out on a neat new package that will help you catch bugs in your apps. Included in the library is a number of Java annotations, that will help Android Studio check your code for possible errors and report them to you. There are quite a few of them, so I only plan to go over a few of them here, but you should definitely <a href="http://tools.android.com/tech-docs/support-annotations">check out the docs</a> for more info about the rest.</p>
 
 <h2>@NonNull / @Nullable</h2>
@@ -213,9 +213,9 @@ public void doSomething() {
   
   <entry>
     <title type="html"><![CDATA[Android Ripples with Rounded Corners]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2015/05/07/android-ripples-with-rounded-corners/"/>
+    <link href="http://michaelevans.org/blog/2015/05/07/android-ripples-with-rounded-corners/"/>
     <updated>2015-05-07T22:55:36-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2015/05/07/android-ripples-with-rounded-corners</id>
+    <id>http://michaelevans.org/blog/2015/05/07/android-ripples-with-rounded-corners</id>
     <content type="html"><![CDATA[<p>So recently I was trying to add a ripple to a view that had rounded corners. Simple enough right? Let&rsquo;s just say I have a FrameLayout with the background similar to this one:</p>
 
 <p>```
@@ -268,9 +268,9 @@ public void doSomething() {
   
   <entry>
     <title type="html"><![CDATA[Blurred background effect for Android]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2014/07/09/blurred-background-effect-for-android/"/>
+    <link href="http://michaelevans.org/blog/2014/07/09/blurred-background-effect-for-android/"/>
     <updated>2014-07-09T23:04:46-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2014/07/09/blurred-background-effect-for-android</id>
+    <id>http://michaelevans.org/blog/2014/07/09/blurred-background-effect-for-android</id>
     <content type="html"><![CDATA[<p>A few months ago, the Android design team reviewed apps that they thought were good-looking, and were referred to as the &ldquo;<a href="https://play.google.com/store/apps/collection/promotion_3000235_beautiful_apps?hl=en">Beautiful Design Collection</a>&rdquo;, as part of their <a href="https://www.youtube.com/playlist?list=PLWz5rJ2EKKc8j2B95zGMb8muZvrIy-wcF">Android Design in Action</a> series.</p>
 
 <p>One of these apps was <a href="https://play.google.com/store/apps/details?id=com.etsy.android&amp;hl=en">Etsy</a>, which had a very cool fading blur background effect, which you can see here:</p>
@@ -303,9 +303,9 @@ in your</code>build.gradle` and you should be ready to roll.</p>
   
   <entry>
     <title type="html"><![CDATA[ColorArt: a library to do iTunes 11-style color matching for Android]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android/"/>
+    <link href="http://michaelevans.org/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android/"/>
     <updated>2013-12-12T00:02:34-05:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android</id>
+    <id>http://michaelevans.org/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android</id>
     <content type="html"><![CDATA[<p>Last week I open sourced an Android library called <a href="https://github.com/MichaelEvans/ColorArt">ColorArt</a>, which is a port of the popular OS X library written by the guys over at <a href="http://www.panic.com/blog/itunes-11-and-colors/">Panic</a>. It allows you to use a source image to create a themed image/text display, very similar to the effect which is done in iTunes 11.</p>
 
 <p><img class="center" src="/images/2013/12/12/itunes-11.png" width="600" height="600" title="iTunes Example" ></p>

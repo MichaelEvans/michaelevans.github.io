@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Gadget Habit]]></title>
-  <link href="http://MichaelEvans.github.io/atom.xml" rel="self"/>
-  <link href="http://MichaelEvans.github.io/"/>
-  <updated>2015-09-09T19:43:18-04:00</updated>
-  <id>http://MichaelEvans.github.io/</id>
+  <link href="http://michaelevans.org/atom.xml" rel="self"/>
+  <link href="http://michaelevans.org/"/>
+  <updated>2015-08-07T09:41:26-04:00</updated>
+  <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Using Espresso for Easy UI Testing]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2015/08/03/using-espresso-for-easy-ui-testing/"/>
+    <link href="http://michaelevans.org/blog/2015/08/03/using-espresso-for-easy-ui-testing/"/>
     <updated>2015-08-03T22:16:49-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2015/08/03/using-espresso-for-easy-ui-testing</id>
+    <id>http://michaelevans.org/blog/2015/08/03/using-espresso-for-easy-ui-testing</id>
     <content type="html"><![CDATA[<p>One thing that I notice when I talk to Android developers is that a lot of them don&rsquo;t put an emphasis on testing. They say that it&rsquo;s too hard to write them or that they are too hard to integrate and set up, or give a bunch of other reasons why they don&rsquo;t. But it&rsquo;s actually pretty simple to write <a href="https://code.google.com/p/android-test-kit/wiki/Espresso">Espresso</a> tests, and they really aren&rsquo;t that hard to integrate with your code base.</p>
 
 <!-- more -->
@@ -194,9 +194,9 @@
   
   <entry>
     <title type="html"><![CDATA[Improving your code with Android Support Annotations]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2015/07/14/improving-your-code-with-android-support-annotations/"/>
+    <link href="http://michaelevans.org/blog/2015/07/14/improving-your-code-with-android-support-annotations/"/>
     <updated>2015-07-14T22:46:56-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2015/07/14/improving-your-code-with-android-support-annotations</id>
+    <id>http://michaelevans.org/blog/2015/07/14/improving-your-code-with-android-support-annotations</id>
     <content type="html"><![CDATA[<p>If you haven&rsquo;t heard of the Android Support Annotations library yet, you&rsquo;re missing out on a neat new package that will help you catch bugs in your apps. Included in the library is a number of Java annotations, that will help Android Studio check your code for possible errors and report them to you. There are quite a few of them, so I only plan to go over a few of them here, but you should definitely <a href="http://tools.android.com/tech-docs/support-annotations">check out the docs</a> for more info about the rest.</p>
 
 <h2>@NonNull / @Nullable</h2>
@@ -208,15 +208,15 @@
 
 <p>Turn this:</p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2015/07/14/no-annotations.png" width="600" height="300" title="Method with no annotations" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2015/07/14/no-annotations.png" width="600" height="300" title="Method with no annotations" ></p>
 
 <p>into this:</p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2015/07/14/nonnull.png" width="600" height="250" title="with @NonNull" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2015/07/14/nonnull.png" width="600" height="250" title="with @NonNull" ></p>
 
 <p>Bonus points: We can even take this example one step further with the <code>@CheckResult</code> annotation, to tell us know that the return type of this method is something that we are expected to use, rather than the method having a side effect.</p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2015/07/14/checkreturn.png" width="600" height="300" title="Check that return type!" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2015/07/14/checkreturn.png" width="600" height="300" title="Check that return type!" ></p>
 
 <h2>@StringRes / @DrawableRes / etc.</h2>
 
@@ -232,7 +232,7 @@
 
 <p>Now if you try to pass a non-String resource id to this method, you get something like this:</p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2015/07/14/stringres.png" width="500" height="200" title="Method takes a @StringRes id, not an int" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2015/07/14/stringres.png" width="500" height="200" title="Method takes a @StringRes id, not an int" ></p>
 
 <p>(There are resouce annotations for all resoruce types, <code>@DrawableRes</code>, <code>@ColorRes</code>, <code>@InterpolatorRes</code>, etc.)</p>
 
@@ -272,9 +272,9 @@
   
   <entry>
     <title type="html"><![CDATA[Android Ripples with Rounded Corners]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2015/05/07/android-ripples-with-rounded-corners/"/>
+    <link href="http://michaelevans.org/blog/2015/05/07/android-ripples-with-rounded-corners/"/>
     <updated>2015-05-07T22:55:36-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2015/05/07/android-ripples-with-rounded-corners</id>
+    <id>http://michaelevans.org/blog/2015/05/07/android-ripples-with-rounded-corners</id>
     <content type="html"><![CDATA[<p>So recently I was trying to add a ripple to a view that had rounded corners. Simple enough right? Let&rsquo;s just say I have a FrameLayout with the background similar to this one:</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -299,7 +299,7 @@
 
 <p>It&rsquo;s not quite as simple as setting the foreground to <code>?attr/selectableItemBackground</code>, or else you&rsquo;ll see the ripple surpasses the corners (which doesn&rsquo;t look <em>so</em> bad when your border radius is small, but this would look terrible with a circlular view):</p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2015/05/07/before.gif" width="600" height="600" title="Rounded Corner Fail!" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2015/05/07/before.gif" width="600" height="600" title="Rounded Corner Fail!" ></p>
 
 <p>The solution for this lies in the special mask layer of the <a href="https://developer.android.com/reference/android/graphics/drawable/RippleDrawable.html">RippleDrawable</a>. You specify the mask layer via the <code>android:id</code> value set to <code>@android:id/mask</code>. For the example above, you can set the mask to the same size/shape as the view you&rsquo;re masking, and then the ripple will only show for that area. For something like our example above, you&rsquo;d use something like this:</p>
 
@@ -329,7 +329,7 @@
 
 <p>Now when you tap on the view, you&rsquo;ll see something like this:</p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2015/05/07/after.gif" width="600" height="600" title="Rounded Corners!" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2015/05/07/after.gif" width="600" height="600" title="Rounded Corners!" ></p>
 
 <p><em>Huzzah!</em></p>
 
@@ -339,14 +339,14 @@
   
   <entry>
     <title type="html"><![CDATA[Blurred background effect for Android]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2014/07/09/blurred-background-effect-for-android/"/>
+    <link href="http://michaelevans.org/blog/2014/07/09/blurred-background-effect-for-android/"/>
     <updated>2014-07-09T23:04:46-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2014/07/09/blurred-background-effect-for-android</id>
+    <id>http://michaelevans.org/blog/2014/07/09/blurred-background-effect-for-android</id>
     <content type="html"><![CDATA[<p>A few months ago, the Android design team reviewed apps that they thought were good-looking, and were referred to as the &ldquo;<a href="https://play.google.com/store/apps/collection/promotion_3000235_beautiful_apps?hl=en">Beautiful Design Collection</a>&rdquo;, as part of their <a href="https://www.youtube.com/playlist?list=PLWz5rJ2EKKc8j2B95zGMb8muZvrIy-wcF">Android Design in Action</a> series.</p>
 
 <p>One of these apps was <a href="https://play.google.com/store/apps/details?id=com.etsy.android&amp;hl=en">Etsy</a>, which had a very cool fading blur background effect, which you can see here:</p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2014/07/09/2014-07-09-23_25_40.gif" width="600" height="600" title="Etsy Example" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2014/07/09/2014-07-09-23_25_40.gif" width="600" height="600" title="Etsy Example" ></p>
 
 <p>As a learning experiment, I set off to replicate this behavior. I had seen a library by Manuel Peinado called <a href="https://github.com/ManuelPeinado/GlassActionBar">GlassActionBar</a> which demonstrated a similar glass-like blur effect on the ActionBar, so I decided to use that code for blurring my background.</p>
 
@@ -366,7 +366,7 @@
 
 <p>Once you have the blurring, the rest of the process is fairly straight forward. When you plan to leave an activity, create a bitmap of the current view and write it to disk. When you start your new activity (which should have a transparent background), you override the transition (otherwise you&rsquo;ll get the default zoom), and set the background to the blurred image you saved earlier. Add a fade in for the alpha and you get a nice little effect!</p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2014/07/09/2014-07-09-23_34_05.gif" width="600" height="600" title="My Example" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2014/07/09/2014-07-09-23_34_05.gif" width="600" height="600" title="My Example" ></p>
 
 <p>If you&rsquo;d like to see how this looks in a sample project, you can find it on Github <a href="https://github.com/MichaelEvans/EtsyBlurExample">here</a>.</p>
 ]]></content>
@@ -374,9 +374,9 @@
   
   <entry>
     <title type="html"><![CDATA[Building OBS Studio for OS X]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2014/06/07/building-obs-studio-for-os-x/"/>
+    <link href="http://michaelevans.org/blog/2014/06/07/building-obs-studio-for-os-x/"/>
     <updated>2014-06-07T22:59:38-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2014/06/07/building-obs-studio-for-os-x</id>
+    <id>http://michaelevans.org/blog/2014/06/07/building-obs-studio-for-os-x</id>
     <content type="html"><![CDATA[<p>Recently I&rsquo;ve been watching a bunch of streams on <a href="http://www.twitch.tv/">Twitch</a>, and was investigating the best options to stream from OS X. Sadly most of the ones I found were very expensive, until I saw that <a href="http://obsproject.com/">Open Broadcaster Software</a>, which was previously only for Windows, was <a href="https://github.com/jp9000/obs-studio">being rewritten</a> to work with OS X and Linux. However, it&rsquo;s still highly beta/under development and as a result, there&rsquo;s not a lot of documentation on how to build it.</p>
 
 <p>Here&rsquo;s how I did it:</p>
@@ -405,9 +405,9 @@
   
   <entry>
     <title type="html"><![CDATA[Embedding Google+ Posts in Octopress]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2014/04/13/embedding-google-plus-posts-in-octopress/"/>
+    <link href="http://michaelevans.org/blog/2014/04/13/embedding-google-plus-posts-in-octopress/"/>
     <updated>2014-04-13T13:46:25-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2014/04/13/embedding-google-plus-posts-in-octopress</id>
+    <id>http://michaelevans.org/blog/2014/04/13/embedding-google-plus-posts-in-octopress</id>
     <content type="html"><![CDATA[<p>A few months back I wrote a blog post about my <a href="http://www.michaelevans.org/blog/2013/12/31/2013-in-review/">2013 in Review</a>. One thing I wanted to add to the post was a link to the #AutoAwesomed video, which was generated from photos and videos I took during the year, which were backed up to Google+.</p>
 
 <p>Fortunately for me, Google allows you to embed posts into your pages using a technique which is documented <a href="https://developers.google.com/+/web/embedded-post/">here</a>. The problem with this method, for me at least, is that my blog is created using <a href="http://octopress.org/">Octopress</a>, and posts are written in Markdown and then rendered to HTML. Octopress does, however, allow you to write plugins which can help us with this issue.</p>
@@ -444,9 +444,9 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
   
   <entry>
     <title type="html"><![CDATA[ADB over WiFi]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2014/03/03/adb-over-wifi/"/>
+    <link href="http://michaelevans.org/blog/2014/03/03/adb-over-wifi/"/>
     <updated>2014-03-03T22:30:38-05:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2014/03/03/adb-over-wifi</id>
+    <id>http://michaelevans.org/blog/2014/03/03/adb-over-wifi</id>
     <content type="html"><![CDATA[<p>I haven&rsquo;t updated my blog in a while, but this is a tip/trick that&rsquo;s so good that I had to share. It&rsquo;s not a very widely known feature, but once you try it, you&rsquo;ll wonder how you lived with out it: using ADB over WiFi! That&rsquo;s right, no more plugging in all your devices to your computer to debug/etc. Best of all, no root required.</p>
 
 <p>It&rsquo;s also ingeniusly simple. First, connect the device you want to use via a USB cable.</p>
@@ -465,9 +465,9 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
   
   <entry>
     <title type="html"><![CDATA[2013 in Review]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2013/12/31/2013-in-review/"/>
+    <link href="http://michaelevans.org/blog/2013/12/31/2013-in-review/"/>
     <updated>2013-12-31T11:27:05-05:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2013/12/31/2013-in-review</id>
+    <id>http://michaelevans.org/blog/2013/12/31/2013-in-review</id>
     <content type="html"><![CDATA[<p>Today is December 31st, and I decided to write up a blog post, reflecting on the year that I&rsquo;ve had. I&rsquo;ve learned a lot over the last twelve months, and done a lot of interesting things (okay, at least interesting to me). Here&rsquo;s a brief overview of what happened:</p>
 
 <div align='center'><div class='g-post' data-href='https://plus.google.com/114052868601022948953/posts/ZzXcKVs2fvH'></div></div>
@@ -503,12 +503,12 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
   
   <entry>
     <title type="html"><![CDATA[ColorArt: a library to do iTunes 11-style color matching for Android]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android/"/>
+    <link href="http://michaelevans.org/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android/"/>
     <updated>2013-12-12T00:02:34-05:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android</id>
+    <id>http://michaelevans.org/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android</id>
     <content type="html"><![CDATA[<p>Last week I open sourced an Android library called <a href="https://github.com/MichaelEvans/ColorArt">ColorArt</a>, which is a port of the popular OS X library written by the guys over at <a href="http://www.panic.com/blog/itunes-11-and-colors/">Panic</a>. It allows you to use a source image to create a themed image/text display, very similar to the effect which is done in iTunes 11.</p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2013/12/12/itunes-11.png" width="600" height="600" title="iTunes Example" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2013/12/12/itunes-11.png" width="600" height="600" title="iTunes Example" ></p>
 
 <!-- more -->
 
@@ -543,7 +543,7 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
 
 <p>Voilà! Now you can make cool themed image/text display using Bitmaps as part of your application.</p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2013/12/12/sample.png" width="300" height="300" title="Sample" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2013/12/12/sample.png" width="300" height="300" title="Sample" ></p>
 
 <h3>Bonus: FadingImageView</h3>
 
@@ -573,9 +573,9 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
   
   <entry>
     <title type="html"><![CDATA[Hands On with Google Helpouts]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2013/11/05/hands-on-with-google-helpouts/"/>
+    <link href="http://michaelevans.org/blog/2013/11/05/hands-on-with-google-helpouts/"/>
     <updated>2013-11-05T10:38:00-05:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2013/11/05/hands-on-with-google-helpouts</id>
+    <id>http://michaelevans.org/blog/2013/11/05/hands-on-with-google-helpouts</id>
     <content type="html"><![CDATA[<p>This morning Google launched a new product called <a href="https://helpouts.google.com">Helpouts</a>, a tool which will connect people with experts for help via a video conference. I was accepted as a Helpout provider a few weeks back, and have been using the product for a little while during the internal beta. I decided to do an Helpout to teach people to write code, which I cleverly named &ldquo;<a href="https://helpouts.google.com/114052868601022948953/ls/a65184ab017ae8b0">Coding 101: learn the basics of writing code and building apps</a>&rdquo;.</p>
 
 <iframe width="640" height="510" src="http://www.youtube.com/embed/K-VFC9AQM1k " frameborder="0" webkitAllowFullScreen mozallowfullscreen allowfullscreen></iframe>
@@ -590,7 +590,7 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
 
 <p>As a provider, you are to create a listing which people can sign up for. The process is pretty simple, all that&rsquo;s required is a bit of a description, fill out some pricing options (free, price per minute or per session), some info about yourself explaining your qualificaitons, and a picture for the listing. After that, you&rsquo;ll wait for your listing to be approved by Google.</p>
 
-<p><img class="left" src="http://MichaelEvans.github.io/images/2013/11/05/pricing_options.png" width="400" height="400" title="Pricing Options" ></p>
+<p><img class="left" src="http://michaelevans.org/images/2013/11/05/pricing_options.png" width="400" height="400" title="Pricing Options" ></p>
 
 <p>Part of the approval process includes doing a Helpout with a Google employee, in order to get a feel for the system and see how it works. They then also verify the information that you provided to make sure you are who you say you are.</p>
 
@@ -598,21 +598,21 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
 
 <p>On the consumer side, prospective users can select from any of the categories of Helpouts, which inlude art and music, computer and electronics, cooking, education, fashion and beauty, fitness and nutrition and home and garden. After you select a category, you choose the topic/listing that you&rsquo;re interested in, pick a time, and you&rsquo;ll get an email confirmation regarding your scheduled appointment.</p>
 
-<p><img class="right" src="http://MichaelEvans.github.io/images/2013/11/05/your_helpouts.png" width="400" height="500" title="Your Helpouts" ></p>
+<p><img class="right" src="http://michaelevans.org/images/2013/11/05/your_helpouts.png" width="400" height="500" title="Your Helpouts" ></p>
 
 <p>When its time for your helpout, you&rsquo;ll get a reminder email with a link you can use to quickly join. The interface looks almost identical to the Hangouts UI, except with a few extra widgets to indicate the Helpout title/price/if it&rsquo;s being recorded.</p>
 
 <p>In addition to paricipating from your computer, Google has also launched an <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.helpouts">Android app</a> so that you can get help while you&rsquo;re mobile as well. Whether you&rsquo;re interested in giving Helpouts a shot, want to learn about writing apps for Android, or just want to see what the newest Google product looks like &ndash; feel free to checkout <a href="https://helpouts.google.com/114052868601022948953/ls/a65184ab017ae8b0">my listing!</a>.</p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2013/11/05/waiting.png" width="600" height="600" title="Waiting" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2013/11/05/waiting.png" width="600" height="600" title="Waiting" ></p>
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[Using a ViewPager in a ScrollView]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2013/10/13/using-a-viewpager-in-a-scrollview/"/>
+    <link href="http://michaelevans.org/blog/2013/10/13/using-a-viewpager-in-a-scrollview/"/>
     <updated>2013-10-13T20:48:00-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2013/10/13/using-a-viewpager-in-a-scrollview</id>
+    <id>http://michaelevans.org/blog/2013/10/13/using-a-viewpager-in-a-scrollview</id>
     <content type="html"><![CDATA[<p>For a new app that I&rsquo;m working on, I wanted to use a ViewPager inside a ScrollView in order to make a simple image carousel. The only problem is, ScrollViews don&rsquo;t seem to play nicely with horizontally swiping Views. As soon as the user moves their finger even slightly up or down, the ViewPager page change is cancelled, and the page snaps back to the current item. This can lead to an extremely frustrating user experience, because it is difficult for the user to understand why the views won&rsquo;t swipe.</p>
 
 <!-- more -->
@@ -697,17 +697,17 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
   
   <entry>
     <title type="html"><![CDATA[My Newest App: Bike Finder]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2013/09/16/my-newest-app-bike-finder/"/>
+    <link href="http://michaelevans.org/blog/2013/09/16/my-newest-app-bike-finder/"/>
     <updated>2013-09-16T23:11:00-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2013/09/16/my-newest-app-bike-finder</id>
-    <content type="html"><![CDATA[<p><img class="right" src="http://MichaelEvans.github.io/images/2013/09/16/map.png" width="240" height="400" title="Map" ></p>
+    <id>http://michaelevans.org/blog/2013/09/16/my-newest-app-bike-finder</id>
+    <content type="html"><![CDATA[<p><img class="right" src="http://michaelevans.org/images/2013/09/16/map.png" width="240" height="400" title="Map" ></p>
 
 <p>Last week I released my newest Android app, <a href="https://play.google.com/store/apps/details?id=org.michaelevans.bikefinder&amp;referrer=utm_source%3Dblog">Bike Finder</a>. It&rsquo;s a fairly straight forward application that allows you to find bikes and stations for use with Washington DC&rsquo;s Capital Bikeshare system. For those of you not local to DC, Capital Bikeshare is a system that lets you use bikes that are available at docking stations all over the city, as well as parts of northern Virginia. The app is free, and I&rsquo;m looking into adding additional cities that have companies that make their bike sharing data available (currently investigating New York City, Montreal and the Bay Area). If you&rsquo;d like to get your city added, <a href="http://twitter.com/m_evans10">let me know</a>, and I&rsquo;ll see if the data is available, and add it to the to-do list.</p>
 
 <!-- more -->
 
 
-<p><img class="left" src="http://MichaelEvans.github.io/images/2013/09/16/details.png" width="240" height="400" title="Details" ></p>
+<p><img class="left" src="http://michaelevans.org/images/2013/09/16/details.png" width="240" height="400" title="Details" ></p>
 
 <p>I&rsquo;m also planning to add some other cool features, like a notification when a &ldquo;favorite&rdquo; station is low on bikes, or when a &ldquo;favorite&rdquo; station is full (so you know you&rsquo;ll have to bring the bike elsewhere). I&rsquo;m also looking into adding some directions/searching feature, so you can navigate your way around the city without having to leave the application.</p>
 ]]></content>
@@ -715,9 +715,9 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
   
   <entry>
     <title type="html"><![CDATA[Parse Android To-do App Tutorial - Part Two - Users]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2013/08/20/parse-android-todo-app-tutorial-part-two-users/"/>
+    <link href="http://michaelevans.org/blog/2013/08/20/parse-android-todo-app-tutorial-part-two-users/"/>
     <updated>2013-08-20T21:13:00-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2013/08/20/parse-android-todo-app-tutorial-part-two-users</id>
+    <id>http://michaelevans.org/blog/2013/08/20/parse-android-todo-app-tutorial-part-two-users</id>
     <content type="html"><![CDATA[<p>Last week <a href="http://michaelevans.org/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse/">I posted a tutorial</a> on how to create a really basic Android To-do list application using <a href="http://www.parse.com">Parse</a>. It allowed a user to create tasks, and then toggle their completion status. Then, this information was synced to a server, so that the tasks will be kept up to date on multiple devices. The biggest issue with this app so far, was that there was no concept of users, so all tasks were shared among everyone. This week, we&rsquo;re going to introduce two new screens (which are very similar to one another), the registration and login screens.</p>
 
 <!-- more -->
@@ -864,7 +864,7 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
 
 <p>The login screen is very similar to that of the registration screen, with the same widgets in the same places, just different ids and labels, so we&rsquo;re just going to go over the registration screen in this tutorial and leave the login screen up as an exercise to the reader. (The code will be available on <a href="https://github.com/MichaelEvans/Parse-Android-Todo">Github</a> if you get stuck). We&rsquo;re going to want to implement that <code>register</code> function in our RegisterActivity, so let&rsquo;s do that next.</p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2013/08/20/login.png" width="300" height="500" title="Logging In" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2013/08/20/login.png" width="300" height="500" title="Logging In" ></p>
 
 <p>After declaring and binding variables to the two <code>EditText</code> fields (we&rsquo;ll call those <code>mUsernameField</code> and <code>mPasswordField</code>), we create our register function:</p>
 
@@ -917,13 +917,13 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2013/08/20/registering.png" width="300" height="500" title="Registering" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2013/08/20/registering.png" width="300" height="500" title="Registering" ></p>
 
 <p>What&#8217; were doing here is a) bailing out early if the user fails to fill in one of the fields, b) disabling the button while the network request is running, so the user can&rsquo;t try to register multiple times by accident, c) creating a ParseUser object with the username and password from the <code>EditText</code> fields, and then calling <code>signUpInBackground</code>, with a callback which is run when the request is complete. If there is an error for any reason, we re-enable the registration button, so that the user can fix any issues and resubmit. (We&rsquo;ll get to error handling a little later.) If there isn&rsquo;t an error, we start the TodoActivity that we <a href="http://michaelevans.org/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse/">created last week</a>.</p>
 
 <p>Huzzah! If you sign up, you now see a users table in your Parse console!</p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2013/08/20/users.png" width="800" height="800" title="Users Console" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2013/08/20/users.png" width="800" height="800" title="Users Console" ></p>
 
 <h3>Making Things Belong</h3>
 
@@ -945,7 +945,7 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
 
 <p>These lines will make the Task only read/writeable by the owner, and set the user associated with them to the current user. Take a peek in your Parse console, and you&rsquo;ll see the Tasks now have an owner!</p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2013/08/20/tasks.png" width="800" height="800" title="Tasks now belong!" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2013/08/20/tasks.png" width="800" height="800" title="Tasks now belong!" ></p>
 
 <p>We also want to make it possible for a user to log out. We&rsquo;ll do this by providing an option in the action bar settings menu. We can do this by adding an entry in the <code>res/menu/todo.xml</code> file like the following:</p>
 
@@ -1066,7 +1066,7 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
 
 <p>This will set some nice messages that will explain what the error is, or fall back to the message that Parse sends us, if it&rsquo;s some other type of problem.</p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2013/08/20/error_handling.png" width="300" height="500" title="Pretty Error Handling" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2013/08/20/error_handling.png" width="300" height="500" title="Pretty Error Handling" ></p>
 
 <h3>Possibilities for Next Time</h3>
 
@@ -1082,9 +1082,9 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
   
   <entry>
     <title type="html"><![CDATA[Tutorial: Building an Android To-Do List app using Parse]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse/"/>
+    <link href="http://michaelevans.org/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse/"/>
     <updated>2013-08-14T22:08:00-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse</id>
+    <id>http://michaelevans.org/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse</id>
     <content type="html"><![CDATA[<p>For a while now I&rsquo;ve been using <a href="http://www.parse.com">Parse</a> for small apps, it allows you to iterate quickly and create a backend for an app without too much work. It also seems like a perfect jumping off point for a series of Android tutorials, where we&rsquo;ll be building a &ldquo;Todo List&rdquo; application. (This tutorial assumes that you have <a href="http://developer.android.com/tools/sdk/eclipse-adt.html">Eclipse and the ADT</a> installed already.)</p>
 
 <!-- more -->
@@ -1094,17 +1094,17 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
 
 <p>First thing you&rsquo;ll want to do is sign up for Parse, and create a new Application. I called mine &ldquo;Todo&rdquo; here, but you can call it anything you&rsquo;d like. After you pick a name, you&rsquo;ll be presented a screen like the following, which contains your API keys. Do not lose these, this is how your app will connect to the Parse services. (I have removed my keys in the screenshot below.)</p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2013/08/14/parse_keys.png" width="300" height="500" title="Parse Keys" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2013/08/14/parse_keys.png" width="300" height="500" title="Parse Keys" ></p>
 
 <p>Next, you&rsquo;ll want to download the Parse libraries from <a href="https://parse.com/downloads/android/Parse/latest">here</a>.</p>
 
 <p>Back in Eclipse, open the New Project Wizard and create a new Android application. I set the minimum SDK version to Honeycomb in the screenshot below, but feel free to pick something newer if you&rsquo;d like.</p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2013/08/14/android_wizard.png" width="500" height="500" title="Android New Project Wizard" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2013/08/14/android_wizard.png" width="500" height="500" title="Android New Project Wizard" ></p>
 
 <p>You&rsquo;ll then be taken to a screen to create your starting activity. Choose Blank Activity, and feel free to name it whatever you like.</p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2013/08/14/android_wizard_3.png" width="500" height="500" title="Android New Project Wizard" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2013/08/14/android_wizard_3.png" width="500" height="500" title="Android New Project Wizard" ></p>
 
 <p>After you complete the wizard, you&rsquo;ll have a new project in your workspace. Copy the Parse jar file that you downloaded before to the <code>libs/</code> directory, and you&rsquo;ll be all set to begin coding.</p>
 
@@ -1283,7 +1283,7 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
 
 <p>Here we are declaring a layout that contains an input field and a button (for creating new tasks), as well as a ListView for showing the existing tasks. If you run what we&rsquo;ve done so far, you should end up with an application on your device that looks like this:</p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2013/08/14/step1.png" width="300" height="500" title="First Run" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2013/08/14/step1.png" width="300" height="500" title="First Run" ></p>
 
 <p>You can type in the input box, but if you hit the submit button, you&rsquo;ll notice the app will crash. Why&rsquo;s that? Because we said in our XML that the button will perform the <code>createTask</code> method when you click on it, but we never declared that method in our activity. Let&rsquo;s do that now.</p>
 
@@ -1323,7 +1323,7 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
 
 <p>Now if you type in a task and hit save, the input field will be blank, but if you go to your Parse Console, you&rsquo;ll see the data in the data browser:</p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2013/08/14/parse_console.png" width="800" height="800" title="Parse Console" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2013/08/14/parse_console.png" width="800" height="800" title="Parse Console" ></p>
 
 <p>Now let&rsquo;s set up the app to fetch the Tasks from Parse.</p>
 
@@ -1501,7 +1501,7 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
 
 <p>This will query Parse for all the Task objects, and return a list of them. Then we will clear the existing set of Tasks from our adapter, and replace the existing list with those. Now if you run the app, you&rsquo;ll be greeted with something like the following:</p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2013/08/14/step2.png" width="300" height="500" title="Step 2" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2013/08/14/step2.png" width="300" height="500" title="Step 2" ></p>
 
 <p>Let&rsquo;s also add this to our <code>createTask()</code> method, to insert the Task we just created at the top of the list:</p>
 
@@ -1562,7 +1562,7 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
 
 <p>That&rsquo;s it! Now you should be able to launch the application, and create, complete and un-complete tasks as you wish!</p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2013/08/14/step3.png" width="300" height="500" title="Step 2" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2013/08/14/step3.png" width="300" height="500" title="Step 2" ></p>
 
 <h2>Optimizations/Improvements</h2>
 
@@ -1591,9 +1591,9 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
   
   <entry>
     <title type="html"><![CDATA[Getting Mavericks' Compressed Memory Feature in Ubuntu]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2013/06/12/getting-mavericks-compressed-memory-feature-in-ubuntu/"/>
+    <link href="http://michaelevans.org/blog/2013/06/12/getting-mavericks-compressed-memory-feature-in-ubuntu/"/>
     <updated>2013-06-12T00:16:00-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2013/06/12/getting-mavericks-compressed-memory-feature-in-ubuntu</id>
+    <id>http://michaelevans.org/blog/2013/06/12/getting-mavericks-compressed-memory-feature-in-ubuntu</id>
     <content type="html"><![CDATA[<p>On Monday, Apple announced a new update for it&rsquo;s desktop operating system, which will be named OS X Mavericks. As part of the annoucement, they touched on a few performance related features, including a new power saving API, which was called App Nap, as well as a memory compression feature, which would allow compress the memory of programs that are not currently active.</p>
 
 <p>According to <a href="http://arstechnica.com/apple/2013/06/how-os-x-mavericks-works-its-power-saving-magic/">Ars Technica</a>, Apple is using a technique called Timer Coalescing to create App Nap. Apps that are not active will have their processes set to a lower priority, and therefore use less CPU/disk/etc, and thereby save power. This feature has been around on Linux for a long time, and apparently has been part of Windows as well.</p>
@@ -1617,9 +1617,9 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
   
   <entry>
     <title type="html"><![CDATA[Running Crouton on a Chromebook Pixel]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2013/06/11/running-crouton-on-a-chromebook-pixel/"/>
+    <link href="http://michaelevans.org/blog/2013/06/11/running-crouton-on-a-chromebook-pixel/"/>
     <updated>2013-06-11T21:22:00-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2013/06/11/running-crouton-on-a-chromebook-pixel</id>
+    <id>http://michaelevans.org/blog/2013/06/11/running-crouton-on-a-chromebook-pixel</id>
     <content type="html"><![CDATA[<p>So a few weeks back at Google IO, Google handed out an awesome laptop to attendees, the <a href="https://play.google.com/store/devices/details?id=chromebook_pixel_wifi">Chromebook Pixel</a>. For those who aren&rsquo;t familiar with it, the Pixel is a laptop running Google&rsquo;s ChromeOS, with the highest resolution screen available on a laptop (2560x1700). Unfortunately for me (and owners of the other Chromebooks), there&rsquo;s a few things you can&rsquo;t do in Chrome, like writing software in the new Android Studio!</p>
 
 <p>In order to work around this limitation in ChromeOS, a developer at Google named David Schneider developed a set of scripts called <a href="https://github.com/dnschneid/crouton">crouton</a>. Crouton allows you to run Ubuntu inside a your ChromeOS system, so that you can easily swap back and forth between the operating systems. This is not limited to the Pixel, so if you&rsquo;re using another model Chromebook, even dating back to the CR-48, this guide should work for you.</p>
@@ -1662,14 +1662,14 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
   
   <entry>
     <title type="html"><![CDATA[Hands On with Google Glass]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2013/04/29/hands-on-with-google-glass/"/>
+    <link href="http://michaelevans.org/blog/2013/04/29/hands-on-with-google-glass/"/>
     <updated>2013-04-29T16:36:00-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2013/04/29/hands-on-with-google-glass</id>
+    <id>http://michaelevans.org/blog/2013/04/29/hands-on-with-google-glass</id>
     <content type="html"><![CDATA[<h3>The Pickup</h3>
 
 <p>Last Wednesday I took the trip up to NYC, to the top floor of Chelsea Market to pick up a device that many have waited anxiously for. A device unlike anything else we&rsquo;ve seen before: Google&rsquo;s Glass. This is the Explorer Edition of the device, which is targeted towards developers, who attended Google&rsquo;s IO conference last year. I was fortunate to be invited to pick up my device on the first day of New York&rsquo;s pickups, which followed several pickup days in Mountain View the previous week.</p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2013/04/29/s_9e3e2acb-a746-4606-a034-1df2c8e2a3cc-0.jpeg" width="500" height="500" title="The View #throughglass" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2013/04/29/s_9e3e2acb-a746-4606-a034-1df2c8e2a3cc-0.jpeg" width="500" height="500" title="The View #throughglass" ></p>
 
 <!-- more -->
 
@@ -1686,19 +1686,19 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
 
 <p>Included in the box is Glass (obviously), a micro USB cable and a AC adapter for it, a microfiber bag for storing Glass when it&rsquo;s not in use, and two visor attachments, one polarized for sun, and the other clear.</p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2013/04/29/IMG_1235.jpg" width="350" height="350" title="Bag o' goodies" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2013/04/29/IMG_1235.jpg" width="350" height="350" title="Bag o' goodies" ></p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2013/04/29/IMG_1238.jpg" width="350" height="350" title="What's in the bag" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2013/04/29/IMG_1238.jpg" width="350" height="350" title="What's in the bag" ></p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2013/04/29/IMG_1237.jpg" width="350" height="350" title="Nice simple box" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2013/04/29/IMG_1237.jpg" width="350" height="350" title="Nice simple box" ></p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2013/04/29/IMG_1231.jpg" width="350" height="350" title="Sweet Shades" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2013/04/29/IMG_1231.jpg" width="350" height="350" title="Sweet Shades" ></p>
 
 <h3>Thoughts so far</h3>
 
 <p>Since I&rsquo;ve only had the device for a few days, I&rsquo;ll need to post a review after I&rsquo;ve used it for a little longer. So far I&rsquo;ve enjoyed the hands-free navigation for wandering around DC, as well as taking some snapshots. I&rsquo;ve always thought it was a little awkward to reply to text messages and emails using your voice (which is why I never really did it on my phone), but maybe I&rsquo;ll warm up to it with Glass. The battery life has been pretty decent, even with the heavy usage of showing it off to excited friends.</p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2013/04/29/20130426_122245_854.jpg" width="400" height="400" title="#throughglass" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2013/04/29/20130426_122245_854.jpg" width="400" height="400" title="#throughglass" ></p>
 
 <h3>But wait&hellip;there&rsquo;s more!</h3>
 
@@ -1709,7 +1709,7 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
 
 <p>Got any questions you&rsquo;d like answered? Drop me a line below in the comments, on <a href="https://twitter.com/m_evans10">Twitter</a> or on <a href="https://plus.google.com/114052868601022948953/posts">Google Plus</a>!</p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2013/04/29/IMG_1246.jpg" width="350" height="350" title="Selfie." ></p>
+<p><img class="center" src="http://michaelevans.org/images/2013/04/29/IMG_1246.jpg" width="350" height="350" title="Selfie." ></p>
 
 <p>Obligatory selfie.</p>
 ]]></content>
@@ -1717,9 +1717,9 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
   
   <entry>
     <title type="html"><![CDATA[Clickable Links in Android ListViews]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2013/03/29/clickable-links-in-android-listviews/"/>
+    <link href="http://michaelevans.org/blog/2013/03/29/clickable-links-in-android-listviews/"/>
     <updated>2013-03-29T00:14:00-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2013/03/29/clickable-links-in-android-listviews</id>
+    <id>http://michaelevans.org/blog/2013/03/29/clickable-links-in-android-listviews</id>
     <content type="html"><![CDATA[<p>As part of my newest app (<a href="https://play.google.com/store/apps/details?id=com.evans.hackernews">Hacker News for Android</a>), I needed to add the ability to click on links in a ListView, and have them open in the browser, while maintaining the ability for the user to click on the ListView row itself, and have the row listen to the click.</p>
 
 <p>If you try using <code>Linkify</code> and <code>LinkMovementMethod</code>, which you&rsquo;d use on normal links in a TextView, you&rsquo;ll find that you can no longer use the ListView properly.</p>
@@ -1860,12 +1860,12 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
   
   <entry>
     <title type="html"><![CDATA[Google Plus Messenger coming to ChromeOS?]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2013/03/28/google-plus-messenger-coming-to-chromeos/"/>
+    <link href="http://michaelevans.org/blog/2013/03/28/google-plus-messenger-coming-to-chromeos/"/>
     <updated>2013-03-28T22:56:00-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2013/03/28/google-plus-messenger-coming-to-chromeos</id>
+    <id>http://michaelevans.org/blog/2013/03/28/google-plus-messenger-coming-to-chromeos</id>
     <content type="html"><![CDATA[<p>While looking through the Chromium bug tracker today, I stumbled upon an <a href="https://code.google.com/p/chromium/issues/detail?id=167513">interesting bug</a>. The interesting part I found was <a href="https://code.google.com/p/chromium/issues/detail?id=167513#c18">a screenshot posted by one of the Chromium team members</a>.</p>
 
-<p><img class="center" src="http://MichaelEvans.github.io/images/2013/03/28/googlemessenger.png" width="500" height="500" title="Google Plus Messenger" ></p>
+<p><img class="center" src="http://michaelevans.org/images/2013/03/28/googlemessenger.png" width="500" height="500" title="Google Plus Messenger" ></p>
 
 <p>If you look closely, it looks like the Google+ Messenger icon on the bottom right corner of the dock. Is this finally the integration of G+ Messenger and the web that we&rsquo;ve been waiting for since G+ Messenger was introduced? Maybe we&rsquo;ll find out in a few short weeks during <a href="http://michaelevans.org/blog/2013/03/14/google-io-2013-and-google-reader/">Google IO</a> this year!</p>
 ]]></content>
@@ -1873,9 +1873,9 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
   
   <entry>
     <title type="html"><![CDATA[Google IO 2013 and Google Reader]]></title>
-    <link href="http://MichaelEvans.github.io/blog/2013/03/14/google-io-2013-and-google-reader/"/>
+    <link href="http://michaelevans.org/blog/2013/03/14/google-io-2013-and-google-reader/"/>
     <updated>2013-03-14T23:52:00-04:00</updated>
-    <id>http://MichaelEvans.github.io/blog/2013/03/14/google-io-2013-and-google-reader</id>
+    <id>http://michaelevans.org/blog/2013/03/14/google-io-2013-and-google-reader</id>
     <content type="html"><![CDATA[<p>Yesterday was a bittersweet day for me in the world of Google. On the bright side, I was one of the lucky few to acquire a ticket to Google IO 2013. This will be my third Google IO, and I cannot be more excited to attend this year. The first year I went brought about the introduction to Android 3.1 (Honeycomb), which began the improvments for Android&rsquo;s Holo Theme, as well as layouts for tablets. Last year was even more groundbreaking, with the unveiling of a <a href="http://michaelevans.org/blog/2012/06/26/shots-from-outside-io-2012/">few</a> new <a href="http://michaelevans.org/blog/2012/09/07/nexus-q-review/">Nexus</a> <a href="http://michaelevans.org/blog/2012/07/03/nexus-7-review/">devices</a>, Android 4.1 (Jelly Bean), as well as <a href="http://michaelevans.org/blog/2013/02/20/googles-project-glass/">Project Glass</a>. I can&rsquo;t even imagine what they will have in store for us this year.</p>
 
 <p>Here comes the bad news though: <a href="http://googleblog.blogspot.com/2013/03/a-second-spring-of-cleaning.html">Google Reader is being shut down</a>. If you don&rsquo;t know, Google Reader is an RSS reader for the web, a hub for all your subscriptions online. This pending shutdown has caused quite a stir, leading to many users scrambling to <a href="http://www.newsblur.com/">new</a> <a href="http://www.feedly.com/">RSS</a> readers, or <a href="http://blog.digg.com/post/45355701332/were-building-a-reader">building new ones</a>. (There was even a <a href="http://mashable.com/2013/03/14/white-house-google-reader/">petition on whitehouse.org</a> for the government to intervene…)</p>
