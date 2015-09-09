@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Microsoft | Gadget Habit]]></title>
-  <link href="http://michaelevans.org/blog/categories/microsoft/atom.xml" rel="self"/>
-  <link href="http://michaelevans.org/"/>
-  <updated>2015-08-07T09:41:26-04:00</updated>
-  <id>http://michaelevans.org/</id>
+  <link href="http://MichaelEvans.github.io/blog/categories/microsoft/atom.xml" rel="self"/>
+  <link href="http://MichaelEvans.github.io/"/>
+  <updated>2015-09-09T19:43:18-04:00</updated>
+  <id>http://MichaelEvans.github.io/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Microsoft Surface: Has Microsoft nailed it?]]></title>
-    <link href="http://michaelevans.org/blog/2012/06/19/microsoft-surface-has-microsoft-nailed-it/"/>
+    <link href="http://MichaelEvans.github.io/blog/2012/06/19/microsoft-surface-has-microsoft-nailed-it/"/>
     <updated>2012-06-19T19:44:00-04:00</updated>
-    <id>http://michaelevans.org/blog/2012/06/19/microsoft-surface-has-microsoft-nailed-it</id>
+    <id>http://MichaelEvans.github.io/blog/2012/06/19/microsoft-surface-has-microsoft-nailed-it</id>
     <content type="html"><![CDATA[<p>Last night Microsoft unveiled Surface, its entry into the already crowded tablet arena. The name, you might be thinking, sounds awfully familiar. That&rsquo;s cause <a href="http://en.wikipedia.org/wiki/Microsoft_PixelSense">it is</a>. Anyway, the hardware of this reincarnation is <em>not</em> a table, it&rsquo;s actually quite sleek.</p>
 
 <!-- more -->

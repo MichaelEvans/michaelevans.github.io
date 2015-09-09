@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Google+ | Gadget Habit]]></title>
-  <link href="http://michaelevans.org/blog/categories/google-plus/atom.xml" rel="self"/>
-  <link href="http://michaelevans.org/"/>
-  <updated>2015-08-07T09:41:26-04:00</updated>
-  <id>http://michaelevans.org/</id>
+  <link href="http://MichaelEvans.github.io/blog/categories/google-plus/atom.xml" rel="self"/>
+  <link href="http://MichaelEvans.github.io/"/>
+  <updated>2015-09-09T19:43:18-04:00</updated>
+  <id>http://MichaelEvans.github.io/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Guide to Google Authorship]]></title>
-    <link href="http://michaelevans.org/blog/2013/02/25/guide-to-google-authorship/"/>
+    <link href="http://MichaelEvans.github.io/blog/2013/02/25/guide-to-google-authorship/"/>
     <updated>2013-02-25T21:22:00-05:00</updated>
-    <id>http://michaelevans.org/blog/2013/02/25/guide-to-google-authorship</id>
+    <id>http://MichaelEvans.github.io/blog/2013/02/25/guide-to-google-authorship</id>
     <content type="html"><![CDATA[<p>Today I noticed something interesting about my blog: I&rsquo;m now a verified author! What does that mean, you might ask? When one of the pages of my blog shows up in a Google search, it will look a little something like this:</p>
 
 <p><img class="center" src="/images/2013/02/25/authorship.png" width="600" height="400" title="Google Authorship" ></p>

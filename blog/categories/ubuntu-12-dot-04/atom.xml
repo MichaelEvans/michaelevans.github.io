@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Ubuntu 12.04 | Gadget Habit]]></title>
-  <link href="http://michaelevans.org/blog/categories/ubuntu-12-dot-04/atom.xml" rel="self"/>
-  <link href="http://michaelevans.org/"/>
-  <updated>2015-08-07T09:41:26-04:00</updated>
-  <id>http://michaelevans.org/</id>
+  <link href="http://MichaelEvans.github.io/blog/categories/ubuntu-12-dot-04/atom.xml" rel="self"/>
+  <link href="http://MichaelEvans.github.io/"/>
+  <updated>2015-09-09T19:43:18-04:00</updated>
+  <id>http://MichaelEvans.github.io/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[VMware 'Easy Install' stuck on Ubuntu 12.04]]></title>
-    <link href="http://michaelevans.org/blog/2012/12/20/vmware-easy-install-stuck-on-ubuntu-12-dot-04/"/>
+    <link href="http://MichaelEvans.github.io/blog/2012/12/20/vmware-easy-install-stuck-on-ubuntu-12-dot-04/"/>
     <updated>2012-12-20T19:34:00-05:00</updated>
-    <id>http://michaelevans.org/blog/2012/12/20/vmware-easy-install-stuck-on-ubuntu-12-dot-04</id>
+    <id>http://MichaelEvans.github.io/blog/2012/12/20/vmware-easy-install-stuck-on-ubuntu-12-dot-04</id>
     <content type="html"><![CDATA[<p>I was trying to install Ubuntu 12.04 in VMware Player on my PC and ran into some trouble during the &ldquo;Easy Install&rdquo; process. The installation basically hung at the console after the installation was successful, with a message telling me that the VMware Tools were being installed, and that I could login and use the system while they were installing. Maybe 10 minutes later, there was no progress, so I restarted the VM.</p>
 
 <p>I decided to log in and start X manually, so I could at least mess around with it in the meanwhile. Without being able to resize the window/use the shared clipboard, I decided to try to install the tools manually. No dice here, since VMware won&rsquo;t let you install the tools while the Easy Install process is still running. Here&rsquo;s what you can do to fix it:</p>

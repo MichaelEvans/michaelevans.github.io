@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Linux | Gadget Habit]]></title>
-  <link href="http://michaelevans.org/blog/categories/linux/atom.xml" rel="self"/>
-  <link href="http://michaelevans.org/"/>
-  <updated>2015-08-07T09:41:26-04:00</updated>
-  <id>http://michaelevans.org/</id>
+  <link href="http://MichaelEvans.github.io/blog/categories/linux/atom.xml" rel="self"/>
+  <link href="http://MichaelEvans.github.io/"/>
+  <updated>2015-09-09T19:43:18-04:00</updated>
+  <id>http://MichaelEvans.github.io/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Getting Mavericks' Compressed Memory Feature in Ubuntu]]></title>
-    <link href="http://michaelevans.org/blog/2013/06/12/getting-mavericks-compressed-memory-feature-in-ubuntu/"/>
+    <link href="http://MichaelEvans.github.io/blog/2013/06/12/getting-mavericks-compressed-memory-feature-in-ubuntu/"/>
     <updated>2013-06-12T00:16:00-04:00</updated>
-    <id>http://michaelevans.org/blog/2013/06/12/getting-mavericks-compressed-memory-feature-in-ubuntu</id>
+    <id>http://MichaelEvans.github.io/blog/2013/06/12/getting-mavericks-compressed-memory-feature-in-ubuntu</id>
     <content type="html"><![CDATA[<p>On Monday, Apple announced a new update for it&rsquo;s desktop operating system, which will be named OS X Mavericks. As part of the annoucement, they touched on a few performance related features, including a new power saving API, which was called App Nap, as well as a memory compression feature, which would allow compress the memory of programs that are not currently active.</p>
 
 <p>According to <a href="http://arstechnica.com/apple/2013/06/how-os-x-mavericks-works-its-power-saving-magic/">Ars Technica</a>, Apple is using a technique called Timer Coalescing to create App Nap. Apps that are not active will have their processes set to a lower priority, and therefore use less CPU/disk/etc, and thereby save power. This feature has been around on Linux for a long time, and apparently has been part of Windows as well.</p>
@@ -41,9 +41,9 @@ sudo apt-get install zram-config
   
   <entry>
     <title type="html"><![CDATA[Running Crouton on a Chromebook Pixel]]></title>
-    <link href="http://michaelevans.org/blog/2013/06/11/running-crouton-on-a-chromebook-pixel/"/>
+    <link href="http://MichaelEvans.github.io/blog/2013/06/11/running-crouton-on-a-chromebook-pixel/"/>
     <updated>2013-06-11T21:22:00-04:00</updated>
-    <id>http://michaelevans.org/blog/2013/06/11/running-crouton-on-a-chromebook-pixel</id>
+    <id>http://MichaelEvans.github.io/blog/2013/06/11/running-crouton-on-a-chromebook-pixel</id>
     <content type="html"><![CDATA[<p>So a few weeks back at Google IO, Google handed out an awesome laptop to attendees, the <a href="https://play.google.com/store/devices/details?id=chromebook_pixel_wifi">Chromebook Pixel</a>. For those who aren&rsquo;t familiar with it, the Pixel is a laptop running Google&rsquo;s ChromeOS, with the highest resolution screen available on a laptop (2560x1700). Unfortunately for me (and owners of the other Chromebooks), there&rsquo;s a few things you can&rsquo;t do in Chrome, like writing software in the new Android Studio!</p>
 
 <p>In order to work around this limitation in ChromeOS, a developer at Google named David Schneider developed a set of scripts called <a href="https://github.com/dnschneid/crouton">crouton</a>. Crouton allows you to run Ubuntu inside a your ChromeOS system, so that you can easily swap back and forth between the operating systems. This is not limited to the Pixel, so if you&rsquo;re using another model Chromebook, even dating back to the CR-48, this guide should work for you.</p>
@@ -86,9 +86,9 @@ sudo apt-get install zram-config
   
   <entry>
     <title type="html"><![CDATA[VMware 'Easy Install' stuck on Ubuntu 12.04]]></title>
-    <link href="http://michaelevans.org/blog/2012/12/20/vmware-easy-install-stuck-on-ubuntu-12-dot-04/"/>
+    <link href="http://MichaelEvans.github.io/blog/2012/12/20/vmware-easy-install-stuck-on-ubuntu-12-dot-04/"/>
     <updated>2012-12-20T19:34:00-05:00</updated>
-    <id>http://michaelevans.org/blog/2012/12/20/vmware-easy-install-stuck-on-ubuntu-12-dot-04</id>
+    <id>http://MichaelEvans.github.io/blog/2012/12/20/vmware-easy-install-stuck-on-ubuntu-12-dot-04</id>
     <content type="html"><![CDATA[<p>I was trying to install Ubuntu 12.04 in VMware Player on my PC and ran into some trouble during the &ldquo;Easy Install&rdquo; process. The installation basically hung at the console after the installation was successful, with a message telling me that the VMware Tools were being installed, and that I could login and use the system while they were installing. Maybe 10 minutes later, there was no progress, so I restarted the VM.</p>
 
 <p>I decided to log in and start X manually, so I could at least mess around with it in the meanwhile. Without being able to resize the window/use the shared clipboard, I decided to try to install the tools manually. No dice here, since VMware won&rsquo;t let you install the tools while the Easy Install process is still running. Here&rsquo;s what you can do to fix it:</p>

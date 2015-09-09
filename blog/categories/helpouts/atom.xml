@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Helpouts | Gadget Habit]]></title>
-  <link href="http://michaelevans.org/blog/categories/helpouts/atom.xml" rel="self"/>
-  <link href="http://michaelevans.org/"/>
-  <updated>2015-08-07T09:41:26-04:00</updated>
-  <id>http://michaelevans.org/</id>
+  <link href="http://MichaelEvans.github.io/blog/categories/helpouts/atom.xml" rel="self"/>
+  <link href="http://MichaelEvans.github.io/"/>
+  <updated>2015-09-09T19:43:18-04:00</updated>
+  <id>http://MichaelEvans.github.io/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Hands On with Google Helpouts]]></title>
-    <link href="http://michaelevans.org/blog/2013/11/05/hands-on-with-google-helpouts/"/>
+    <link href="http://MichaelEvans.github.io/blog/2013/11/05/hands-on-with-google-helpouts/"/>
     <updated>2013-11-05T10:38:00-05:00</updated>
-    <id>http://michaelevans.org/blog/2013/11/05/hands-on-with-google-helpouts</id>
+    <id>http://MichaelEvans.github.io/blog/2013/11/05/hands-on-with-google-helpouts</id>
     <content type="html"><![CDATA[<p>This morning Google launched a new product called <a href="https://helpouts.google.com">Helpouts</a>, a tool which will connect people with experts for help via a video conference. I was accepted as a Helpout provider a few weeks back, and have been using the product for a little while during the internal beta. I decided to do an Helpout to teach people to write code, which I cleverly named &ldquo;<a href="https://helpouts.google.com/114052868601022948953/ls/a65184ab017ae8b0">Coding 101: learn the basics of writing code and building apps</a>&rdquo;.</p>
 
 <p><iframe width="640" height="510" src="http://www.youtube.com/embed/K-VFC9AQM1k " frameborder="0" webkitAllowFullScreen mozallowfullscreen allowfullscreen></iframe></p>

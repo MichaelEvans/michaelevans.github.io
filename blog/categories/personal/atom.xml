@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Personal | Gadget Habit]]></title>
-  <link href="http://michaelevans.org/blog/categories/personal/atom.xml" rel="self"/>
-  <link href="http://michaelevans.org/"/>
-  <updated>2015-08-07T09:41:26-04:00</updated>
-  <id>http://michaelevans.org/</id>
+  <link href="http://MichaelEvans.github.io/blog/categories/personal/atom.xml" rel="self"/>
+  <link href="http://MichaelEvans.github.io/"/>
+  <updated>2015-09-09T19:43:18-04:00</updated>
+  <id>http://MichaelEvans.github.io/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[2013 in Review]]></title>
-    <link href="http://michaelevans.org/blog/2013/12/31/2013-in-review/"/>
+    <link href="http://MichaelEvans.github.io/blog/2013/12/31/2013-in-review/"/>
     <updated>2013-12-31T11:27:05-05:00</updated>
-    <id>http://michaelevans.org/blog/2013/12/31/2013-in-review</id>
+    <id>http://MichaelEvans.github.io/blog/2013/12/31/2013-in-review</id>
     <content type="html"><![CDATA[<p>Today is December 31st, and I decided to write up a blog post, reflecting on the year that I&rsquo;ve had. I&rsquo;ve learned a lot over the last twelve months, and done a lot of interesting things (okay, at least interesting to me). Here&rsquo;s a brief overview of what happened:</p>
 
 <p><div align='center'><div class='g-post' data-href='https://plus.google.com/114052868601022948953/posts/ZzXcKVs2fvH'></div></div></p>

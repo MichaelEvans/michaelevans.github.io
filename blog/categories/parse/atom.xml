@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Parse | Gadget Habit]]></title>
-  <link href="http://michaelevans.org/blog/categories/parse/atom.xml" rel="self"/>
-  <link href="http://michaelevans.org/"/>
-  <updated>2015-08-07T09:41:26-04:00</updated>
-  <id>http://michaelevans.org/</id>
+  <link href="http://MichaelEvans.github.io/blog/categories/parse/atom.xml" rel="self"/>
+  <link href="http://MichaelEvans.github.io/"/>
+  <updated>2015-09-09T19:43:18-04:00</updated>
+  <id>http://MichaelEvans.github.io/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Parse Android To-do App Tutorial - Part Two - Users]]></title>
-    <link href="http://michaelevans.org/blog/2013/08/20/parse-android-todo-app-tutorial-part-two-users/"/>
+    <link href="http://MichaelEvans.github.io/blog/2013/08/20/parse-android-todo-app-tutorial-part-two-users/"/>
     <updated>2013-08-20T21:13:00-04:00</updated>
-    <id>http://michaelevans.org/blog/2013/08/20/parse-android-todo-app-tutorial-part-two-users</id>
+    <id>http://MichaelEvans.github.io/blog/2013/08/20/parse-android-todo-app-tutorial-part-two-users</id>
     <content type="html"><![CDATA[<p>Last week <a href="http://michaelevans.org/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse/">I posted a tutorial</a> on how to create a really basic Android To-do list application using <a href="http://www.parse.com">Parse</a>. It allowed a user to create tasks, and then toggle their completion status. Then, this information was synced to a server, so that the tasks will be kept up to date on multiple devices. The biggest issue with this app so far, was that there was no concept of users, so all tasks were shared among everyone. This week, we&rsquo;re going to introduce two new screens (which are very similar to one another), the registration and login screens.</p>
 
 <!-- more -->
@@ -277,9 +277,9 @@ v.setEnabled(true);
   
   <entry>
     <title type="html"><![CDATA[Tutorial: Building an Android To-Do List app using Parse]]></title>
-    <link href="http://michaelevans.org/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse/"/>
+    <link href="http://MichaelEvans.github.io/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse/"/>
     <updated>2013-08-14T22:08:00-04:00</updated>
-    <id>http://michaelevans.org/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse</id>
+    <id>http://MichaelEvans.github.io/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse</id>
     <content type="html"><![CDATA[<p>For a while now I&rsquo;ve been using <a href="http://www.parse.com">Parse</a> for small apps, it allows you to iterate quickly and create a backend for an app without too much work. It also seems like a perfect jumping off point for a series of Android tutorials, where we&rsquo;ll be building a &ldquo;Todo List&rdquo; application. (This tutorial assumes that you have <a href="http://developer.android.com/tools/sdk/eclipse-adt.html">Eclipse and the ADT</a> installed already.)</p>
 
 <!-- more -->
