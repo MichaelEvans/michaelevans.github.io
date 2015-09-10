@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ubuntu 12.04 | Gadget Habit]]></title>
   <link href="http://michaelevans.org/blog/categories/ubuntu-12-dot-04/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2015-09-09T20:07:17-04:00</updated>
+  <updated>2015-09-09T20:10:25-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -25,26 +25,21 @@
 <!--more-->
 
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo mv /etc/issue.backup /etc/issue
-</span><span class='line'>sudo mv /etc/rc.local.backup /etc/rc.local
-</span><span class='line'>sudo mv /opt/vmware-tools-installer/lightdm.conf /etc/init
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+<p>{% codeblock lang:bash %}
+sudo mv /etc/issue.backup /etc/issue
+sudo mv /etc/rc.local.backup /etc/rc.local
+sudo mv /opt/vmware-tools-installer/lightdm.conf /etc/init
+{% endcodeblock %}</p>
 
 <p>Then follow these few steps to stop the easy install process:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>Power off the virtual machine.
-</span><span class='line'>Go to VM > Settings
-</span><span class='line'>Select Floppy.
-</span><span class='line'>Select &lsquo;Use physical drive&rsquo;, and set the dropdown to &lsquo;Auto Detect&rsquo;.
-</span><span class='line'>Power on the virtual machine and install VMware Tools.</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+<p>{% codeblock %}
+Power off the virtual machine.
+Go to VM > Settings
+Select Floppy.
+Select &lsquo;Use physical drive&rsquo;, and set the dropdown to &lsquo;Auto Detect&rsquo;.
+Power on the virtual machine and install VMware Tools.
+{% endcodeblock %}</p>
 
 <p>Hope this helps!</p>
 ]]></content>

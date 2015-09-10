@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Microsoft | Gadget Habit]]></title>
   <link href="http://michaelevans.org/blog/categories/microsoft/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2015-09-09T20:07:17-04:00</updated>
+  <updated>2015-09-09T20:10:25-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -27,7 +27,7 @@
 
 <p>It&rsquo;s thinner and lighter than an iPad, and has a built in kickstand. But here&rsquo;s the kicker, the &ldquo;smart cover&rdquo;, doubles as a keyboard. Combine this with Microsoft Office, and I think you might have a competitor in the works. It has a stylus that can work even when your hand is on the screen, a USB port, and all the bells and whistles you&rsquo;d want to see from a mobile machine.</p>
 
-<p><img src="/images/2012/06/19/surface.jpeg" width="700" height="400" title="Microsoft Surface" ></p>
+<p>{% img /images/2012/06/19/surface.jpeg 700 400 Microsoft Surface %}</p>
 
 <p>Unfortunately, I can&rsquo;t end the article there. Despite the fact that Microsoft blew me away by revealing a hot tablet, they still might let us down anyway. They were unable to provide a concrete release date, pricing, or battery life. Those three factors could easily change this purchase from a must-have, to a don&rsquo;t-bother.</p>
 
@@ -35,7 +35,7 @@
 
 <p>All in all, I&rsquo;m still impressed with what I saw yesterday. The form factor is good, and the potential is there. And when Microsoft takes the hardware and software into their own hands, the usually do a <a href="http://www.xbox.com/en-US/">good</a> <a href="http://www.xbox.com/en-US/Kinect">job</a>. Hopefully when it comes out in the fall, Microsoft won&rsquo;t let us down.</p>
 
-<p><iframe width="640" height="510" src="http://www.youtube.com/embed/dpzu3HM2CIo " frameborder="0" webkitAllowFullScreen mozallowfullscreen allowfullscreen></iframe></p>
+<p>{% youtube dpzu3HM2CIo %}</p>
 ]]></content>
   </entry>
   

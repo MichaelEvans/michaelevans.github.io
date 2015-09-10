@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Google+ | Gadget Habit]]></title>
   <link href="http://michaelevans.org/blog/categories/google-plus/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2015-09-09T20:07:17-04:00</updated>
+  <updated>2015-09-09T20:10:25-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -20,7 +20,7 @@
     <id>http://michaelevans.org/blog/2013/02/25/guide-to-google-authorship</id>
     <content type="html"><![CDATA[<p>Today I noticed something interesting about my blog: I&rsquo;m now a verified author! What does that mean, you might ask? When one of the pages of my blog shows up in a Google search, it will look a little something like this:</p>
 
-<p><img class="center" src="/images/2013/02/25/authorship.png" width="600" height="400" title="Google Authorship" ></p>
+<p>{% img center /images/2013/02/25/authorship.png 600 400 Google Authorship %}</p>
 
 <!-- more -->
 

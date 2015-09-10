@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Personal | Gadget Habit]]></title>
   <link href="http://michaelevans.org/blog/categories/personal/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2015-09-09T20:07:17-04:00</updated>
+  <updated>2015-09-09T20:10:25-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -20,7 +20,7 @@
     <id>http://michaelevans.org/blog/2013/12/31/2013-in-review</id>
     <content type="html"><![CDATA[<p>Today is December 31st, and I decided to write up a blog post, reflecting on the year that I&rsquo;ve had. I&rsquo;ve learned a lot over the last twelve months, and done a lot of interesting things (okay, at least interesting to me). Here&rsquo;s a brief overview of what happened:</p>
 
-<p><div align='center'><div class='g-post' data-href='https://plus.google.com/114052868601022948953/posts/ZzXcKVs2fvH'></div></div></p>
+<p>{% google_plus <a href="https://plus.google.com/114052868601022948953/posts/ZzXcKVs2fvH">https://plus.google.com/114052868601022948953/posts/ZzXcKVs2fvH</a> %}</p>
 
 <!-- more -->
 

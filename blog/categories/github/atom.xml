@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Github | Gadget Habit]]></title>
   <link href="http://michaelevans.org/blog/categories/github/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2015-09-09T20:07:17-04:00</updated>
+  <updated>2015-09-09T20:10:25-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -22,7 +22,7 @@
 
 <p>One of these apps was <a href="https://play.google.com/store/apps/details?id=com.etsy.android&amp;hl=en">Etsy</a>, which had a very cool fading blur background effect, which you can see here:</p>
 
-<p><img class="center" src="/images/2014/07/09/2014-07-09-23_25_40.gif" width="600" height="600" title="Etsy Example" ></p>
+<p>{% img center /images/2014/07/09/2014-07-09-23_25_40.gif 600 600 Etsy Example %}</p>
 
 <p>As a learning experiment, I set off to replicate this behavior. I had seen a library by Manuel Peinado called <a href="https://github.com/ManuelPeinado/GlassActionBar">GlassActionBar</a> which demonstrated a similar glass-like blur effect on the ActionBar, so I decided to use that code for blurring my background.</p>
 
@@ -42,7 +42,7 @@ in your</code>build.gradle` and you should be ready to roll.</p>
 
 <p>Once you have the blurring, the rest of the process is fairly straight forward. When you plan to leave an activity, create a bitmap of the current view and write it to disk. When you start your new activity (which should have a transparent background), you override the transition (otherwise you&rsquo;ll get the default zoom), and set the background to the blurred image you saved earlier. Add a fade in for the alpha and you get a nice little effect!</p>
 
-<p><img class="center" src="/images/2014/07/09/2014-07-09-23_34_05.gif" width="600" height="600" title="My Example" ></p>
+<p>{% img center /images/2014/07/09/2014-07-09-23_34_05.gif 600 600 My Example %}</p>
 
 <p>If you&rsquo;d like to see how this looks in a sample project, you can find it on Github <a href="https://github.com/MichaelEvans/EtsyBlurExample">here</a>.</p>
 ]]></content>
@@ -55,7 +55,7 @@ in your</code>build.gradle` and you should be ready to roll.</p>
     <id>http://michaelevans.org/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android</id>
     <content type="html"><![CDATA[<p>Last week I open sourced an Android library called <a href="https://github.com/MichaelEvans/ColorArt">ColorArt</a>, which is a port of the popular OS X library written by the guys over at <a href="http://www.panic.com/blog/itunes-11-and-colors/">Panic</a>. It allows you to use a source image to create a themed image/text display, very similar to the effect which is done in iTunes 11.</p>
 
-<p><img class="center" src="/images/2013/12/12/itunes-11.png" width="600" height="600" title="iTunes Example" ></p>
+<p>{% img center /images/2013/12/12/itunes-11.png 600 600 iTunes Example %}</p>
 
 <!-- more -->
 
@@ -86,7 +86,7 @@ colorArt.getDetailColor()
 
 <p>Voilà! Now you can make cool themed image/text display using Bitmaps as part of your application.</p>
 
-<p><img class="center" src="/images/2013/12/12/sample.png" width="300" height="300" title="Sample" ></p>
+<p>{% img center /images/2013/12/12/sample.png 300 300 Sample %}</p>
 
 <h3>Bonus: FadingImageView</h3>
 

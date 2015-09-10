@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Review | Gadget Habit]]></title>
   <link href="http://michaelevans.org/blog/categories/review/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2015-09-09T20:07:17-04:00</updated>
+  <updated>2015-09-09T20:10:25-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -22,7 +22,7 @@
 
 <p>Last Wednesday I took the trip up to NYC, to the top floor of Chelsea Market to pick up a device that many have waited anxiously for. A device unlike anything else we&rsquo;ve seen before: Google&rsquo;s Glass. This is the Explorer Edition of the device, which is targeted towards developers, who attended Google&rsquo;s IO conference last year. I was fortunate to be invited to pick up my device on the first day of New York&rsquo;s pickups, which followed several pickup days in Mountain View the previous week.</p>
 
-<p><img class="center" src="/images/2013/04/29/s_9e3e2acb-a746-4606-a034-1df2c8e2a3cc-0.jpeg" width="500" height="500" title="The View #throughglass" ></p>
+<p>{% img center /images/2013/04/29/s_9e3e2acb-a746-4606-a034-1df2c8e2a3cc-0.jpeg 500 500 The View #throughglass %}</p>
 
 <!-- more -->
 
@@ -39,29 +39,29 @@
 
 <p>Included in the box is Glass (obviously), a micro USB cable and a AC adapter for it, a microfiber bag for storing Glass when it&rsquo;s not in use, and two visor attachments, one polarized for sun, and the other clear.</p>
 
-<p><img class="center" src="/images/2013/04/29/IMG_1235.jpg" width="350" height="350" title="Bag o' goodies" ></p>
+<p>{% img center /images/2013/04/29/IMG_1235.jpg 350 350 Bag o' goodies %}</p>
 
-<p><img class="center" src="/images/2013/04/29/IMG_1238.jpg" width="350" height="350" title="What&rsquo;s in the bag" ></p>
+<p>{% img center /images/2013/04/29/IMG_1238.jpg 350 350 What&rsquo;s in the bag %}</p>
 
-<p><img class="center" src="/images/2013/04/29/IMG_1237.jpg" width="350" height="350" title="Nice simple box" ></p>
+<p>{% img center /images/2013/04/29/IMG_1237.jpg 350 350 Nice simple box %}</p>
 
-<p><img class="center" src="/images/2013/04/29/IMG_1231.jpg" width="350" height="350" title="Sweet Shades" ></p>
+<p>{% img center /images/2013/04/29/IMG_1231.jpg 350 350 Sweet Shades %}</p>
 
 <h3>Thoughts so far</h3>
 
 <p>Since I&rsquo;ve only had the device for a few days, I&rsquo;ll need to post a review after I&rsquo;ve used it for a little longer. So far I&rsquo;ve enjoyed the hands-free navigation for wandering around DC, as well as taking some snapshots. I&rsquo;ve always thought it was a little awkward to reply to text messages and emails using your voice (which is why I never really did it on my phone), but maybe I&rsquo;ll warm up to it with Glass. The battery life has been pretty decent, even with the heavy usage of showing it off to excited friends.</p>
 
-<p><img class="center" src="/images/2013/04/29/20130426_122245_854.jpg" width="400" height="400" title="#throughglass" ></p>
+<p>{% img center /images/2013/04/29/20130426_122245_854.jpg 400 400 #throughglass %}</p>
 
 <h3>But wait&hellip;there&rsquo;s more!</h3>
 
 <p>A few days after I returned with Glass, I was interviewed by The Fold, a flagship video series by The Washington Post! You can check out the video here:</p>
 
-<p><iframe width="640" height="510" src="http://www.youtube.com/embed/iBrbVaY99kA " frameborder="0" webkitAllowFullScreen mozallowfullscreen allowfullscreen></iframe></p>
+<p>{% youtube iBrbVaY99kA %}</p>
 
 <p>Got any questions you&rsquo;d like answered? Drop me a line below in the comments, on <a href="https://twitter.com/m_evans10">Twitter</a> or on <a href="https://plus.google.com/114052868601022948953/posts">Google Plus</a>!</p>
 
-<p><img class="center" src="/images/2013/04/29/IMG_1246.jpg" width="350" height="350" title="Selfie." ></p>
+<p>{% img center /images/2013/04/29/IMG_1246.jpg 350 350 Selfie. %}</p>
 
 <p>Obligatory selfie.</p>
 ]]></content>
@@ -74,7 +74,7 @@
     <id>http://michaelevans.org/blog/2012/09/07/nexus-q-review</id>
     <content type="html"><![CDATA[<p>It’s a <em>what</em>? Ever since I returned from Google I/O, this is what people have been saying when they see the newest addition to my TV setup, the Nexus Q. It’s hard to blame them though, since it just looks so different, for a home theatre device. unlike those bland, black boxes that most living rooms are filled with, the Nexus Q is a heavy (about two pounds) sphere, which is lit by a ring of 32 LEDs. The top side of the Q spins freely to function as a volume knob, and can be tapped to mute.</p>
 
-<p><img src="/images/2012/09/07/q.jpeg" width="400" height="400" title="Nexus Q" ></p>
+<p>{% img /images/2012/09/07/q.jpeg 400 400 Nexus Q %}</p>
 
 <p>On the back of the Q, things are less clean. There’s both micro HDMI and optical audio out, ethernet and a micro USB port for “encouraged hacking”. There’s also a set of banana connectors to allow you to hook up speakers to the built in 25-watt amplifier.</p>
 
@@ -82,11 +82,11 @@
 
 <p>Since the Q doesn’t have it’s own UI, let’s take a look at the <a href="https://play.google.com/store/apps/details?id=com.google.android.setupwarlock">Nexus Q app for Android</a>.</p>
 
-<p><img src="/images/2012/09/07/qapp.jpeg" width="400" height="400" title="Nexus Q App" ></p>
+<p>{% img /images/2012/09/07/qapp.jpeg 400 400 Nexus Q App %}</p>
 
 <p>You don&rsquo;t really use the app for anything after setting up the Q initially, all the media is controlled through the Play Music, Play Movies and Youtube apps. All you need to do is hit the little triangle that will appear when you&rsquo;re on the same network as a Q.</p>
 
-<p><img src="/images/2012/09/07/music.png" width="400" height="400" title="Play Music with Q" ></p>
+<p>{% img /images/2012/09/07/music.png 400 400 Play Music with Q %}</p>
 
 <p>My biggest complaint about the Q is the way you set it up to involve your friends. First you need to enable guest mode from the Q app, and then manually invite all the people you want to have access, which actually sends them an <strong>email</strong> to download the app. This seems like such a convoluted process, and I doubt people will actually care to do this. Not only that, but I see no way of revoking someone’s ability to use the Q after you’ve invited them. We all know that one person who takes their music privileges a little too far, but it seems that the only recourse in that event is to turn guest mode off all together.</p>
 
@@ -101,7 +101,7 @@
     <id>http://michaelevans.org/blog/2012/07/03/nexus-7-review</id>
     <content type="html"><![CDATA[<p>So by now you&rsquo;ve probably heard about the Nexus 7. We heard it was coming <a href="/blog/2012/06/26/shots-from-outside-io-2012/">last week</a>, and now after using it for a few days, here&rsquo;s my review.</p>
 
-<p><img src="/images/2012/07/03/nexus.jpg" width="400" height="200" title="Nexus 7" ></p>
+<p>{% img /images/2012/07/03/nexus.jpg 400 200 Nexus 7 %}</p>
 
 <!-- more -->
 
@@ -126,7 +126,7 @@
 
 <p>Google&rsquo;s new voice search is their strike back against Siri. Powered by Google&rsquo;s Knowledge Graph, it can do a lot more than Apple&rsquo;s offering.</p>
 
-<p><img class="left" src="/images/2012/07/03/voice.jpg" width="375" height="200" title="Voice Search Demo" ></p>
+<p>{% img left /images/2012/07/03/voice.jpg 375 200 Voice Search Demo %}</p>
 
 <p>The speech-to-text seems to be significantly more accurate than Apple&rsquo;s, as well as much quicker. I imagine this is because Google has moved the speech-to-text engine onto the device, as this is another feature of the new keyboard (more on that below).</p>
 
@@ -148,7 +148,7 @@
 
 <p>At 340 grams (compared to the Kindle Fire’s 413 grams), the Nexus 7 feels extremely light. It measures 10.45mm thick, which is just shy of the thickness of the Kindle Fire. The front of the tablet is an IPS 7-inch 1280 x 800 display, which is powered by an NVIDIA Tegra 3 quad-core processor, with 12 GPU cores, and 1GB of RAM. As for storage, it comes in 8GB ($199) and 16GB ($249) capacities.</p>
 
-<p><img class="right" src="/images/2012/07/03/chrome.jpg" width="375" height="200" title="Chrome" ></p>
+<p>{% img right /images/2012/07/03/chrome.jpg 375 200 Chrome %}</p>
 
 <p>In addition to that serious computing power, the Nexus 7 has plenty of sensors and radios. Under the hood, there&rsquo;s Bluetooth and NFC, not to mention GPS, an accelerometer, a digital compass and a gyroscope. All this is paired with a battery that managed to last me around eight hours. Based on other reviews I&rsquo;ve seen, the battery seems to last between seven and nine hours, depending on usage.</p>
 
@@ -169,15 +169,15 @@
     <id>http://michaelevans.org/blog/2012/06/05/the-raspberry-pi-has-arrived</id>
     <content type="html"><![CDATA[<p>As the title suggests, I just received my <a href="http://www.raspberrypi.org">Raspberry Pi</a> (Model B) in the mail. For those who don&rsquo;t know about the Raspberry Pi, it&rsquo;s a small little computer with 256MB of RAM, a 700MHz CPU and a GPU capable of 1080p output over HDMI. Connectivity is provided via 2 USB 2.0 ports, and a RJ45 10/100 Ethernet port. There&rsquo;s HDMI and RCA video, and a 3.5mm jack for audio. Lastly, there&rsquo;s an SD slot on the bottom for storage, and the device is powered by a microUSB port, the same one as most smartphones.</p>
 
-<p><img src="/images/2012/06/05/raspberrypi.jpg" width="700" height="200" title="Pi Box" ></p>
+<p>{% img /images/2012/06/05/raspberrypi.jpg 700 200 Pi Box %}</p>
 
 <p>I have to say, despite looking at pictures, and seeing information about the Pi on the web, I&rsquo;m still surprised how small this thing is. It&rsquo;s so small that the box that it comes in looks like a deck of playing cards:</p>
 
-<p><img class="left" src="/images/2012/06/05/box.jpg" width="200" height="100" title="Pi Box" ></p>
+<p>{% img left /images/2012/06/05/box.jpg 200 100 Pi Box %}</p>
 
 <p>I decided to go with the <a href="http://www.debian.org/">Debian</a> image, not only because I&rsquo;m familiar with it, but also because that is the suggested distro in the documentation. I&rsquo;m considering switching to Arch after I fiddle around with it a little bit more.  After quickly running to pick up an SD card, I hastily plugged in the Pi to my home network, and plugged in the power. A few seconds later, and I was up and running. I logged in and tried the default setup of LXDE (pictured below), and I have to say, it&rsquo;s a little sluggish. I tried out some of the included apps, like <a href="http://en.wikipedia.org/wiki/Midori_(web_browser)">Midori</a> (the default browser), and a few of the included development tools.</p>
 
-<p><img class="right" src="/images/2012/06/05/it_lives.jpg" width="400" height="200" title="Pi Box" ></p>
+<p>{% img right /images/2012/06/05/it_lives.jpg 400 200 Pi Box %}</p>
 
 <p>While the CPU is a little on the slow side, the GPU performance looks impressive. It plays 1080p content with no trouble, and I&rsquo;m going to try streaming some video from my NAS later. Others on the internet have reported no issues with that so far.</p>
 
@@ -185,7 +185,7 @@
 
 <h6>Small Computer, Huge Screen</h6>
 
-<p><img src="/images/2012/06/05/lxde.jpg" width="700" height="200" title="Pi Box" ></p>
+<p>{% img /images/2012/06/05/lxde.jpg 700 200 Pi Box %}</p>
 
 <p>Is it worth the $35? Yeah, I think so. Maybe not to the average person, since it&rsquo;s pretty underpowered for things like web browsing. The community around this thing seems huge (and probably will grow as more are shipped) which makes me feel there will be more in store for it. At this price, it&rsquo;s slightly more expensive than an <a href="http://www.arduino.cc/">Arduino</a>, and a lot more versatile (at least from a software perspective).</p>
 ]]></content>
