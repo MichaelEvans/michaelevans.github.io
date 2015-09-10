@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Android | Gadget Habit]]></title>
   <link href="http://michaelevans.org/blog/categories/android/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2015-09-09T19:59:25-04:00</updated>
+  <updated>2015-09-09T20:04:33-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -12,19 +12,6 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
-  
-  <entry>
-    <title type="html"><![CDATA[Droidcon NYC 2015: @AnnotationProcessors("ByExample")]]></title>
-    <link href="http://michaelevans.org/blog/2015/09/09/droidcon-nyc-2015-at-annotationprocessors-byexample/"/>
-    <updated>2015-09-09T16:30:48-04:00</updated>
-    <id>http://michaelevans.org/blog/2015/09/09/droidcon-nyc-2015-at-annotationprocessors-byexample</id>
-    <content type="html"><![CDATA[<p>Here are slides and the video for my talk from Droidcon NYC 2015 on writing your own Annotation Processor:</p>
-
-<p><iframe width="640" height="510" src="http://www.youtube.com/embed/dBUAqPs0TB0 " frameborder="0" webkitAllowFullScreen mozallowfullscreen allowfullscreen></iframe></p>
-
-<p><script async="true" class="speakerdeck-embed" data-id="95e696d902d845dcb5079e0691eb5f3f" src="//speakerdeck.com/assets/embed.js"> </script></p>
-]]></content>
-  </entry>
   
   <entry>
     <title type="html"><![CDATA[Using Espresso for Easy UI Testing]]></title>
@@ -311,6 +298,70 @@ in your</code>build.gradle` and you should be ready to roll.</p>
 <p><img class="center" src="/images/2014/07/09/2014-07-09-23_34_05.gif" width="600" height="600" title="My Example" ></p>
 
 <p>If you&rsquo;d like to see how this looks in a sample project, you can find it on Github <a href="https://github.com/MichaelEvans/EtsyBlurExample">here</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ColorArt: a library to do iTunes 11-style color matching for Android]]></title>
+    <link href="http://michaelevans.org/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android/"/>
+    <updated>2013-12-12T00:02:34-05:00</updated>
+    <id>http://michaelevans.org/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android</id>
+    <content type="html"><![CDATA[<p>Last week I open sourced an Android library called <a href="https://github.com/MichaelEvans/ColorArt">ColorArt</a>, which is a port of the popular OS X library written by the guys over at <a href="http://www.panic.com/blog/itunes-11-and-colors/">Panic</a>. It allows you to use a source image to create a themed image/text display, very similar to the effect which is done in iTunes 11.</p>
+
+<p><img class="center" src="/images/2013/12/12/itunes-11.png" width="600" height="600" title="iTunes Example" ></p>
+
+<!-- more -->
+
+
+<h3>Using the Library</h3>
+
+<p>ColorArt is pretty easy to use, and can add a cool effect to any app. In order to add it to your project, add the dependency to your <code>build.gradle</code> file:</p>
+
+<p><code>
+compile 'org.michaelevans.colorart:library:0.0.1'﻿
+</code></p>
+
+<p>The next thing you need is to take a Bitmap that you want to use, and pass it to a ColorArt object:</p>
+
+<p><code>
+Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.album);
+ColorArt colorArt = new ColorArt(bitmap);
+</code></p>
+
+<p>After that, it&rsquo;s as simple as calling some getter methods in order to get the colors that make up the image:</p>
+
+<p><code>
+colorArt.getBackgroundColor()
+colorArt.getPrimaryColor()
+colorArt.getSecondaryColor()
+colorArt.getDetailColor()
+</code></p>
+
+<p>Voilà! Now you can make cool themed image/text display using Bitmaps as part of your application.</p>
+
+<p><img class="center" src="/images/2013/12/12/sample.png" width="300" height="300" title="Sample" ></p>
+
+<h3>Bonus: FadingImageView</h3>
+
+<p>I also added a class that extends ImageView, which will allow you to add a subtle gradient from the image, to the background color, similar to what you see in the iTunes display. It&rsquo;s also extremely easy to use:</p>
+
+<ol>
+<li>Replace the ImageView that you are presently using with a <code>FadingImageView</code>.</li>
+<li>Call
+<code>
+mFadingImageView.setBackgroundColor(colorArt.getBackgroundColor(), FadingImageView.FadeSide.LEFT);
+</code>
+to set the background color to fade to, and which side gets the gradient.</li>
+</ol>
+
+
+<p>That&rsquo;s it!</p>
+
+<p>You can also toggle that gradient with a call to <code>mImageView.setFadeEnabled(true/false);</code>.</p>
+
+<hr />
+
+<p>Are you using this library in your app? Please let me know so I can add a link to it on the <a href="https://github.com/MichaelEvans/ColorArt">GitHub project page</a>! Also, feel free to send pull requests!</p>
 ]]></content>
   </entry>
   
