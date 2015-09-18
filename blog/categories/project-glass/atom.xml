@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Project Glass | Gadget Habit]]></title>
   <link href="http://michaelevans.org/blog/categories/project-glass/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2015-09-09T20:10:25-04:00</updated>
+  <updated>2015-09-09T20:07:17-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -22,7 +22,7 @@
 
 <p>Last Wednesday I took the trip up to NYC, to the top floor of Chelsea Market to pick up a device that many have waited anxiously for. A device unlike anything else we&rsquo;ve seen before: Google&rsquo;s Glass. This is the Explorer Edition of the device, which is targeted towards developers, who attended Google&rsquo;s IO conference last year. I was fortunate to be invited to pick up my device on the first day of New York&rsquo;s pickups, which followed several pickup days in Mountain View the previous week.</p>
 
-<p>{% img center /images/2013/04/29/s_9e3e2acb-a746-4606-a034-1df2c8e2a3cc-0.jpeg 500 500 The View #throughglass %}</p>
+<p><img class="center" src="/images/2013/04/29/s_9e3e2acb-a746-4606-a034-1df2c8e2a3cc-0.jpeg" width="500" height="500" title="The View #throughglass" ></p>
 
 <!-- more -->
 
@@ -39,29 +39,29 @@
 
 <p>Included in the box is Glass (obviously), a micro USB cable and a AC adapter for it, a microfiber bag for storing Glass when it&rsquo;s not in use, and two visor attachments, one polarized for sun, and the other clear.</p>
 
-<p>{% img center /images/2013/04/29/IMG_1235.jpg 350 350 Bag o' goodies %}</p>
+<p><img class="center" src="/images/2013/04/29/IMG_1235.jpg" width="350" height="350" title="Bag o' goodies" ></p>
 
-<p>{% img center /images/2013/04/29/IMG_1238.jpg 350 350 What&rsquo;s in the bag %}</p>
+<p><img class="center" src="/images/2013/04/29/IMG_1238.jpg" width="350" height="350" title="What&rsquo;s in the bag" ></p>
 
-<p>{% img center /images/2013/04/29/IMG_1237.jpg 350 350 Nice simple box %}</p>
+<p><img class="center" src="/images/2013/04/29/IMG_1237.jpg" width="350" height="350" title="Nice simple box" ></p>
 
-<p>{% img center /images/2013/04/29/IMG_1231.jpg 350 350 Sweet Shades %}</p>
+<p><img class="center" src="/images/2013/04/29/IMG_1231.jpg" width="350" height="350" title="Sweet Shades" ></p>
 
 <h3>Thoughts so far</h3>
 
 <p>Since I&rsquo;ve only had the device for a few days, I&rsquo;ll need to post a review after I&rsquo;ve used it for a little longer. So far I&rsquo;ve enjoyed the hands-free navigation for wandering around DC, as well as taking some snapshots. I&rsquo;ve always thought it was a little awkward to reply to text messages and emails using your voice (which is why I never really did it on my phone), but maybe I&rsquo;ll warm up to it with Glass. The battery life has been pretty decent, even with the heavy usage of showing it off to excited friends.</p>
 
-<p>{% img center /images/2013/04/29/20130426_122245_854.jpg 400 400 #throughglass %}</p>
+<p><img class="center" src="/images/2013/04/29/20130426_122245_854.jpg" width="400" height="400" title="#throughglass" ></p>
 
 <h3>But wait&hellip;there&rsquo;s more!</h3>
 
 <p>A few days after I returned with Glass, I was interviewed by The Fold, a flagship video series by The Washington Post! You can check out the video here:</p>
 
-<p>{% youtube iBrbVaY99kA %}</p>
+<p><iframe width="640" height="510" src="http://www.youtube.com/embed/iBrbVaY99kA " frameborder="0" webkitAllowFullScreen mozallowfullscreen allowfullscreen></iframe></p>
 
 <p>Got any questions you&rsquo;d like answered? Drop me a line below in the comments, on <a href="https://twitter.com/m_evans10">Twitter</a> or on <a href="https://plus.google.com/114052868601022948953/posts">Google Plus</a>!</p>
 
-<p>{% img center /images/2013/04/29/IMG_1246.jpg 350 350 Selfie. %}</p>
+<p><img class="center" src="/images/2013/04/29/IMG_1246.jpg" width="350" height="350" title="Selfie." ></p>
 
 <p>Obligatory selfie.</p>
 ]]></content>
@@ -81,7 +81,7 @@
 
 <p>Me (and my team, which included Jacob Hilker and Ryan Warner), won the Glass Foundry Hackathon! Like I said, I cannot share much more about it, but I do have this sweet picture of me wearing them:</p>
 
-<p>{% img center /images/2013/02/20/glass.jpg 400 400 Project Glass %}</p>
+<p><img class="center" src="/images/2013/02/20/glass.jpg" width="400" height="400" title="Project Glass" ></p>
 
 <p>And the best part is the prize for the winners &ndash; a free Glass Explorer device (when they are available, of course).</p>
 ]]></content>

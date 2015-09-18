@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Development | Gadget Habit]]></title>
   <link href="http://michaelevans.org/blog/categories/development/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2015-09-09T20:10:25-04:00</updated>
+  <updated>2015-09-09T20:07:17-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -20,9 +20,9 @@
     <id>http://michaelevans.org/blog/2015/09/09/droidcon-nyc-2015-at-annotationprocessors-byexample</id>
     <content type="html"><![CDATA[<p>Here are slides and the video for my talk from Droidcon NYC 2015 on writing your own Annotation Processor:</p>
 
-<p>{% youtube dBUAqPs0TB0 %}</p>
+<p><iframe width="640" height="510" src="http://www.youtube.com/embed/dBUAqPs0TB0 " frameborder="0" webkitAllowFullScreen mozallowfullscreen allowfullscreen></iframe></p>
 
-<p>{% speakerdeck 95e696d902d845dcb5079e0691eb5f3f %}</p>
+<p><script async="true" class="speakerdeck-embed" data-id="95e696d902d845dcb5079e0691eb5f3f" src="//speakerdeck.com/assets/embed.js"> </script></p>
 ]]></content>
   </entry>
   
@@ -64,9 +64,7 @@ public void testSayHello() {
 
 <p>From the Espresso documentation:</p>
 
-<p>{% blockquote %}
-The centerpiece of Espresso is its ability to seamlessly synchronize all test operations with the application under test. By default, Espresso waits for UI events in the current message queue to process and default AsyncTasks* to complete before it moves on to the next test operation. This should address the majority of application/test synchronization in your application.&ldquo;
-{% endblockquote %}</p>
+<p><blockquote><p>The centerpiece of Espresso is its ability to seamlessly synchronize all test operations with the application under test. By default, Espresso waits for UI events in the current message queue to process and default AsyncTasks* to complete before it moves on to the next test operation. This should address the majority of application/test synchronization in your application.&ldquo;</p></blockquote></p>
 
 <p>But if you&rsquo;re like me, you&rsquo;re not writing AsyncTasks to handle your background operations. My go-to tool for making HTTP requests (probably one of the most common uses of AsyncTask) is <a href="http://square.github.io/retrofit/">Retrofit</a>. So what can we do? Espresso has an API called <code>registerIdlingResource</code>, which allows you to synchronize your custom logic with Espresso.</p>
 
@@ -166,15 +164,15 @@ new RestAdapter.Builder()
 
 <p>Turn this:</p>
 
-<p>{% img center /images/2015/07/14/no-annotations.png 600 300 Method with no annotations %}</p>
+<p><img class="center" src="/images/2015/07/14/no-annotations.png" width="600" height="300" title="Method with no annotations" ></p>
 
 <p>into this:</p>
 
-<p>{% img center /images/2015/07/14/nonnull.png 600 250 with @NonNull %}</p>
+<p><img class="center" src="/images/2015/07/14/nonnull.png" width="600" height="250" title="with @NonNull" ></p>
 
 <p>Bonus points: We can even take this example one step further with the <code>@CheckResult</code> annotation, to tell us know that the return type of this method is something that we are expected to use, rather than the method having a side effect.</p>
 
-<p>{% img center /images/2015/07/14/checkreturn.png 600 300 Check that return type! %}</p>
+<p><img class="center" src="/images/2015/07/14/checkreturn.png" width="600" height="300" title="Check that return type!" ></p>
 
 <h2>@StringRes / @DrawableRes / etc.</h2>
 
@@ -191,7 +189,7 @@ public void setText(@StringRes int id) {</p>
 
 <p>Now if you try to pass a non-String resource id to this method, you get something like this:</p>
 
-<p>{% img center /images/2015/07/14/stringres.png 500 200 Method takes a @StringRes id, not an int %}</p>
+<p><img class="center" src="/images/2015/07/14/stringres.png" width="500" height="200" title="Method takes a @StringRes id, not an int" ></p>
 
 <p>(There are resouce annotations for all resoruce types, <code>@DrawableRes</code>, <code>@ColorRes</code>, <code>@InterpolatorRes</code>, etc.)</p>
 
@@ -250,7 +248,7 @@ public void doSomething() {
 
 <p>It&rsquo;s not quite as simple as setting the foreground to <code>?attr/selectableItemBackground</code>, or else you&rsquo;ll see the ripple surpasses the corners (which doesn&rsquo;t look <em>so</em> bad when your border radius is small, but this would look terrible with a circlular view):</p>
 
-<p>{% img center /images/2015/05/07/before.gif 600 600 Rounded Corner Fail! %}</p>
+<p><img class="center" src="/images/2015/05/07/before.gif" width="600" height="600" title="Rounded Corner Fail!" ></p>
 
 <p>The solution for this lies in the special mask layer of the <a href="https://developer.android.com/reference/android/graphics/drawable/RippleDrawable.html">RippleDrawable</a>. You specify the mask layer via the <code>android:id</code> value set to <code>@android:id/mask</code>. For the example above, you can set the mask to the same size/shape as the view you&rsquo;re masking, and then the ripple will only show for that area. For something like our example above, you&rsquo;d use something like this:</p>
 
@@ -273,7 +271,7 @@ public void doSomething() {
 
 <p>Now when you tap on the view, you&rsquo;ll see something like this:</p>
 
-<p>{% img center /images/2015/05/07/after.gif 600 600 Rounded Corners! %}</p>
+<p><img class="center" src="/images/2015/05/07/after.gif" width="600" height="600" title="Rounded Corners!" ></p>
 
 <p><em>Huzzah!</em></p>
 
@@ -290,7 +288,7 @@ public void doSomething() {
 
 <p>One of these apps was <a href="https://play.google.com/store/apps/details?id=com.etsy.android&amp;hl=en">Etsy</a>, which had a very cool fading blur background effect, which you can see here:</p>
 
-<p>{% img center /images/2014/07/09/2014-07-09-23_25_40.gif 600 600 Etsy Example %}</p>
+<p><img class="center" src="/images/2014/07/09/2014-07-09-23_25_40.gif" width="600" height="600" title="Etsy Example" ></p>
 
 <p>As a learning experiment, I set off to replicate this behavior. I had seen a library by Manuel Peinado called <a href="https://github.com/ManuelPeinado/GlassActionBar">GlassActionBar</a> which demonstrated a similar glass-like blur effect on the ActionBar, so I decided to use that code for blurring my background.</p>
 
@@ -310,7 +308,7 @@ in your</code>build.gradle` and you should be ready to roll.</p>
 
 <p>Once you have the blurring, the rest of the process is fairly straight forward. When you plan to leave an activity, create a bitmap of the current view and write it to disk. When you start your new activity (which should have a transparent background), you override the transition (otherwise you&rsquo;ll get the default zoom), and set the background to the blurred image you saved earlier. Add a fade in for the alpha and you get a nice little effect!</p>
 
-<p>{% img center /images/2014/07/09/2014-07-09-23_34_05.gif 600 600 My Example %}</p>
+<p><img class="center" src="/images/2014/07/09/2014-07-09-23_34_05.gif" width="600" height="600" title="My Example" ></p>
 
 <p>If you&rsquo;d like to see how this looks in a sample project, you can find it on Github <a href="https://github.com/MichaelEvans/EtsyBlurExample">here</a>.</p>
 ]]></content>

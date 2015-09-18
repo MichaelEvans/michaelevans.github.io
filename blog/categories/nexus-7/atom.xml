@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Nexus 7 | Gadget Habit]]></title>
   <link href="http://michaelevans.org/blog/categories/nexus-7/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2015-09-09T20:10:25-04:00</updated>
+  <updated>2015-09-09T20:07:17-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -20,7 +20,7 @@
     <id>http://michaelevans.org/blog/2012/07/03/nexus-7-review</id>
     <content type="html"><![CDATA[<p>So by now you&rsquo;ve probably heard about the Nexus 7. We heard it was coming <a href="/blog/2012/06/26/shots-from-outside-io-2012/">last week</a>, and now after using it for a few days, here&rsquo;s my review.</p>
 
-<p>{% img /images/2012/07/03/nexus.jpg 400 200 Nexus 7 %}</p>
+<p><img src="/images/2012/07/03/nexus.jpg" width="400" height="200" title="Nexus 7" ></p>
 
 <!-- more -->
 
@@ -45,7 +45,7 @@
 
 <p>Google&rsquo;s new voice search is their strike back against Siri. Powered by Google&rsquo;s Knowledge Graph, it can do a lot more than Apple&rsquo;s offering.</p>
 
-<p>{% img left /images/2012/07/03/voice.jpg 375 200 Voice Search Demo %}</p>
+<p><img class="left" src="/images/2012/07/03/voice.jpg" width="375" height="200" title="Voice Search Demo" ></p>
 
 <p>The speech-to-text seems to be significantly more accurate than Apple&rsquo;s, as well as much quicker. I imagine this is because Google has moved the speech-to-text engine onto the device, as this is another feature of the new keyboard (more on that below).</p>
 
@@ -67,7 +67,7 @@
 
 <p>At 340 grams (compared to the Kindle Fire’s 413 grams), the Nexus 7 feels extremely light. It measures 10.45mm thick, which is just shy of the thickness of the Kindle Fire. The front of the tablet is an IPS 7-inch 1280 x 800 display, which is powered by an NVIDIA Tegra 3 quad-core processor, with 12 GPU cores, and 1GB of RAM. As for storage, it comes in 8GB ($199) and 16GB ($249) capacities.</p>
 
-<p>{% img right /images/2012/07/03/chrome.jpg 375 200 Chrome %}</p>
+<p><img class="right" src="/images/2012/07/03/chrome.jpg" width="375" height="200" title="Chrome" ></p>
 
 <p>In addition to that serious computing power, the Nexus 7 has plenty of sensors and radios. Under the hood, there&rsquo;s Bluetooth and NFC, not to mention GPS, an accelerometer, a digital compass and a gyroscope. All this is paired with a battery that managed to last me around eight hours. Based on other reviews I&rsquo;ve seen, the battery seems to last between seven and nine hours, depending on usage.</p>
 

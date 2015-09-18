@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Helpouts | Gadget Habit]]></title>
   <link href="http://michaelevans.org/blog/categories/helpouts/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2015-09-09T20:10:25-04:00</updated>
+  <updated>2015-09-09T20:07:17-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -20,7 +20,7 @@
     <id>http://michaelevans.org/blog/2013/11/05/hands-on-with-google-helpouts</id>
     <content type="html"><![CDATA[<p>This morning Google launched a new product called <a href="https://helpouts.google.com">Helpouts</a>, a tool which will connect people with experts for help via a video conference. I was accepted as a Helpout provider a few weeks back, and have been using the product for a little while during the internal beta. I decided to do an Helpout to teach people to write code, which I cleverly named &ldquo;<a href="https://helpouts.google.com/114052868601022948953/ls/a65184ab017ae8b0">Coding 101: learn the basics of writing code and building apps</a>&rdquo;.</p>
 
-<p>{% youtube K-VFC9AQM1k %}</p>
+<p><iframe width="640" height="510" src="http://www.youtube.com/embed/K-VFC9AQM1k " frameborder="0" webkitAllowFullScreen mozallowfullscreen allowfullscreen></iframe></p>
 
 <!-- more -->
 
@@ -29,7 +29,7 @@
 
 <p>As a provider, you are to create a listing which people can sign up for. The process is pretty simple, all that&rsquo;s required is a bit of a description, fill out some pricing options (free, price per minute or per session), some info about yourself explaining your qualificaitons, and a picture for the listing. After that, you&rsquo;ll wait for your listing to be approved by Google.</p>
 
-<p>{% img left /images/2013/11/05/pricing_options.png 400 400 Pricing Options %}</p>
+<p><img class="left" src="/images/2013/11/05/pricing_options.png" width="400" height="400" title="Pricing Options" ></p>
 
 <p>Part of the approval process includes doing a Helpout with a Google employee, in order to get a feel for the system and see how it works. They then also verify the information that you provided to make sure you are who you say you are.</p>
 
@@ -37,13 +37,13 @@
 
 <p>On the consumer side, prospective users can select from any of the categories of Helpouts, which inlude art and music, computer and electronics, cooking, education, fashion and beauty, fitness and nutrition and home and garden. After you select a category, you choose the topic/listing that you&rsquo;re interested in, pick a time, and you&rsquo;ll get an email confirmation regarding your scheduled appointment.</p>
 
-<p>{% img right /images/2013/11/05/your_helpouts.png 400 500 Your Helpouts %}</p>
+<p><img class="right" src="/images/2013/11/05/your_helpouts.png" width="400" height="500" title="Your Helpouts" ></p>
 
 <p>When its time for your helpout, you&rsquo;ll get a reminder email with a link you can use to quickly join. The interface looks almost identical to the Hangouts UI, except with a few extra widgets to indicate the Helpout title/price/if it&rsquo;s being recorded.</p>
 
 <p>In addition to paricipating from your computer, Google has also launched an <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.helpouts">Android app</a> so that you can get help while you&rsquo;re mobile as well. Whether you&rsquo;re interested in giving Helpouts a shot, want to learn about writing apps for Android, or just want to see what the newest Google product looks like &ndash; feel free to checkout <a href="https://helpouts.google.com/114052868601022948953/ls/a65184ab017ae8b0">my listing!</a>.</p>
 
-<p>{% img center /images/2013/11/05/waiting.png 600 600 Waiting %}</p>
+<p><img class="center" src="/images/2013/11/05/waiting.png" width="600" height="600" title="Waiting" ></p>
 ]]></content>
   </entry>
   

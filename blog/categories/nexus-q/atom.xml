@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Nexus Q | Gadget Habit]]></title>
   <link href="http://michaelevans.org/blog/categories/nexus-q/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2015-09-09T20:10:25-04:00</updated>
+  <updated>2015-09-09T20:07:17-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -20,7 +20,7 @@
     <id>http://michaelevans.org/blog/2012/09/07/nexus-q-review</id>
     <content type="html"><![CDATA[<p>It’s a <em>what</em>? Ever since I returned from Google I/O, this is what people have been saying when they see the newest addition to my TV setup, the Nexus Q. It’s hard to blame them though, since it just looks so different, for a home theatre device. unlike those bland, black boxes that most living rooms are filled with, the Nexus Q is a heavy (about two pounds) sphere, which is lit by a ring of 32 LEDs. The top side of the Q spins freely to function as a volume knob, and can be tapped to mute.</p>
 
-<p>{% img /images/2012/09/07/q.jpeg 400 400 Nexus Q %}</p>
+<p><img src="/images/2012/09/07/q.jpeg" width="400" height="400" title="Nexus Q" ></p>
 
 <p>On the back of the Q, things are less clean. There’s both micro HDMI and optical audio out, ethernet and a micro USB port for “encouraged hacking”. There’s also a set of banana connectors to allow you to hook up speakers to the built in 25-watt amplifier.</p>
 
@@ -28,11 +28,11 @@
 
 <p>Since the Q doesn’t have it’s own UI, let’s take a look at the <a href="https://play.google.com/store/apps/details?id=com.google.android.setupwarlock">Nexus Q app for Android</a>.</p>
 
-<p>{% img /images/2012/09/07/qapp.jpeg 400 400 Nexus Q App %}</p>
+<p><img src="/images/2012/09/07/qapp.jpeg" width="400" height="400" title="Nexus Q App" ></p>
 
 <p>You don&rsquo;t really use the app for anything after setting up the Q initially, all the media is controlled through the Play Music, Play Movies and Youtube apps. All you need to do is hit the little triangle that will appear when you&rsquo;re on the same network as a Q.</p>
 
-<p>{% img /images/2012/09/07/music.png 400 400 Play Music with Q %}</p>
+<p><img src="/images/2012/09/07/music.png" width="400" height="400" title="Play Music with Q" ></p>
 
 <p>My biggest complaint about the Q is the way you set it up to involve your friends. First you need to enable guest mode from the Q app, and then manually invite all the people you want to have access, which actually sends them an <strong>email</strong> to download the app. This seems like such a convoluted process, and I doubt people will actually care to do this. Not only that, but I see no way of revoking someone’s ability to use the Q after you’ve invited them. We all know that one person who takes their music privileges a little too far, but it seems that the only recourse in that event is to turn guest mode off all together.</p>
 

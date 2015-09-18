@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Parse | Gadget Habit]]></title>
   <link href="http://michaelevans.org/blog/categories/parse/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2015-09-09T20:10:25-04:00</updated>
+  <updated>2015-09-09T20:07:17-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -103,7 +103,7 @@ tools:context=".RegisterActivity" &gt;
 
 <p>The login screen is very similar to that of the registration screen, with the same widgets in the same places, just different ids and labels, so we&rsquo;re just going to go over the registration screen in this tutorial and leave the login screen up as an exercise to the reader. (The code will be available on <a href="https://github.com/MichaelEvans/Parse-Android-Todo">Github</a> if you get stuck). We&rsquo;re going to want to implement that <code>register</code> function in our RegisterActivity, so let&rsquo;s do that next.</p>
 
-<p>{% img center /images/2013/08/20/login.png 300 500 Logging In %}</p>
+<p><img class="center" src="/images/2013/08/20/login.png" width="300" height="500" title="Logging In" ></p>
 
 <p>After declaring and binding variables to the two <code>EditText</code> fields (we&rsquo;ll call those <code>mUsernameField</code> and <code>mPasswordField</code>), we create our register function:</p>
 
@@ -136,13 +136,13 @@ user.signUpInBackground(new SignUpCallback() {
 
 <p>```</p>
 
-<p>{% img center /images/2013/08/20/registering.png 300 500 Registering %}</p>
+<p><img class="center" src="/images/2013/08/20/registering.png" width="300" height="500" title="Registering" ></p>
 
 <p>What' were doing here is a) bailing out early if the user fails to fill in one of the fields, b) disabling the button while the network request is running, so the user can&rsquo;t try to register multiple times by accident, c) creating a ParseUser object with the username and password from the <code>EditText</code> fields, and then calling <code>signUpInBackground</code>, with a callback which is run when the request is complete. If there is an error for any reason, we re-enable the registration button, so that the user can fix any issues and resubmit. (We&rsquo;ll get to error handling a little later.) If there isn&rsquo;t an error, we start the TodoActivity that we <a href="http://michaelevans.org/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse/">created last week</a>.</p>
 
 <p>Huzzah! If you sign up, you now see a users table in your Parse console!</p>
 
-<p>{% img center /images/2013/08/20/users.png 800 800 Users Console %}</p>
+<p><img class="center" src="/images/2013/08/20/users.png" width="800" height="800" title="Users Console" ></p>
 
 <h3>Making Things Belong</h3>
 
@@ -160,7 +160,7 @@ t.setUser(ParseUser.getCurrentUser());
 
 <p>These lines will make the Task only read/writeable by the owner, and set the user associated with them to the current user. Take a peek in your Parse console, and you&rsquo;ll see the Tasks now have an owner!</p>
 
-<p>{% img center /images/2013/08/20/tasks.png 800 800 Tasks now belong! %}</p>
+<p><img class="center" src="/images/2013/08/20/tasks.png" width="800" height="800" title="Tasks now belong!" ></p>
 
 <p>We also want to make it possible for a user to log out. We&rsquo;ll do this by providing an option in the action bar settings menu. We can do this by adding an entry in the <code>res/menu/todo.xml</code> file like the following:</p>
 
@@ -261,7 +261,7 @@ v.setEnabled(true);
 
 <p>This will set some nice messages that will explain what the error is, or fall back to the message that Parse sends us, if it&rsquo;s some other type of problem.</p>
 
-<p>{% img center /images/2013/08/20/error_handling.png 300 500 Pretty Error Handling %}</p>
+<p><img class="center" src="/images/2013/08/20/error_handling.png" width="300" height="500" title="Pretty Error Handling" ></p>
 
 <h3>Possibilities for Next Time</h3>
 
@@ -289,17 +289,17 @@ v.setEnabled(true);
 
 <p>First thing you&rsquo;ll want to do is sign up for Parse, and create a new Application. I called mine &ldquo;Todo&rdquo; here, but you can call it anything you&rsquo;d like. After you pick a name, you&rsquo;ll be presented a screen like the following, which contains your API keys. Do not lose these, this is how your app will connect to the Parse services. (I have removed my keys in the screenshot below.)</p>
 
-<p>{% img center /images/2013/08/14/parse_keys.png 300 500 Parse Keys %}</p>
+<p><img class="center" src="/images/2013/08/14/parse_keys.png" width="300" height="500" title="Parse Keys" ></p>
 
 <p>Next, you&rsquo;ll want to download the Parse libraries from <a href="https://parse.com/downloads/android/Parse/latest">here</a>.</p>
 
 <p>Back in Eclipse, open the New Project Wizard and create a new Android application. I set the minimum SDK version to Honeycomb in the screenshot below, but feel free to pick something newer if you&rsquo;d like.</p>
 
-<p>{% img center /images/2013/08/14/android_wizard.png 500 500 Android New Project Wizard %}</p>
+<p><img class="center" src="/images/2013/08/14/android_wizard.png" width="500" height="500" title="Android New Project Wizard" ></p>
 
 <p>You&rsquo;ll then be taken to a screen to create your starting activity. Choose Blank Activity, and feel free to name it whatever you like.</p>
 
-<p>{% img center /images/2013/08/14/android_wizard_3.png 500 500 Android New Project Wizard %}</p>
+<p><img class="center" src="/images/2013/08/14/android_wizard_3.png" width="500" height="500" title="Android New Project Wizard" ></p>
 
 <p>After you complete the wizard, you&rsquo;ll have a new project in your workspace. Copy the Parse jar file that you downloaded before to the <code>libs/</code> directory, and you&rsquo;ll be all set to begin coding.</p>
 
@@ -411,7 +411,7 @@ tools:context=".TodoActivity" &gt;
 
 <p>Here we are declaring a layout that contains an input field and a button (for creating new tasks), as well as a ListView for showing the existing tasks. If you run what we&rsquo;ve done so far, you should end up with an application on your device that looks like this:</p>
 
-<p>{% img center /images/2013/08/14/step1.png 300 500 First Run %}</p>
+<p><img class="center" src="/images/2013/08/14/step1.png" width="300" height="500" title="First Run" ></p>
 
 <p>You can type in the input box, but if you hit the submit button, you&rsquo;ll notice the app will crash. Why&rsquo;s that? Because we said in our XML that the button will perform the <code>createTask</code> method when you click on it, but we never declared that method in our activity. Let&rsquo;s do that now.</p>
 
@@ -441,7 +441,7 @@ public void createTask(View v) {</p>
 
 <p>Now if you type in a task and hit save, the input field will be blank, but if you go to your Parse Console, you&rsquo;ll see the data in the data browser:</p>
 
-<p>{% img center /images/2013/08/14/parse_console.png 800 800 Parse Console %}</p>
+<p><img class="center" src="/images/2013/08/14/parse_console.png" width="800" height="800" title="Parse Console" ></p>
 
 <p>Now let&rsquo;s set up the app to fetch the Tasks from Parse.</p>
 
@@ -549,7 +549,7 @@ query.findInBackground(new FindCallback&lt;Task&gt;() {
 
 <p>This will query Parse for all the Task objects, and return a list of them. Then we will clear the existing set of Tasks from our adapter, and replace the existing list with those. Now if you run the app, you&rsquo;ll be greeted with something like the following:</p>
 
-<p>{% img center /images/2013/08/14/step2.png 300 500 Step 2 %}</p>
+<p><img class="center" src="/images/2013/08/14/step2.png" width="300" height="500" title="Step 2" ></p>
 
 <p>Let&rsquo;s also add this to our <code>createTask()</code> method, to insert the Task we just created at the top of the list:
 <code>java
@@ -593,7 +593,7 @@ task.saveEventually();
 
 <p>That&rsquo;s it! Now you should be able to launch the application, and create, complete and un-complete tasks as you wish!</p>
 
-<p>{% img center /images/2013/08/14/step3.png 300 500 Step 2 %}</p>
+<p><img class="center" src="/images/2013/08/14/step3.png" width="300" height="500" title="Step 2" ></p>
 
 <h2>Optimizations/Improvements</h2>
 

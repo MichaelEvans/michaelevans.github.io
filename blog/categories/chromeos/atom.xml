@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ChromeOS | Gadget Habit]]></title>
   <link href="http://michaelevans.org/blog/categories/chromeos/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2015-09-09T20:10:25-04:00</updated>
+  <updated>2015-09-09T20:07:17-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -20,7 +20,7 @@
     <id>http://michaelevans.org/blog/2013/03/28/google-plus-messenger-coming-to-chromeos</id>
     <content type="html"><![CDATA[<p>While looking through the Chromium bug tracker today, I stumbled upon an <a href="https://code.google.com/p/chromium/issues/detail?id=167513">interesting bug</a>. The interesting part I found was <a href="https://code.google.com/p/chromium/issues/detail?id=167513#c18">a screenshot posted by one of the Chromium team members</a>.</p>
 
-<p>{% img center /images/2013/03/28/googlemessenger.png 500 500 Google Plus Messenger %}</p>
+<p><img class="center" src="/images/2013/03/28/googlemessenger.png" width="500" height="500" title="Google Plus Messenger" ></p>
 
 <p>If you look closely, it looks like the Google+ Messenger icon on the bottom right corner of the dock. Is this finally the integration of G+ Messenger and the web that we&rsquo;ve been waiting for since G+ Messenger was introduced? Maybe we&rsquo;ll find out in a few short weeks during <a href="http://michaelevans.org/blog/2013/03/14/google-io-2013-and-google-reader/">Google IO</a> this year!</p>
 ]]></content>
