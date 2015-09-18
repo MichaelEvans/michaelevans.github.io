@@ -4,7 +4,7 @@
   <title><![CDATA[Gadget Habit]]></title>
   <link href="http://michaelevans.org/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2015-09-09T20:07:17-04:00</updated>
+  <updated>2015-09-18T12:25:21-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -12,6 +12,108 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Testing Intents with Espresso Intents]]></title>
+    <link href="http://michaelevans.org/blog/2015/09/15/testing-intents-with-espresso-intents/"/>
+    <updated>2015-09-15T22:03:57-04:00</updated>
+    <id>http://michaelevans.org/blog/2015/09/15/testing-intents-with-espresso-intents</id>
+    <content type="html"><![CDATA[<p>A few weeks ago, I wrote <a href="http://michaelevans.org/blog/2015/08/03/using-espresso-for-easy-ui-testing/">a basic introduction</a> on how to use Espresso to test the UI of an Android application. However, when I went to write instrumentation tests for <a href="https://github.com/MichaelEvans/Aftermath">Aftermath</a>, I ran into trouble testing things that exist outside my application&rsquo;s process. For example, what do you do when your app needs to use the Android Intent system to call upon the dialer or the browser, or pick a contact with the contact picker? What about testing a share action? Because these apps run outside your application itself, you can&rsquo;t use Espresso to interact with them. So how can you test your app&rsquo;s behavior? You can either use Espresso-Intents or UI Automator (but that&rsquo;s another show).</p>
+
+<!-- more -->
+
+
+<h2>The Setup</h2>
+
+<p>Setting up Espresso-Intents is dead simple if you&rsquo;re already using Espresso. Make sure you&rsquo;re already depending on Espresso, the rules, and the runner and then add the dependency:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>androidTestCompile 'com.android.support.test.espresso:espresso-intents:2.2.1'</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>The Tests</h2>
+
+<p>Let&rsquo;s imagine that you had an application with a button to launch the contact picker, which would then show the contact <code>Uri</code> of the selected contact in a text view. Not only would this be hard to test because you are leaving your own application&rsquo;s process, but you don&rsquo;t even know if your test can rely on any contacts even existing on the test device (not to mention not knowing which app is registered to handle the contact-picking Intent itself). Fortunately we can use Espresso-Intents to stub out the response for activities that are launched with <code>startActivityForResult</code>.</p>
+
+<p>Here&rsquo;s what that might look like:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Before</span> <span class="kd">public</span> <span class="kt">void</span> <span class="n">stubContactIntent</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Intent</span><span class="o">();</span>
+</span><span class='line'>    <span class="n">intent</span><span class="o">.</span><span class="na">setData</span><span class="o">(</span><span class="n">Uri</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="n">TEST_URI</span><span class="o">));</span>
+</span><span class='line'>    <span class="n">ActivityResult</span> <span class="n">result</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ActivityResult</span><span class="o">(</span><span class="n">Activity</span><span class="o">.</span><span class="na">RESULT_OK</span><span class="o">,</span> <span class="n">intent</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">intending</span><span class="o">(</span><span class="n">allOf</span><span class="o">(</span>
+</span><span class='line'>        <span class="n">hasData</span><span class="o">(</span><span class="n">ContactsContract</span><span class="o">.</span><span class="na">CommonDataKinds</span><span class="o">.</span><span class="na">Phone</span><span class="o">.</span><span class="na">CONTENT_URI</span><span class="o">),</span>
+</span><span class='line'>        <span class="n">hasAction</span><span class="o">(</span><span class="n">Intent</span><span class="o">.</span><span class="na">ACTION_PICK</span><span class="o">))</span>
+</span><span class='line'>    <span class="o">).</span><span class="na">respondWith</span><span class="o">(</span><span class="n">result</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Test</span> <span class="kd">public</span> <span class="kt">void</span> <span class="n">pickContact_viewIsSet</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="c1">//Check to make sure the Uri field is empty</span>
+</span><span class='line'>  <span class="n">onView</span><span class="o">(</span><span class="n">withId</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">phone_number</span><span class="o">)).</span><span class="na">check</span><span class="o">(</span><span class="n">matches</span><span class="o">(</span><span class="n">withText</span><span class="o">(</span><span class="s">&quot;&quot;</span><span class="o">)));</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">//Start contact picker</span>
+</span><span class='line'>  <span class="n">onView</span><span class="o">(</span><span class="n">withId</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">pick_contact</span><span class="o">)).</span><span class="na">perform</span><span class="o">(</span><span class="n">click</span><span class="o">());</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">//Verify that Uri was set properly.</span>
+</span><span class='line'>  <span class="n">onView</span><span class="o">(</span><span class="n">withId</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">phone_number</span><span class="o">)).</span><span class="na">check</span><span class="o">(</span><span class="n">matches</span><span class="o">(</span><span class="n">withText</span><span class="o">(</span><span class="n">TEST_URI</span><span class="o">)));</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Using the <code>intending</code> API, we can respond with our mock <code>ActivityResult</code> data. If you&rsquo;ve used <a href="http://mockito.org/">Mockito</a> before, this stubbing will look very familiar to the <code>when</code>/<code>respondWith</code> methods. In this example, we&rsquo;re going to stub any Intents for the <code>ACTION_PICK</code> Intent with the <code>CONTENT_URI</code> data set to return a particular hard-coded Uri.</p>
+
+<p>So this is great &mdash; our test no longer depends on any particular contact picker app, or any contacts even being present on the test device. But what do we do if we want to verify that a particular outgoing intent is launched with some given extras or data?</p>
+
+<p>Let&rsquo;s say our sample app had an input field that would take a phone number, with a button to start the dialer to call that number. (Yes, I do realize that this application would likely not receive any venture capital funding).</p>
+
+<p>All we have to do is use the <code>intended</code> API, which is most similar to Mockito&rsquo;s <code>verify</code> method. A sample of this might look like the following:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Test</span> <span class="kd">public</span> <span class="kt">void</span> <span class="n">typeNumber_ValidInput_InitiatesCall</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">onView</span><span class="o">(</span><span class="n">withId</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">number_input</span><span class="o">)).</span><span class="na">perform</span><span class="o">(</span><span class="n">typeText</span><span class="o">(</span><span class="n">VALID_PHONE_NUMBER</span><span class="o">),</span> <span class="n">closeSoftKeyboard</span><span class="o">());</span>
+</span><span class='line'>    <span class="n">onView</span><span class="o">(</span><span class="n">withId</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">dial_button</span><span class="o">)).</span><span class="na">perform</span><span class="o">(</span><span class="n">click</span><span class="o">());</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">intended</span><span class="o">(</span><span class="n">allOf</span><span class="o">(</span><span class="n">hasAction</span><span class="o">(</span><span class="n">Intent</span><span class="o">.</span><span class="na">ACTION_DIAL</span><span class="o">),</span> <span class="n">hasData</span><span class="o">(</span><span class="n">INTENT_DATA_PHONE_NUMBER</span><span class="o">)));</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In this case, we&rsquo;re just going to verify that the intended Intent had the right action and the right data that we&rsquo;d expect to hand off to the dialer.</p>
+
+<p>And you&rsquo;ll notice that the Espresso-Intents package includes handy Hamcrest matchers that you can use for things like Strings on the different parts of the Intent.</p>
+
+<p>Now go forth and test those inter-app component interactions!</p>
+
+<p>The sample code for this blog post can be found <a href="https://github.com/MichaelEvans/Espresso-Samples/tree/master/espresso-intents-sample">here</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Droidcon NYC 2015: @AnnotationProcessors("ByExample")]]></title>
@@ -25,7 +127,7 @@
 
 <p></p>
 
-<script async="true" class="speakerdeck-embed" data-id="95e696d902d845dcb5079e0691eb5f3f" src="//speakerdeck.com/assets/embed.js"> </script>
+<script async="true" class="speakerdeck-embed" data-id="95e696d902d845dcb5079e0691eb5f3f" data-ratio="1.77777777777778" src="//speakerdeck.com/assets/embed.js"> </script>
 
 ]]></content>
   </entry>
@@ -1872,19 +1974,6 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
 <hr />
 
 <p>Like this post? Any other Android tips you&rsquo;d like to hear about? Let me know on <a href="https://twitter.com/m_evans10">Twitter</a> or <a href="https://plus.google.com/114052868601022948953/posts">Google Plus</a>, or leave a comment.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Google Plus Messenger coming to ChromeOS?]]></title>
-    <link href="http://michaelevans.org/blog/2013/03/28/google-plus-messenger-coming-to-chromeos/"/>
-    <updated>2013-03-28T22:56:00-04:00</updated>
-    <id>http://michaelevans.org/blog/2013/03/28/google-plus-messenger-coming-to-chromeos</id>
-    <content type="html"><![CDATA[<p>While looking through the Chromium bug tracker today, I stumbled upon an <a href="https://code.google.com/p/chromium/issues/detail?id=167513">interesting bug</a>. The interesting part I found was <a href="https://code.google.com/p/chromium/issues/detail?id=167513#c18">a screenshot posted by one of the Chromium team members</a>.</p>
-
-<p><img class="center" src="http://michaelevans.org/images/2013/03/28/googlemessenger.png" width="500" height="500" title="Google Plus Messenger" ></p>
-
-<p>If you look closely, it looks like the Google+ Messenger icon on the bottom right corner of the dock. Is this finally the integration of G+ Messenger and the web that we&rsquo;ve been waiting for since G+ Messenger was introduced? Maybe we&rsquo;ll find out in a few short weeks during <a href="http://michaelevans.org/blog/2013/03/14/google-io-2013-and-google-reader/">Google IO</a> this year!</p>
 ]]></content>
   </entry>
   

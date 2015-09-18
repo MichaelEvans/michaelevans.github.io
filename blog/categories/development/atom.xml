@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Development | Gadget Habit]]></title>
   <link href="http://michaelevans.org/blog/categories/development/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2015-09-09T20:07:17-04:00</updated>
+  <updated>2015-09-18T12:25:21-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -12,6 +12,90 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Testing Intents with Espresso Intents]]></title>
+    <link href="http://michaelevans.org/blog/2015/09/15/testing-intents-with-espresso-intents/"/>
+    <updated>2015-09-15T22:03:57-04:00</updated>
+    <id>http://michaelevans.org/blog/2015/09/15/testing-intents-with-espresso-intents</id>
+    <content type="html"><![CDATA[<p>A few weeks ago, I wrote <a href="http://michaelevans.org/blog/2015/08/03/using-espresso-for-easy-ui-testing/">a basic introduction</a> on how to use Espresso to test the UI of an Android application. However, when I went to write instrumentation tests for <a href="https://github.com/MichaelEvans/Aftermath">Aftermath</a>, I ran into trouble testing things that exist outside my application&rsquo;s process. For example, what do you do when your app needs to use the Android Intent system to call upon the dialer or the browser, or pick a contact with the contact picker? What about testing a share action? Because these apps run outside your application itself, you can&rsquo;t use Espresso to interact with them. So how can you test your app&rsquo;s behavior? You can either use Espresso-Intents or UI Automator (but that&rsquo;s another show).</p>
+
+<!-- more -->
+
+
+<h2>The Setup</h2>
+
+<p>Setting up Espresso-Intents is dead simple if you&rsquo;re already using Espresso. Make sure you&rsquo;re already depending on Espresso, the rules, and the runner and then add the dependency:</p>
+
+<p><code>
+androidTestCompile 'com.android.support.test.espresso:espresso-intents:2.2.1'
+</code></p>
+
+<h2>The Tests</h2>
+
+<p>Let&rsquo;s imagine that you had an application with a button to launch the contact picker, which would then show the contact <code>Uri</code> of the selected contact in a text view. Not only would this be hard to test because you are leaving your own application&rsquo;s process, but you don&rsquo;t even know if your test can rely on any contacts even existing on the test device (not to mention not knowing which app is registered to handle the contact-picking Intent itself). Fortunately we can use Espresso-Intents to stub out the response for activities that are launched with <code>startActivityForResult</code>.</p>
+
+<p>Here&rsquo;s what that might look like:</p>
+
+<p>```java
+@Before public void stubContactIntent() {</p>
+
+<pre><code>Intent intent = new Intent();
+intent.setData(Uri.parse(TEST_URI));
+ActivityResult result = new ActivityResult(Activity.RESULT_OK, intent);
+
+intending(allOf(
+    hasData(ContactsContract.CommonDataKinds.Phone.CONTENT_URI),
+    hasAction(Intent.ACTION_PICK))
+).respondWith(result);
+</code></pre>
+
+<p>}</p>
+
+<p>@Test public void pickContact_viewIsSet() {</p>
+
+<pre><code>//Check to make sure the Uri field is empty
+onView(withId(R.id.phone_number)).check(matches(withText("")));
+
+//Start contact picker
+onView(withId(R.id.pick_contact)).perform(click());
+
+//Verify that Uri was set properly.
+onView(withId(R.id.phone_number)).check(matches(withText(TEST_URI)));
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Using the <code>intending</code> API, we can respond with our mock <code>ActivityResult</code> data. If you&rsquo;ve used <a href="http://mockito.org/">Mockito</a> before, this stubbing will look very familiar to the <code>when</code>/<code>respondWith</code> methods. In this example, we&rsquo;re going to stub any Intents for the <code>ACTION_PICK</code> Intent with the <code>CONTENT_URI</code> data set to return a particular hard-coded Uri.</p>
+
+<p>So this is great &mdash; our test no longer depends on any particular contact picker app, or any contacts even being present on the test device. But what do we do if we want to verify that a particular outgoing intent is launched with some given extras or data?</p>
+
+<p>Let&rsquo;s say our sample app had an input field that would take a phone number, with a button to start the dialer to call that number. (Yes, I do realize that this application would likely not receive any venture capital funding).</p>
+
+<p>All we have to do is use the <code>intended</code> API, which is most similar to Mockito&rsquo;s <code>verify</code> method. A sample of this might look like the following:</p>
+
+<p>```java
+@Test public void typeNumber_ValidInput_InitiatesCall() {</p>
+
+<pre><code>onView(withId(R.id.number_input)).perform(typeText(VALID_PHONE_NUMBER), closeSoftKeyboard());
+onView(withId(R.id.dial_button)).perform(click());
+
+intended(allOf(hasAction(Intent.ACTION_DIAL), hasData(INTENT_DATA_PHONE_NUMBER)));
+</code></pre>
+
+<p>}
+```</p>
+
+<p>In this case, we&rsquo;re just going to verify that the intended Intent had the right action and the right data that we&rsquo;d expect to hand off to the dialer.</p>
+
+<p>And you&rsquo;ll notice that the Espresso-Intents package includes handy Hamcrest matchers that you can use for things like Strings on the different parts of the Intent.</p>
+
+<p>Now go forth and test those inter-app component interactions!</p>
+
+<p>The sample code for this blog post can be found <a href="https://github.com/MichaelEvans/Espresso-Samples/tree/master/espresso-intents-sample">here</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Droidcon NYC 2015: @AnnotationProcessors("ByExample")]]></title>
@@ -22,7 +106,7 @@
 
 <p><iframe width="640" height="510" src="http://www.youtube.com/embed/dBUAqPs0TB0 " frameborder="0" webkitAllowFullScreen mozallowfullscreen allowfullscreen></iframe></p>
 
-<p><script async="true" class="speakerdeck-embed" data-id="95e696d902d845dcb5079e0691eb5f3f" src="//speakerdeck.com/assets/embed.js"> </script></p>
+<p><script async="true" class="speakerdeck-embed" data-id="95e696d902d845dcb5079e0691eb5f3f" data-ratio="1.77777777777778" src="//speakerdeck.com/assets/embed.js"> </script></p>
 ]]></content>
   </entry>
   
@@ -276,41 +360,6 @@ public void doSomething() {
 <p><em>Huzzah!</em></p>
 
 <p>Another tip: if you don&rsquo;t set a click listener for a FrameLayout (like we used in this example), the pressed state will never be used!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Blurred background effect for Android]]></title>
-    <link href="http://michaelevans.org/blog/2014/07/09/blurred-background-effect-for-android/"/>
-    <updated>2014-07-09T23:04:46-04:00</updated>
-    <id>http://michaelevans.org/blog/2014/07/09/blurred-background-effect-for-android</id>
-    <content type="html"><![CDATA[<p>A few months ago, the Android design team reviewed apps that they thought were good-looking, and were referred to as the &ldquo;<a href="https://play.google.com/store/apps/collection/promotion_3000235_beautiful_apps?hl=en">Beautiful Design Collection</a>&rdquo;, as part of their <a href="https://www.youtube.com/playlist?list=PLWz5rJ2EKKc8j2B95zGMb8muZvrIy-wcF">Android Design in Action</a> series.</p>
-
-<p>One of these apps was <a href="https://play.google.com/store/apps/details?id=com.etsy.android&amp;hl=en">Etsy</a>, which had a very cool fading blur background effect, which you can see here:</p>
-
-<p><img class="center" src="/images/2014/07/09/2014-07-09-23_25_40.gif" width="600" height="600" title="Etsy Example" ></p>
-
-<p>As a learning experiment, I set off to replicate this behavior. I had seen a library by Manuel Peinado called <a href="https://github.com/ManuelPeinado/GlassActionBar">GlassActionBar</a> which demonstrated a similar glass-like blur effect on the ActionBar, so I decided to use that code for blurring my background.</p>
-
-<p>The code itself is pretty interesting, specifically the bit for versions on Jelly Bean or higher. If you&rsquo;re using API version 16 and up, you can use <a href="http://android-developers.blogspot.com/2013/08/renderscript-intrinsics.html">Renderscript Intrinsics</a>, which are a set of built-in functions that require very little code to use, but are optimized for high-performance.</p>
-
-<p>In my sample tests, using Renderscript to blur the image took on average about ~175ms, vs ~2 seconds doing the blur using Java code. (The required code is also only a tiny fraction of the length of the Renderscript one).</p>
-
-<p>Renderscript is extremely easy to add to your project, just throw
-```</p>
-
-<pre><code>    renderscriptTargetApi 19
-    renderscriptSupportMode true
-</code></pre>
-
-<p><code>``
-in your</code>build.gradle` and you should be ready to roll.</p>
-
-<p>Once you have the blurring, the rest of the process is fairly straight forward. When you plan to leave an activity, create a bitmap of the current view and write it to disk. When you start your new activity (which should have a transparent background), you override the transition (otherwise you&rsquo;ll get the default zoom), and set the background to the blurred image you saved earlier. Add a fade in for the alpha and you get a nice little effect!</p>
-
-<p><img class="center" src="/images/2014/07/09/2014-07-09-23_34_05.gif" width="600" height="600" title="My Example" ></p>
-
-<p>If you&rsquo;d like to see how this looks in a sample project, you can find it on Github <a href="https://github.com/MichaelEvans/EtsyBlurExample">here</a>.</p>
 ]]></content>
   </entry>
   

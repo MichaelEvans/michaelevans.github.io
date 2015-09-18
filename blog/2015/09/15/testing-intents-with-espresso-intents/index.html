@@ -1,0 +1,407 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="msvalidate.01" content="275BF9CDA457668389C1F9916C380DD0" />
+  <title>Testing Intents with Espresso Intents - Gadget Habit</title>
+  <meta name="author" content="Michael Evans">
+
+  
+  <meta name="description" content="Testing Intents with Espresso Intents">
+  <meta name="keywords" content="Android, Development, Testing">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://michaelevans.org/blog/2015/09/15/testing-intents-with-espresso-intents/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Gadget Habit" type="application/atom+xml">
+  <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-28589266-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Gadget Habit</a></h1>
+  
+    <h2>A bunch of technobabble.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:michaelevans.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Testing Intents With Espresso Intents</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-09-15T22:03:57-04:00" pubdate data-updated="true">Sep 15<span>th</span>, 2015</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>A few weeks ago, I wrote <a href="http://michaelevans.org/blog/2015/08/03/using-espresso-for-easy-ui-testing/">a basic introduction</a> on how to use Espresso to test the UI of an Android application. However, when I went to write instrumentation tests for <a href="https://github.com/MichaelEvans/Aftermath">Aftermath</a>, I ran into trouble testing things that exist outside my application&rsquo;s process. For example, what do you do when your app needs to use the Android Intent system to call upon the dialer or the browser, or pick a contact with the contact picker? What about testing a share action? Because these apps run outside your application itself, you can&rsquo;t use Espresso to interact with them. So how can you test your app&rsquo;s behavior? You can either use Espresso-Intents or UI Automator (but that&rsquo;s another show).</p>
+
+<!-- more -->
+
+
+<h2>The Setup</h2>
+
+<p>Setting up Espresso-Intents is dead simple if you&rsquo;re already using Espresso. Make sure you&rsquo;re already depending on Espresso, the rules, and the runner and then add the dependency:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>androidTestCompile 'com.android.support.test.espresso:espresso-intents:2.2.1'</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>The Tests</h2>
+
+<p>Let&rsquo;s imagine that you had an application with a button to launch the contact picker, which would then show the contact <code>Uri</code> of the selected contact in a text view. Not only would this be hard to test because you are leaving your own application&rsquo;s process, but you don&rsquo;t even know if your test can rely on any contacts even existing on the test device (not to mention not knowing which app is registered to handle the contact-picking Intent itself). Fortunately we can use Espresso-Intents to stub out the response for activities that are launched with <code>startActivityForResult</code>.</p>
+
+<p>Here&rsquo;s what that might look like:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Before</span> <span class="kd">public</span> <span class="kt">void</span> <span class="n">stubContactIntent</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Intent</span><span class="o">();</span>
+</span><span class='line'>    <span class="n">intent</span><span class="o">.</span><span class="na">setData</span><span class="o">(</span><span class="n">Uri</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="n">TEST_URI</span><span class="o">));</span>
+</span><span class='line'>    <span class="n">ActivityResult</span> <span class="n">result</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ActivityResult</span><span class="o">(</span><span class="n">Activity</span><span class="o">.</span><span class="na">RESULT_OK</span><span class="o">,</span> <span class="n">intent</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">intending</span><span class="o">(</span><span class="n">allOf</span><span class="o">(</span>
+</span><span class='line'>        <span class="n">hasData</span><span class="o">(</span><span class="n">ContactsContract</span><span class="o">.</span><span class="na">CommonDataKinds</span><span class="o">.</span><span class="na">Phone</span><span class="o">.</span><span class="na">CONTENT_URI</span><span class="o">),</span>
+</span><span class='line'>        <span class="n">hasAction</span><span class="o">(</span><span class="n">Intent</span><span class="o">.</span><span class="na">ACTION_PICK</span><span class="o">))</span>
+</span><span class='line'>    <span class="o">).</span><span class="na">respondWith</span><span class="o">(</span><span class="n">result</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Test</span> <span class="kd">public</span> <span class="kt">void</span> <span class="n">pickContact_viewIsSet</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="c1">//Check to make sure the Uri field is empty</span>
+</span><span class='line'>  <span class="n">onView</span><span class="o">(</span><span class="n">withId</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">phone_number</span><span class="o">)).</span><span class="na">check</span><span class="o">(</span><span class="n">matches</span><span class="o">(</span><span class="n">withText</span><span class="o">(</span><span class="s">&quot;&quot;</span><span class="o">)));</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">//Start contact picker</span>
+</span><span class='line'>  <span class="n">onView</span><span class="o">(</span><span class="n">withId</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">pick_contact</span><span class="o">)).</span><span class="na">perform</span><span class="o">(</span><span class="n">click</span><span class="o">());</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">//Verify that Uri was set properly.</span>
+</span><span class='line'>  <span class="n">onView</span><span class="o">(</span><span class="n">withId</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">phone_number</span><span class="o">)).</span><span class="na">check</span><span class="o">(</span><span class="n">matches</span><span class="o">(</span><span class="n">withText</span><span class="o">(</span><span class="n">TEST_URI</span><span class="o">)));</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Using the <code>intending</code> API, we can respond with our mock <code>ActivityResult</code> data. If you&rsquo;ve used <a href="http://mockito.org/">Mockito</a> before, this stubbing will look very familiar to the <code>when</code>/<code>respondWith</code> methods. In this example, we&rsquo;re going to stub any Intents for the <code>ACTION_PICK</code> Intent with the <code>CONTENT_URI</code> data set to return a particular hard-coded Uri.</p>
+
+<p>So this is great &mdash; our test no longer depends on any particular contact picker app, or any contacts even being present on the test device. But what do we do if we want to verify that a particular outgoing intent is launched with some given extras or data?</p>
+
+<p>Let&rsquo;s say our sample app had an input field that would take a phone number, with a button to start the dialer to call that number. (Yes, I do realize that this application would likely not receive any venture capital funding).</p>
+
+<p>All we have to do is use the <code>intended</code> API, which is most similar to Mockito&rsquo;s <code>verify</code> method. A sample of this might look like the following:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Test</span> <span class="kd">public</span> <span class="kt">void</span> <span class="n">typeNumber_ValidInput_InitiatesCall</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">onView</span><span class="o">(</span><span class="n">withId</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">number_input</span><span class="o">)).</span><span class="na">perform</span><span class="o">(</span><span class="n">typeText</span><span class="o">(</span><span class="n">VALID_PHONE_NUMBER</span><span class="o">),</span> <span class="n">closeSoftKeyboard</span><span class="o">());</span>
+</span><span class='line'>    <span class="n">onView</span><span class="o">(</span><span class="n">withId</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">dial_button</span><span class="o">)).</span><span class="na">perform</span><span class="o">(</span><span class="n">click</span><span class="o">());</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">intended</span><span class="o">(</span><span class="n">allOf</span><span class="o">(</span><span class="n">hasAction</span><span class="o">(</span><span class="n">Intent</span><span class="o">.</span><span class="na">ACTION_DIAL</span><span class="o">),</span> <span class="n">hasData</span><span class="o">(</span><span class="n">INTENT_DATA_PHONE_NUMBER</span><span class="o">)));</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In this case, we&rsquo;re just going to verify that the intended Intent had the right action and the right data that we&rsquo;d expect to hand off to the dialer.</p>
+
+<p>And you&rsquo;ll notice that the Espresso-Intents package includes handy Hamcrest matchers that you can use for things like Strings on the different parts of the Intent.</p>
+
+<p>Now go forth and test those inter-app component interactions!</p>
+
+<p>The sample code for this blog post can be found <a href="https://github.com/MichaelEvans/Espresso-Samples/tree/master/espresso-intents-sample">here</a>.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Michael Evans</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-09-15T22:03:57-04:00" pubdate data-updated="true">Sep 15<span>th</span>, 2015</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/development/'>Development</a>, <a class='category' href='/blog/categories/testing/'>Testing</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://michaelevans.org/blog/2015/09/15/testing-intents-with-espresso-intents/" data-via="m_evans10" data-counturl="http://michaelevans.org/blog/2015/09/15/testing-intents-with-espresso-intents/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/09/09/droidcon-nyc-2015-at-annotationprocessors-byexample/" title="Previous Post: Droidcon NYC 2015: @AnnotationProcessors("ByExample")">&laquo; Droidcon NYC 2015: @AnnotationProcessors("ByExample")</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/09/15/testing-intents-with-espresso-intents/">Testing Intents with Espresso Intents</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/09/09/droidcon-nyc-2015-at-annotationprocessors-byexample/">Droidcon NYC 2015: @AnnotationProcessors("ByExample")</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/08/03/using-espresso-for-easy-ui-testing/">Using Espresso for Easy UI Testing</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/07/14/improving-your-code-with-android-support-annotations/">Improving your code with Android Support Annotations</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/05/07/android-ripples-with-rounded-corners/">Android Ripples with Rounded Corners</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/MichaelEvans">@MichaelEvans</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'MichaelEvans',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/114052868601022948953?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Michael Evans -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mevans';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://michaelevans.org/blog/2015/09/15/testing-intents-with-espresso-intents/';
+        var disqus_url = 'http://michaelevans.org/blog/2015/09/15/testing-intents-with-espresso-intents/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

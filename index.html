@@ -10,7 +10,7 @@
   <meta name="author" content="Michael Evans">
 
   
-  <meta name="description" content="Here are slides and the video for my talk from Droidcon NYC 2015 on writing your own Annotation Processor: ">
+  <meta name="description" content="A few weeks ago, I wrote a basic introduction on how to use Espresso to test the UI of an Android application. However, when I went to write &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,6 +85,49 @@
       
   <header>
     
+      <h1 class="entry-title"><a href="/blog/2015/09/15/testing-intents-with-espresso-intents/">Testing Intents With Espresso Intents</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-09-15T22:03:57-04:00" pubdate data-updated="true">Sep 15<span>th</span>, 2015</time>
+        
+         | <a href="/blog/2015/09/15/testing-intents-with-espresso-intents/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>A few weeks ago, I wrote <a href="http://michaelevans.org/blog/2015/08/03/using-espresso-for-easy-ui-testing/">a basic introduction</a> on how to use Espresso to test the UI of an Android application. However, when I went to write instrumentation tests for <a href="https://github.com/MichaelEvans/Aftermath">Aftermath</a>, I ran into trouble testing things that exist outside my application&rsquo;s process. For example, what do you do when your app needs to use the Android Intent system to call upon the dialer or the browser, or pick a contact with the contact picker? What about testing a share action? Because these apps run outside your application itself, you can&rsquo;t use Espresso to interact with them. So how can you test your app&rsquo;s behavior? You can either use Espresso-Intents or UI Automator (but that&rsquo;s another show).</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2015/09/15/testing-intents-with-espresso-intents/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/blog/2015/09/09/droidcon-nyc-2015-at-annotationprocessors-byexample/">Droidcon NYC 2015: @AnnotationProcessors(&#8220;ByExample&#8221;)</a></h1>
     
     
@@ -117,7 +160,7 @@
 
 <p></p>
 
-<script async="true" class="speakerdeck-embed" data-id="95e696d902d845dcb5079e0691eb5f3f" src="//speakerdeck.com/assets/embed.js"> </script>
+<script async="true" class="speakerdeck-embed" data-id="95e696d902d845dcb5079e0691eb5f3f" data-ratio="1.77777777777778" src="//speakerdeck.com/assets/embed.js"> </script>
 
 </div>
   
@@ -602,51 +645,6 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android/">ColorArt: A Library to Do iTunes 11-style Color Matching for Android</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-12-12T00:02:34-05:00" pubdate data-updated="true">Dec 12<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Last week I open sourced an Android library called <a href="https://github.com/MichaelEvans/ColorArt">ColorArt</a>, which is a port of the popular OS X library written by the guys over at <a href="http://www.panic.com/blog/itunes-11-and-colors/">Panic</a>. It allows you to use a source image to create a themed image/text display, very similar to the effect which is done in iTunes 11.</p>
-
-<p><img class="center" src="/images/2013/12/12/itunes-11.png" width="600" height="600" title="iTunes Example" ></p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -662,6 +660,10 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/09/15/testing-intents-with-espresso-intents/">Testing Intents with Espresso Intents</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/09/09/droidcon-nyc-2015-at-annotationprocessors-byexample/">Droidcon NYC 2015: @AnnotationProcessors(&#8220;ByExample&#8221;)</a>
       </li>
     
@@ -675,10 +677,6 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
     
       <li class="post">
         <a href="/blog/2015/05/07/android-ripples-with-rounded-corners/">Android Ripples with Rounded Corners</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/07/09/blurred-background-effect-for-android/">Blurred background effect for Android</a>
       </li>
     
   </ul>
