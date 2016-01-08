@@ -4,7 +4,7 @@
   <title><![CDATA[Michael Evans]]></title>
   <link href="http://michaelevans.org/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2016-01-07T22:33:17-05:00</updated>
+  <updated>2016-01-07T23:14:54-05:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -26,6 +26,8 @@
 <h2>Language Injection</h2>
 
 <p>Ever needed to type a JSON string? Perhaps you&rsquo;ve used one as a text fixture for one of your GSON deserializers and know that it&rsquo;s a huge pain to manage all those backslashes. Fortunately, IntelliJ has a feature called <em>Language Injection</em>, which allows you to edit the JSON fragment in its own editor and then IntelliJ will properly inject that fragment into your code as an escaped String.</p>
+
+<p><img class="center" src="http://michaelevans.org/images/2016/01/06/fragment_intention.png" width="300" height="100" title="Intention Action" ></p>
 
 <p>Inject Language/Reference is an intention action<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>, so you can start it by using <kbd>⌥</kbd>+<kbd>Return</kbd>, or <kbd>⌘</kbd>+<kbd>⇧</kbd>+<kbd>A</kbd> and searching for it.</p>
 
@@ -63,7 +65,7 @@
 
 <h2>Bonus Round &ndash; IntelliJ 15 Only</h2>
 
-<p>Did you know IntelliJ has <a href="https://www.jetbrains.com/idea/help/testing-restful-web-services.html">it&rsquo;s own REST client built in</a>? Super handy for testing out API calls without something like <a href="https://luckymarmot.com/paw">Paw</a> or <a href="https://chrome.google.com/webstore/detail/postman/fhbjgbiflinjbdggehcddcbncdddomop?hl=en">Postman</a>.</p>
+<p>Did you know IntelliJ has <a href="https://www.jetbrains.com/idea/help/testing-restful-web-services.html">its own REST client</a>? Super handy for testing out API calls without something like <a href="https://luckymarmot.com/paw">Paw</a> or <a href="https://chrome.google.com/webstore/detail/postman/fhbjgbiflinjbdggehcddcbncdddomop?hl=en">Postman</a>.</p>
 
 <p>Have any other favorite tips or tricks? Let me know!</p>
 <div class="footnotes">
