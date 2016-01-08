@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: Android | Gadget Habit]]></title>
+  <title><![CDATA[Category: Android | Michael Evans]]></title>
   <link href="http://michaelevans.org/blog/categories/android/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2015-09-18T12:25:21-04:00</updated>
+  <updated>2016-01-07T22:30:36-05:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -12,6 +12,70 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Android Studio Tips and Tricks]]></title>
+    <link href="http://michaelevans.org/blog/2016/01/06/android-studio-tips-and-tricks/"/>
+    <updated>2016-01-06T20:25:53-05:00</updated>
+    <id>http://michaelevans.org/blog/2016/01/06/android-studio-tips-and-tricks</id>
+    <content type="html"><![CDATA[<p>I recently attended Google&rsquo;s <a href="https://androiddevsummit.withgoogle.com/">Android Dev Summit</a> where the Tools team presented a talk entitled <a href="https://www.youtube.com/watch?v=Y2GC6P5hPeA">Android Studio For Experts</a>. The room was packed for the 90 minute session, where a lot of great Android Studio tips where shared. This gave me the idea of showing off some of my favorite Android Studio tips!</p>
+
+<!-- more -->
+
+
+<h2>Language Injection</h2>
+
+<p>Ever needed to type a JSON string? Perhaps you&rsquo;ve used one as a text fixture for one of your GSON deserializers and know that it&rsquo;s a huge pain to manage all those backslashes. Fortunately, IntelliJ has a feature called <em>Language Injection</em>, which allows you to edit the JSON fragment in its own editor and then IntelliJ will properly inject that fragment into your code as an escaped String.</p>
+
+<p>Inject Language/Reference is an intention action<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>, so you can start it by using <kbd>⌥</kbd>+<kbd>Return</kbd>, or <kbd>⌘</kbd>+<kbd>⇧</kbd>+<kbd>A</kbd> and searching for it.</p>
+
+<p><img class="center" src="/images/2016/01/06/fragment_editor.png" width="300" height="300" title="Editing JSON" ></p>
+
+<h2><a href="https://xkcd.com/1171/">Check RegExp</a></h2>
+
+<p>This is pretty similar to the last tip, but if you select the language of the fragment as &ldquo;RegExp&rdquo;, you&rsquo;ll get a handy regular expression tester!</p>
+
+<p><img class="center" src="/images/2016/01/06/reg_exp_1.png" width="300" height="150" title="Editing Regex" ></p>
+
+<p><img class="center" src="/images/2016/01/06/reg_exp_2.png" width="300" height="200" title="Valid Regex" ></p>
+
+<p><img class="center" src="/images/2016/01/06/reg_exp_3.png" width="300" height="200" title="Invalid Regex" ></p>
+
+<h2>Smart(er) Completion</h2>
+
+<p>Now I’m pretty sure most of you have used IntelliJ’s code completion features. Press <kbd>⌥</kbd>+<kbd>Space</kbd>, and IntelliJ/Android Studio lists options to complete the names of classes, methods, fields, and keywords within the visibility scope. But have you ever noticed that the suggestions seem to be based off the characters you&rsquo;ve typed, rather than the actual <em>types</em> that are expected in the scope of the caret? Something like this:</p>
+
+<p><img class="center" src="/images/2016/01/06/basic_autocomplete.png" width="300" height="200" title="Autocomplete" ></p>
+
+<p>Well if you use <em>Type Completion</em> (by pressing <kbd>⌥</kbd>+<kbd>⇧</kbd>+<kbd>Space</kbd>), you will see a list of suggestions containing only those types that are applicable to the current context. Like the example below, you&rsquo;ll only get types that return a <code>Reader</code>, which is the type that BufferedReaders constructor expects:</p>
+
+<p><img class="center" src="/images/2016/01/06/smart_autocomplete.png" width="300" height="200" title="Better Autocomplete" ></p>
+
+<p>What&rsquo;s even cooler is that you can press it an additional time, and IntelliJ will do a deeper scan (looking at static method calls, chained expressions, etc.) to find more options for you:</p>
+
+<p><img class="center" src="/images/2016/01/06/chained_autocomplete.png" width="300" height="200" title="Chained Autocomplete" ></p>
+
+<h2>Discovering Your Own Tips and Tricks</h2>
+
+<p>Another really cool feature is the <em>Productivity Guide</em>. It shows you usage statistics for a lot of IntelliJ&rsquo;s features, like how many keystokes have been saved or possible bugs avoided by using the various shortcuts. It&rsquo;s also very helpful for discovering features you might not have known about; you can scroll through the list of unused features to see what you&rsquo;re missing out on! To find the productivity guide, go to <code>Help -&gt; Productivity Guide</code>.</p>
+
+<p><img class="center" src="/images/2016/01/06/productivity_guide.png" width="700" height="500" title="Invalid Regex" ></p>
+
+<h2>Bonus Round &ndash; IntelliJ 15 Only</h2>
+
+<p>Did you know IntelliJ has <a href="https://www.jetbrains.com/idea/help/testing-restful-web-services.html">it&rsquo;s own REST client built in</a>? Super handy for testing out API calls without something like <a href="https://luckymarmot.com/paw">Paw</a> or <a href="https://chrome.google.com/webstore/detail/postman/fhbjgbiflinjbdggehcddcbncdddomop?hl=en">Postman</a>.</p>
+
+<p>Have any other favorite tips or tricks? Let me know!</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p><a href="https://www.jetbrains.com/idea/help/intention-actions.html">Intention Actions</a> are those suggestions in the little popup menus that allow you to quick-fix things like classes that haven&rsquo;t been imported, etc.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Testing Intents with Espresso Intents]]></title>
@@ -305,61 +369,6 @@ public void doSomething() {
 </ol>
 </div>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Android Ripples with Rounded Corners]]></title>
-    <link href="http://michaelevans.org/blog/2015/05/07/android-ripples-with-rounded-corners/"/>
-    <updated>2015-05-07T22:55:36-04:00</updated>
-    <id>http://michaelevans.org/blog/2015/05/07/android-ripples-with-rounded-corners</id>
-    <content type="html"><![CDATA[<p>So recently I was trying to add a ripple to a view that had rounded corners. Simple enough right? Let&rsquo;s just say I have a FrameLayout with the background similar to this one:</p>
-
-<p>```
-&lt;?xml version=&ldquo;1.0&rdquo; encoding=&ldquo;utf-8&rdquo;?>
-&lt;shape xmlns:android=&ldquo;<a href="http://schemas.android.com/apk/res/android">http://schemas.android.com/apk/res/android</a>&rdquo;</p>
-
-<pre><code>android:shape="rectangle"&gt;
-&lt;solid android:color="@android:color/transparent"/&gt;
-&lt;corners android:radius="15dp" /&gt;
-&lt;stroke
-    android:width="1px"
-    android:color="#000000" /&gt;
-</code></pre>
-
-<p></shape>
-```</p>
-
-<p>It&rsquo;s not quite as simple as setting the foreground to <code>?attr/selectableItemBackground</code>, or else you&rsquo;ll see the ripple surpasses the corners (which doesn&rsquo;t look <em>so</em> bad when your border radius is small, but this would look terrible with a circlular view):</p>
-
-<p><img class="center" src="/images/2015/05/07/before.gif" width="600" height="600" title="Rounded Corner Fail!" ></p>
-
-<p>The solution for this lies in the special mask layer of the <a href="https://developer.android.com/reference/android/graphics/drawable/RippleDrawable.html">RippleDrawable</a>. You specify the mask layer via the <code>android:id</code> value set to <code>@android:id/mask</code>. For the example above, you can set the mask to the same size/shape as the view you&rsquo;re masking, and then the ripple will only show for that area. For something like our example above, you&rsquo;d use something like this:</p>
-
-<p>```
-&lt;?xml version=&ldquo;1.0&rdquo; encoding=&ldquo;utf-8&rdquo;?>
-&lt;ripple xmlns:android=&ldquo;<a href="http://schemas.android.com/apk/res/android">http://schemas.android.com/apk/res/android</a>&rdquo;</p>
-
-<pre><code>android:color="?android:attr/colorControlHighlight"&gt;
-&lt;item android:id="@android:id/mask"&gt;
-    &lt;shape android:shape="rectangle"&gt;
-        &lt;solid android:color="#000000" /&gt;
-        &lt;corners android:radius="15dp" /&gt;
-    &lt;/shape&gt;
-&lt;/item&gt;
-&lt;item android:drawable="@drawable/rounded_corners" /&gt;
-</code></pre>
-
-<p></ripple>
-```</p>
-
-<p>Now when you tap on the view, you&rsquo;ll see something like this:</p>
-
-<p><img class="center" src="/images/2015/05/07/after.gif" width="600" height="600" title="Rounded Corners!" ></p>
-
-<p><em>Huzzah!</em></p>
-
-<p>Another tip: if you don&rsquo;t set a click listener for a FrameLayout (like we used in this example), the pressed state will never be used!</p>
 ]]></content>
   </entry>
   

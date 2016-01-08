@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Gadget Habit]]></title>
+  <title><![CDATA[Michael Evans]]></title>
   <link href="http://michaelevans.org/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2015-09-18T12:25:21-04:00</updated>
+  <updated>2016-01-07T22:30:36-05:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -12,6 +12,70 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Android Studio Tips and Tricks]]></title>
+    <link href="http://michaelevans.org/blog/2016/01/06/android-studio-tips-and-tricks/"/>
+    <updated>2016-01-06T20:25:53-05:00</updated>
+    <id>http://michaelevans.org/blog/2016/01/06/android-studio-tips-and-tricks</id>
+    <content type="html"><![CDATA[<p>I recently attended Google&rsquo;s <a href="https://androiddevsummit.withgoogle.com/">Android Dev Summit</a> where the Tools team presented a talk entitled <a href="https://www.youtube.com/watch?v=Y2GC6P5hPeA">Android Studio For Experts</a>. The room was packed for the 90 minute session, where a lot of great Android Studio tips where shared. This gave me the idea of showing off some of my favorite Android Studio tips!</p>
+
+<!-- more -->
+
+
+<h2>Language Injection</h2>
+
+<p>Ever needed to type a JSON string? Perhaps you&rsquo;ve used one as a text fixture for one of your GSON deserializers and know that it&rsquo;s a huge pain to manage all those backslashes. Fortunately, IntelliJ has a feature called <em>Language Injection</em>, which allows you to edit the JSON fragment in its own editor and then IntelliJ will properly inject that fragment into your code as an escaped String.</p>
+
+<p>Inject Language/Reference is an intention action<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>, so you can start it by using <kbd>⌥</kbd>+<kbd>Return</kbd>, or <kbd>⌘</kbd>+<kbd>⇧</kbd>+<kbd>A</kbd> and searching for it.</p>
+
+<p><img class="center" src="http://michaelevans.org/images/2016/01/06/fragment_editor.png" width="300" height="300" title="Editing JSON" ></p>
+
+<h2><a href="https://xkcd.com/1171/">Check RegExp</a></h2>
+
+<p>This is pretty similar to the last tip, but if you select the language of the fragment as &ldquo;RegExp&rdquo;, you&rsquo;ll get a handy regular expression tester!</p>
+
+<p><img class="center" src="http://michaelevans.org/images/2016/01/06/reg_exp_1.png" width="300" height="150" title="Editing Regex" ></p>
+
+<p><img class="center" src="http://michaelevans.org/images/2016/01/06/reg_exp_2.png" width="300" height="200" title="Valid Regex" ></p>
+
+<p><img class="center" src="http://michaelevans.org/images/2016/01/06/reg_exp_3.png" width="300" height="200" title="Invalid Regex" ></p>
+
+<h2>Smart(er) Completion</h2>
+
+<p>Now I’m pretty sure most of you have used IntelliJ’s code completion features. Press <kbd>⌥</kbd>+<kbd>Space</kbd>, and IntelliJ/Android Studio lists options to complete the names of classes, methods, fields, and keywords within the visibility scope. But have you ever noticed that the suggestions seem to be based off the characters you&rsquo;ve typed, rather than the actual <em>types</em> that are expected in the scope of the caret? Something like this:</p>
+
+<p><img class="center" src="http://michaelevans.org/images/2016/01/06/basic_autocomplete.png" width="300" height="200" title="Autocomplete" ></p>
+
+<p>Well if you use <em>Type Completion</em> (by pressing <kbd>⌥</kbd>+<kbd>⇧</kbd>+<kbd>Space</kbd>), you will see a list of suggestions containing only those types that are applicable to the current context. Like the example below, you&rsquo;ll only get types that return a <code>Reader</code>, which is the type that BufferedReaders constructor expects:</p>
+
+<p><img class="center" src="http://michaelevans.org/images/2016/01/06/smart_autocomplete.png" width="300" height="200" title="Better Autocomplete" ></p>
+
+<p>What&rsquo;s even cooler is that you can press it an additional time, and IntelliJ will do a deeper scan (looking at static method calls, chained expressions, etc.) to find more options for you:</p>
+
+<p><img class="center" src="http://michaelevans.org/images/2016/01/06/chained_autocomplete.png" width="300" height="200" title="Chained Autocomplete" ></p>
+
+<h2>Discovering Your Own Tips and Tricks</h2>
+
+<p>Another really cool feature is the <em>Productivity Guide</em>. It shows you usage statistics for a lot of IntelliJ&rsquo;s features, like how many keystokes have been saved or possible bugs avoided by using the various shortcuts. It&rsquo;s also very helpful for discovering features you might not have known about; you can scroll through the list of unused features to see what you&rsquo;re missing out on! To find the productivity guide, go to <code>Help -&gt; Productivity Guide</code>.</p>
+
+<p><img class="center" src="http://michaelevans.org/images/2016/01/06/productivity_guide.png" width="700" height="500" title="Invalid Regex" ></p>
+
+<h2>Bonus Round &ndash; IntelliJ 15 Only</h2>
+
+<p>Did you know IntelliJ has <a href="https://www.jetbrains.com/idea/help/testing-restful-web-services.html">it&rsquo;s own REST client built in</a>? Super handy for testing out API calls without something like <a href="https://luckymarmot.com/paw">Paw</a> or <a href="https://chrome.google.com/webstore/detail/postman/fhbjgbiflinjbdggehcddcbncdddomop?hl=en">Postman</a>.</p>
+
+<p>Have any other favorite tips or tricks? Let me know!</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p><a href="https://www.jetbrains.com/idea/help/intention-actions.html">Intention Actions</a> are those suggestions in the little popup menus that allow you to quick-fix things like classes that haven&rsquo;t been imported, etc.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Testing Intents with Espresso Intents]]></title>
@@ -1831,149 +1895,6 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
 <p><img class="center" src="http://michaelevans.org/images/2013/04/29/IMG_1246.jpg" width="350" height="350" title="Selfie." ></p>
 
 <p>Obligatory selfie.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Clickable Links in Android ListViews]]></title>
-    <link href="http://michaelevans.org/blog/2013/03/29/clickable-links-in-android-listviews/"/>
-    <updated>2013-03-29T00:14:00-04:00</updated>
-    <id>http://michaelevans.org/blog/2013/03/29/clickable-links-in-android-listviews</id>
-    <content type="html"><![CDATA[<p>As part of my newest app (<a href="https://play.google.com/store/apps/details?id=com.evans.hackernews">Hacker News for Android</a>), I needed to add the ability to click on links in a ListView, and have them open in the browser, while maintaining the ability for the user to click on the ListView row itself, and have the row listen to the click.</p>
-
-<p>If you try using <code>Linkify</code> and <code>LinkMovementMethod</code>, which you&rsquo;d use on normal links in a TextView, you&rsquo;ll find that you can no longer use the ListView properly.</p>
-
-<!-- more -->
-
-
-<p>The solution I&rsquo;m using is slightly modified from this answer on StackOverflow <a href="http://stackoverflow.com/a/7327332/458603">here</a>.</p>
-
-<figure class='code'><figcaption><span>LinkifiedTextView.java</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">android.content.Context</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">android.text.Layout</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">android.text.Selection</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">android.text.Spannable</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">android.text.Spanned</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">android.text.style.ClickableSpan</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">android.util.AttributeSet</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">android.view.MotionEvent</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">android.widget.TextView</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">LinkifiedTextView</span> <span class="kd">extends</span> <span class="n">TextView</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="nf">LinkifiedTextView</span><span class="o">(</span><span class="n">Context</span> <span class="n">context</span><span class="o">,</span> <span class="n">AttributeSet</span> <span class="n">attrs</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="kd">super</span><span class="o">(</span><span class="n">context</span><span class="o">,</span> <span class="n">attrs</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@Override</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">onTouchEvent</span><span class="o">(</span><span class="n">MotionEvent</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">TextView</span> <span class="n">widget</span> <span class="o">=</span> <span class="o">(</span><span class="n">TextView</span><span class="o">)</span> <span class="k">this</span><span class="o">;</span>
-</span><span class='line'>      <span class="n">Object</span> <span class="n">text</span> <span class="o">=</span> <span class="n">widget</span><span class="o">.</span><span class="na">getText</span><span class="o">();</span>
-</span><span class='line'>      <span class="k">if</span> <span class="o">(</span><span class="n">text</span> <span class="k">instanceof</span> <span class="n">Spanned</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>          <span class="n">Spannable</span> <span class="n">buffer</span> <span class="o">=</span> <span class="o">(</span><span class="n">Spannable</span><span class="o">)</span> <span class="n">text</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>          <span class="kt">int</span> <span class="n">action</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="na">getAction</span><span class="o">();</span>
-</span><span class='line'>
-</span><span class='line'>          <span class="k">if</span> <span class="o">(</span><span class="n">action</span> <span class="o">==</span> <span class="n">MotionEvent</span><span class="o">.</span><span class="na">ACTION_UP</span>
-</span><span class='line'>                  <span class="o">||</span> <span class="n">action</span> <span class="o">==</span> <span class="n">MotionEvent</span><span class="o">.</span><span class="na">ACTION_DOWN</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>              <span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="o">(</span><span class="kt">int</span><span class="o">)</span> <span class="n">event</span><span class="o">.</span><span class="na">getX</span><span class="o">();</span>
-</span><span class='line'>              <span class="kt">int</span> <span class="n">y</span> <span class="o">=</span> <span class="o">(</span><span class="kt">int</span><span class="o">)</span> <span class="n">event</span><span class="o">.</span><span class="na">getY</span><span class="o">();</span>
-</span><span class='line'>
-</span><span class='line'>              <span class="n">x</span> <span class="o">-=</span> <span class="n">widget</span><span class="o">.</span><span class="na">getTotalPaddingLeft</span><span class="o">();</span>
-</span><span class='line'>              <span class="n">y</span> <span class="o">-=</span> <span class="n">widget</span><span class="o">.</span><span class="na">getTotalPaddingTop</span><span class="o">();</span>
-</span><span class='line'>
-</span><span class='line'>              <span class="n">x</span> <span class="o">+=</span> <span class="n">widget</span><span class="o">.</span><span class="na">getScrollX</span><span class="o">();</span>
-</span><span class='line'>              <span class="n">y</span> <span class="o">+=</span> <span class="n">widget</span><span class="o">.</span><span class="na">getScrollY</span><span class="o">();</span>
-</span><span class='line'>
-</span><span class='line'>              <span class="n">Layout</span> <span class="n">layout</span> <span class="o">=</span> <span class="n">widget</span><span class="o">.</span><span class="na">getLayout</span><span class="o">();</span>
-</span><span class='line'>              <span class="kt">int</span> <span class="n">line</span> <span class="o">=</span> <span class="n">layout</span><span class="o">.</span><span class="na">getLineForVertical</span><span class="o">(</span><span class="n">y</span><span class="o">);</span>
-</span><span class='line'>              <span class="kt">int</span> <span class="n">off</span> <span class="o">=</span> <span class="n">layout</span><span class="o">.</span><span class="na">getOffsetForHorizontal</span><span class="o">(</span><span class="n">line</span><span class="o">,</span> <span class="n">x</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'>              <span class="n">ClickableSpan</span><span class="o">[]</span> <span class="n">link</span> <span class="o">=</span> <span class="n">buffer</span><span class="o">.</span><span class="na">getSpans</span><span class="o">(</span><span class="n">off</span><span class="o">,</span> <span class="n">off</span><span class="o">,</span>
-</span><span class='line'>                      <span class="n">ClickableSpan</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'>              <span class="k">if</span> <span class="o">(</span><span class="n">link</span><span class="o">.</span><span class="na">length</span> <span class="o">!=</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>                  <span class="k">if</span> <span class="o">(</span><span class="n">action</span> <span class="o">==</span> <span class="n">MotionEvent</span><span class="o">.</span><span class="na">ACTION_UP</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>                      <span class="n">link</span><span class="o">[</span><span class="mi">0</span><span class="o">].</span><span class="na">onClick</span><span class="o">(</span><span class="n">widget</span><span class="o">);</span>
-</span><span class='line'>                  <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">action</span> <span class="o">==</span> <span class="n">MotionEvent</span><span class="o">.</span><span class="na">ACTION_DOWN</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>                      <span class="n">Selection</span><span class="o">.</span><span class="na">setSelection</span><span class="o">(</span><span class="n">buffer</span><span class="o">,</span>
-</span><span class='line'>                              <span class="n">buffer</span><span class="o">.</span><span class="na">getSpanStart</span><span class="o">(</span><span class="n">link</span><span class="o">[</span><span class="mi">0</span><span class="o">]),</span>
-</span><span class='line'>                              <span class="n">buffer</span><span class="o">.</span><span class="na">getSpanEnd</span><span class="o">(</span><span class="n">link</span><span class="o">[</span><span class="mi">0</span><span class="o">]));</span>
-</span><span class='line'>                  <span class="o">}</span>
-</span><span class='line'>                  <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
-</span><span class='line'>              <span class="o">}</span>
-</span><span class='line'>          <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Just drop this in as a replacement for your normal TextView, and you&rsquo;ll have the clicks on links in your text intercepted. Hope this helps a fellow developer!</p>
-
-<hr />
-
-<p>Like this post? Any other Android tips you&rsquo;d like to hear about? Let me know on <a href="https://twitter.com/m_evans10">Twitter</a> or <a href="https://plus.google.com/114052868601022948953/posts">Google Plus</a>, or leave a comment.</p>
 ]]></content>
   </entry>
   
