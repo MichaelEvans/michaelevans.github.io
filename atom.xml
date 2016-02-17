@@ -4,7 +4,7 @@
   <title><![CDATA[Michael Evans]]></title>
   <link href="http://michaelevans.org/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2016-01-08T11:33:08-05:00</updated>
+  <updated>2016-02-17T13:11:11-05:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -12,6 +12,94 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Using Dagger 1 and Kotlin]]></title>
+    <link href="http://michaelevans.org/blog/2016/02/17/using-dagger-1-and-kotlin/"/>
+    <updated>2016-02-17T13:43:25-05:00</updated>
+    <id>http://michaelevans.org/blog/2016/02/17/using-dagger-1-and-kotlin</id>
+    <content type="html"><![CDATA[<p>Unless you&rsquo;ve been hiding from all the news about Android development, you&rsquo;ve <a href="https://medium.com/@CodingDoug/kotlin-android-a-brass-tacks-experiment-part-1-3e5028491bcc#.15w4ypfer">likely</a> <a href="http://antonioleiva.com/kotlin-awesome-tricks-for-android/">heard</a> <a href="http://vishnurajeevan.com/2016/02/13/Using-Kotlin-Extensions-for-Rx-ifying/">about</a> <a href="https://realm.io/news/oredev-jake-wharton-kotlin-advancing-android-dev/">Kotlin</a> (<a href="https://blog.jetbrains.com/kotlin/2016/02/kotlin-1-0-released-pragmatic-language-for-jvm-and-android/">which hit version 1.0 on Monday</a>!). I&rsquo;ve been toying around with it lately (the <a href="https://kotlinlang.org/docs/tutorials/koans.html">Kotlin Koans</a> are a great place to start for a beginner) and wanted to try building an app with it &ndash; that is, until I hit a few road blocks.</p>
+
+<!-- more -->
+
+
+<p>Personally, I&rsquo;m still a fan of Dagger 1 (or as I refer to it, <a href="https://en.wikipedia.org/wiki/New_Coke#New_Coke_after_Coke_Classic">Dagger Classic</a>), and when I started working on my Kotlin app, that&rsquo;s what I was planning to use. I knew Annotation Processing support was a relatively new addition to Kotlin, so I began to search for some information about how to get Dagger to play nicely with the Kotlin compiler. There&rsquo;s a lot of information about using Dagger 2 with Kotlin but not so much about Dagger Classic. Finally, I stumbled upon <a href="http://www.beyondtechnicallycorrect.com/2015/12/30/android-kotlin-dagger/">this article</a>, which said, &ldquo;Unfortunately, Square’s Dagger 1 does not appear to work with Kotlin while Google’s Dagger 2 does&rdquo;.</p>
+
+<p><em>Bummer.</em></p>
+
+<p>This didn&rsquo;t really deter me, however, because I&rsquo;m stubborn like that. So I proceeded to give it a try with <code>kapt</code><sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> anyway (which seemed like it <em>might</em> do what I want).</p>
+
+<h2>Modules</h2>
+
+<p>The first thing I did was try to create the various Dagger Modules that I&rsquo;d need, which is where I hit my first roadblock. Attempting to compile my module gave the following error:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Error:Modules must not extend from other classes: org.michaelevans.example.AppModule</span></code></pre></td></tr></table></div></figure>
+
+
+<p>My intial thought was that Kotlin was causing my Module to extend <code>Any</code>, rather than <code>Object</code>. (<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/">Any</a> is the root of the class hierarchy in Kotlin, similar to the way that Object is the root of the Java class hierarchy.) Upon closer inspection, that didn&rsquo;t seem to be the issue, but rather than get hung up on this &ndash; I just converted my modules to Java classes and decided to come back to this issue later.</p>
+
+<h2>@Inject</h2>
+
+<p>So now I had my modules set up, and I went about trying to <code>@Inject</code> some fields on an Activity or two. This yielded another problem: Kotlin doesn&rsquo;t have fields, and we obviously can&rsquo;t do constructor injection on something for which we don&rsquo;t control the constructor &ndash; like <code>Activity</code>.</p>
+
+<p>I thought I&rsquo;d use Dagger to inject a property with &ldquo;method&rdquo; injection like so:</p>
+
+<p><code>lateinit var service : MyService @Inject set</code></p>
+
+<p>But when you try this &ndash; you&rsquo;ll find out that Dagger doesn&rsquo;t support Method injection!</p>
+
+<p>So what can we do? We can target the <a href="https://kotlinlang.org/docs/reference/annotations.html#annotation-use-site-targets">annotation on the backing field</a> like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>@field:Inject
+</span><span class='line'>lateinit var app : Application</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And now when we compile, our dependencies are injected! Woo, progress.</p>
+
+<h2>Modules (part 2)</h2>
+
+<p>I was pretty pleased that I had Dagger and Kotlin playing nicely enough that I could write things (other than my modules) in Kotlin, and that DI was working. But it did bother me that I was so close to having the ability to use Kotlin for everything with one exception &ndash; why wouldn&rsquo;t these Modules play nicely?</p>
+
+<p>I dug into the Dagger source to find out where this error was coming from and found <a href="https://github.com/square/dagger/blob/2f9579c48e887ffa316f329c12c2fa2abbec27b1/compiler/src/main/java/dagger/internal/codegen/ModuleAdapterProcessor.java#L217">this</a>. The JavaDoc for <a href="https://docs.oracle.com/javase/8/docs/api/javax/lang/model/type/TypeMirror.html#equals-java.lang.Object-">TypeMirror&rsquo;s equals method</a> says, <code>Semantic comparisons of type equality should instead use Types.isSameType(TypeMirror, TypeMirror). The results of t1.equals(t2) and Types.isSameType(t1, t2) may differ.</code></p>
+
+<p>I was pretty proud of myself for finding this potential issue in Dagger, and was about to submit a Pull Request until I noticed&hellip;<a href="https://github.com/square/dagger/commit/61e471df3891cf017755998b83839042f8455c29">that Jake had solved this issue about 18 months ago</a>.</p>
+
+<p>Running the <code>1.3-SNAPSHOT</code> builds of Dagger that include this change allow my Modules to be compiled properly from Kotlin. <em>Success!</em></p>
+
+<h2>In Summary (aka TL;DR)</h2>
+
+<ul>
+<li>Dagger works just fine with Kotlin (as long as you&rsquo;re on 1.3)</li>
+<li>Use annotations on the backing fields to perform injection</li>
+<li>Use <code>kapt</code> instead of <code>apt</code> for the scope of your <code>dagger-compiler</code> dependency</li>
+<li>Make sure to have the following lines in your <code>build.gradle</code></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>kapt {
+</span><span class='line'>    generateStubs = true
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>Hopefully this helps others who are still using Dagger Classic and want to try out Kotlin!</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p><code>kapt</code> is <a href="http://blog.jetbrains.com/kotlin/2015/06/better-annotation-processing-supporting-stubs-in-kapt/">the annotation processing tool for Kotlin</a><a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Android Studio Tips and Tricks]]></title>
@@ -1842,61 +1930,6 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
 <p>To switch back and forth between ChromeOS and Crouton, swap with Ctrl+Alt+Back and the sequence Ctrl+Alt+Forward followed by Ctrl+Alt+Refresh.</p>
 
 <p>Pro tip: Increase the font size under the display settings, so that the text is a little more readable!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Hands On with Google Glass]]></title>
-    <link href="http://michaelevans.org/blog/2013/04/29/hands-on-with-google-glass/"/>
-    <updated>2013-04-29T16:36:00-04:00</updated>
-    <id>http://michaelevans.org/blog/2013/04/29/hands-on-with-google-glass</id>
-    <content type="html"><![CDATA[<h3>The Pickup</h3>
-
-<p>Last Wednesday I took the trip up to NYC, to the top floor of Chelsea Market to pick up a device that many have waited anxiously for. A device unlike anything else we&rsquo;ve seen before: Google&rsquo;s Glass. This is the Explorer Edition of the device, which is targeted towards developers, who attended Google&rsquo;s IO conference last year. I was fortunate to be invited to pick up my device on the first day of New York&rsquo;s pickups, which followed several pickup days in Mountain View the previous week.</p>
-
-<p><img class="center" src="http://michaelevans.org/images/2013/04/29/s_9e3e2acb-a746-4606-a034-1df2c8e2a3cc-0.jpeg" width="500" height="500" title="The View #throughglass" ></p>
-
-<!-- more -->
-
-
-<p>The pickup experience was very exciting, it included an informative one-on-one experience with a Glass Guide, who helped walk me through the device (which I had gotten some previous experience <a href="http://michaelevans.org/blog/2013/02/20/googles-project-glass/">a few months back</a>) and fit it to my face. The top floor of Chelsea Market allowed me to break in the camera of the device with a nice view of lower Manhattan.</p>
-
-<p>I was able to try on all five colors that were available, but I ended up choosing charcoal (also known as black.) Other options included Cotton, Shale, Tangerine, and Sky (white, grey, orange and light blue, respectively.)</p>
-
-<p>Configuring Glass was a snap, I opted to use the <a href="https://play.google.com/store/apps/details?id=com.google.glass.companion">MyGlass app</a> for Android, although users without the app, can use a web based utility to set up their device. After my scheduled pickup apoinment, another Explorer and myself walked up towards Times Square, and were greeted with several people giving us a look for wearing at our new eyeware.</p>
-
-<p>So far people have either thought they look ridiculous, which might be the nature of the device, or the fact that I&rsquo;ve been wearing them overtop of my prescription glasses. This hasn&rsquo;t stopped anyone, however, from asking me to try them on and get a demo of the features.</p>
-
-<h3>What&rsquo;s in the box?</h3>
-
-<p>Included in the box is Glass (obviously), a micro USB cable and a AC adapter for it, a microfiber bag for storing Glass when it&rsquo;s not in use, and two visor attachments, one polarized for sun, and the other clear.</p>
-
-<p><img class="center" src="http://michaelevans.org/images/2013/04/29/IMG_1235.jpg" width="350" height="350" title="Bag o' goodies" ></p>
-
-<p><img class="center" src="http://michaelevans.org/images/2013/04/29/IMG_1238.jpg" width="350" height="350" title="What's in the bag" ></p>
-
-<p><img class="center" src="http://michaelevans.org/images/2013/04/29/IMG_1237.jpg" width="350" height="350" title="Nice simple box" ></p>
-
-<p><img class="center" src="http://michaelevans.org/images/2013/04/29/IMG_1231.jpg" width="350" height="350" title="Sweet Shades" ></p>
-
-<h3>Thoughts so far</h3>
-
-<p>Since I&rsquo;ve only had the device for a few days, I&rsquo;ll need to post a review after I&rsquo;ve used it for a little longer. So far I&rsquo;ve enjoyed the hands-free navigation for wandering around DC, as well as taking some snapshots. I&rsquo;ve always thought it was a little awkward to reply to text messages and emails using your voice (which is why I never really did it on my phone), but maybe I&rsquo;ll warm up to it with Glass. The battery life has been pretty decent, even with the heavy usage of showing it off to excited friends.</p>
-
-<p><img class="center" src="http://michaelevans.org/images/2013/04/29/20130426_122245_854.jpg" width="400" height="400" title="#throughglass" ></p>
-
-<h3>But wait&hellip;there&rsquo;s more!</h3>
-
-<p>A few days after I returned with Glass, I was interviewed by The Fold, a flagship video series by The Washington Post! You can check out the video here:</p>
-
-<iframe width="640" height="510" src="http://www.youtube.com/embed/iBrbVaY99kA " frameborder="0" webkitAllowFullScreen mozallowfullscreen allowfullscreen></iframe>
-
-
-<p>Got any questions you&rsquo;d like answered? Drop me a line below in the comments, on <a href="https://twitter.com/m_evans10">Twitter</a> or on <a href="https://plus.google.com/114052868601022948953/posts">Google Plus</a>!</p>
-
-<p><img class="center" src="http://michaelevans.org/images/2013/04/29/IMG_1246.jpg" width="350" height="350" title="Selfie." ></p>
-
-<p>Obligatory selfie.</p>
 ]]></content>
   </entry>
   

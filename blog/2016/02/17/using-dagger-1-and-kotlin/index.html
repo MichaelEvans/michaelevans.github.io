@@ -6,12 +6,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="msvalidate.01" content="275BF9CDA457668389C1F9916C380DD0" />
-  <title>Improving your code with Android Support Annotations - Michael Evans</title>
+  <title>Using Dagger 1 and Kotlin - Michael Evans</title>
   <meta name="author" content="Michael Evans">
 
   
-  <meta name="description" content="Improving your code with Android Support Annotations">
-  <meta name="keywords" content="Android, Development">
+  <meta name="description" content="Unless you&rsquo;ve been hiding from all the news about Android development, you&rsquo;ve likely heard about Kotlin (which hit version 1.0 on Monday &hellip;">
+  
 
   <!-- http://t.co/dKP3o1e -->
   <meta name="HandheldFriendly" content="True">
@@ -19,7 +19,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://michaelevans.org/blog/2015/07/14/improving-your-code-with-android-support-annotations/">
+  <link rel="canonical" href="http://michaelevans.org/blog/2016/02/17/using-dagger-1-and-kotlin/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -82,7 +82,7 @@
   
   <header>
     
-      <h1 class="entry-title">Improving Your Code With Android Support Annotations</h1>
+      <h1 class="entry-title">Using Dagger 1 and Kotlin</h1>
     
     
       <p class="meta">
@@ -98,7 +98,7 @@
   
 
 
-<time datetime="2015-07-14T22:46:56-04:00" pubdate data-updated="true">Jul 14<span>th</span>, 2015</time>
+<time datetime="2016-02-17T13:43:25-05:00" pubdate data-updated="true">Feb 17<span>th</span>, 2016</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -107,73 +107,83 @@
   </header>
 
 
-<div class="entry-content"><p>If you haven&rsquo;t heard of the Android Support Annotations library yet, you&rsquo;re missing out on a neat new package that will help you catch bugs in your apps. Included in the library is a number of Java annotations, that will help Android Studio check your code for possible errors and report them to you. There are quite a few of them, so I only plan to go over a few of them here, but you should definitely <a href="http://tools.android.com/tech-docs/support-annotations">check out the docs</a> for more info about the rest.</p>
-
-<h2>@NonNull / @Nullable</h2>
-
-<p><code>@NonNull</code> and <code>@Nullable</code> are probably the most basic of the support annotations, but also some of the most helpful! Annotate a parameter or method with either of these to denote if the parameter or method&rsquo;s return value can be null or not, and voila, now Android Studio can give us a nice warning that we&rsquo;re doing something unsafe.</p>
+<div class="entry-content"><p>Unless you&rsquo;ve been hiding from all the news about Android development, you&rsquo;ve <a href="https://medium.com/@CodingDoug/kotlin-android-a-brass-tacks-experiment-part-1-3e5028491bcc#.15w4ypfer">likely</a> <a href="http://antonioleiva.com/kotlin-awesome-tricks-for-android/">heard</a> <a href="http://vishnurajeevan.com/2016/02/13/Using-Kotlin-Extensions-for-Rx-ifying/">about</a> <a href="https://realm.io/news/oredev-jake-wharton-kotlin-advancing-android-dev/">Kotlin</a> (<a href="https://blog.jetbrains.com/kotlin/2016/02/kotlin-1-0-released-pragmatic-language-for-jvm-and-android/">which hit version 1.0 on Monday</a>!). I&rsquo;ve been toying around with it lately (the <a href="https://kotlinlang.org/docs/tutorials/koans.html">Kotlin Koans</a> are a great place to start for a beginner) and wanted to try building an app with it &ndash; that is, until I hit a few road blocks.</p>
 
 <!-- more -->
 
 
-<p>Turn this:</p>
+<p>Personally, I&rsquo;m still a fan of Dagger 1 (or as I refer to it, <a href="https://en.wikipedia.org/wiki/New_Coke#New_Coke_after_Coke_Classic">Dagger Classic</a>), and when I started working on my Kotlin app, that&rsquo;s what I was planning to use. I knew Annotation Processing support was a relatively new addition to Kotlin, so I began to search for some information about how to get Dagger to play nicely with the Kotlin compiler. There&rsquo;s a lot of information about using Dagger 2 with Kotlin but not so much about Dagger Classic. Finally, I stumbled upon <a href="http://www.beyondtechnicallycorrect.com/2015/12/30/android-kotlin-dagger/">this article</a>, which said, &ldquo;Unfortunately, Square’s Dagger 1 does not appear to work with Kotlin while Google’s Dagger 2 does&rdquo;.</p>
 
-<p><img class="center" src="/images/2015/07/14/no-annotations.png" width="600" height="300" title="Method with no annotations" ></p>
+<p><em>Bummer.</em></p>
 
-<p>into this:</p>
+<p>This didn&rsquo;t really deter me, however, because I&rsquo;m stubborn like that. So I proceeded to give it a try with <code>kapt</code><sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> anyway (which seemed like it <em>might</em> do what I want).</p>
 
-<p><img class="center" src="/images/2015/07/14/nonnull.png" width="600" height="250" title="with @NonNull" ></p>
+<h2>Modules</h2>
 
-<p>Bonus points: We can even take this example one step further with the <code>@CheckResult</code> annotation, to tell us know that the return type of this method is something that we are expected to use, rather than the method having a side effect.</p>
+<p>The first thing I did was try to create the various Dagger Modules that I&rsquo;d need, which is where I hit my first roadblock. Attempting to compile my module gave the following error:</p>
 
-<p><img class="center" src="/images/2015/07/14/checkreturn.png" width="600" height="300" title="Check that return type!" ></p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Error:Modules must not extend from other classes: org.michaelevans.example.AppModule</span></code></pre></td></tr></table></div></figure>
 
-<h2>@StringRes / @DrawableRes / etc.</h2>
 
-<p>Have you ever attempted to call <code>setText</code> on a TextView, and gotten a somewhat mysterious <code>android.content.res.Resources$NotFoundException: String resource ID #0x3039</code> exception? If you pass an integer to setText, TextView assumes it&rsquo;s a String resource id, and will look it up in order to set the text. If only there were a way to denote that integers are not valid ids for this method&hellip;<code>@StringRes</code> to the rescue!</p>
+<p>My intial thought was that Kotlin was causing my Module to extend <code>Any</code>, rather than <code>Object</code>. (<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/">Any</a> is the root of the class hierarchy in Kotlin, similar to the way that Object is the root of the Java class hierarchy.) Upon closer inspection, that didn&rsquo;t seem to be the issue, but rather than get hung up on this &ndash; I just converted my modules to Java classes and decided to come back to this issue later.</p>
+
+<h2>@Inject</h2>
+
+<p>So now I had my modules set up, and I went about trying to <code>@Inject</code> some fields on an Activity or two. This yielded another problem: Kotlin doesn&rsquo;t have fields, and we obviously can&rsquo;t do constructor injection on something for which we don&rsquo;t control the constructor &ndash; like <code>Activity</code>.</p>
+
+<p>I thought I&rsquo;d use Dagger to inject a property with &ldquo;method&rdquo; injection like so:</p>
+
+<p><code>lateinit var service : MyService @Inject set</code></p>
+
+<p>But when you try this &ndash; you&rsquo;ll find out that Dagger doesn&rsquo;t support Method injection!</p>
+
+<p>So what can we do? We can target the <a href="https://kotlinlang.org/docs/reference/annotations.html#annotation-use-site-targets">annotation on the backing field</a> like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>@field:Inject
+</span><span class='line'>lateinit var app : Application</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And now when we compile, our dependencies are injected! Woo, progress.</p>
+
+<h2>Modules (part 2)</h2>
+
+<p>I was pretty pleased that I had Dagger and Kotlin playing nicely enough that I could write things (other than my modules) in Kotlin, and that DI was working. But it did bother me that I was so close to having the ability to use Kotlin for everything with one exception &ndash; why wouldn&rsquo;t these Modules play nicely?</p>
+
+<p>I dug into the Dagger source to find out where this error was coming from and found <a href="https://github.com/square/dagger/blob/2f9579c48e887ffa316f329c12c2fa2abbec27b1/compiler/src/main/java/dagger/internal/codegen/ModuleAdapterProcessor.java#L217">this</a>. The JavaDoc for <a href="https://docs.oracle.com/javase/8/docs/api/javax/lang/model/type/TypeMirror.html#equals-java.lang.Object-">TypeMirror&rsquo;s equals method</a> says, <code>Semantic comparisons of type equality should instead use Types.isSameType(TypeMirror, TypeMirror). The results of t1.equals(t2) and Types.isSameType(t1, t2) may differ.</code></p>
+
+<p>I was pretty proud of myself for finding this potential issue in Dagger, and was about to submit a Pull Request until I noticed&hellip;<a href="https://github.com/square/dagger/commit/61e471df3891cf017755998b83839042f8455c29">that Jake had solved this issue about 18 months ago</a>.</p>
+
+<p>Running the <code>1.3-SNAPSHOT</code> builds of Dagger that include this change allow my Modules to be compiled properly from Kotlin. <em>Success!</em></p>
+
+<h2>In Summary (aka TL;DR)</h2>
+
+<ul>
+<li>Dagger works just fine with Kotlin (as long as you&rsquo;re on 1.3)</li>
+<li>Use annotations on the backing fields to perform injection</li>
+<li>Use <code>kapt</code> instead of <code>apt</code> for the scope of your <code>dagger-compiler</code> dependency</li>
+<li>Make sure to have the following lines in your <code>build.gradle</code></li>
+</ul>
+
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>public void setText(@StringRes int id) {
-</span><span class='line'>  // Do something like getString(id), etc.
+</pre></td><td class='code'><pre><code class=''><span class='line'>kapt {
+</span><span class='line'>    generateStubs = true
 </span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
 
 
-<p>Now if you try to pass a non-String resource id to this method, you get something like this:</p>
+<p></p>
 
-<p><img class="center" src="/images/2015/07/14/stringres.png" width="500" height="200" title="Method takes a @StringRes id, not an int" ></p>
-
-<p>(There are resouce annotations for all resoruce types, <code>@DrawableRes</code>, <code>@ColorRes</code>, <code>@InterpolatorRes</code>, etc.)</p>
-
-<h2>@Keep</h2>
-
-<p>Today I discovered a new support annotation <code>@Keep</code>. According to the support annotation docs, this annotation hasn&rsquo;t been hooked up to the Gradle plugin yet<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>, but it will let you annotate methods and classes that should be retained when minimizing the app.</p>
-
-<p>If you&rsquo;ve ever messed around with the cryptic <code>-keep class com.foo.bar { public static &lt;methods&gt; }</code> incantations that you need to use to summon the Proguard Gods, you&rsquo;ll know how painful it is to rip your hair out, while trying to exclude a particular method or class from being optimized away. This handy annotation will tell Proguard to leave the method or class alone &ndash; like so:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>public class Example {
-</span><span class='line'>  @Keep
-</span><span class='line'>  public void doSomething() {
-</span><span class='line'>      // hopefully this method does something
-</span><span class='line'>  }
-</span><span class='line'>  ...
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The best part is &ndash; if you&rsquo;re using <code>appcompat-v7</code>, you&rsquo;re already including <code>support-annotations</code>, so just start using them already!</p>
+<p>Hopefully this helps others who are still using Dagger Classic and want to try out Kotlin!</p>
 <div class="footnotes">
 <hr/>
 <ol>
 <li id="fn:1">
-<p><a href="https://android-review.googlesource.com/#/c/152983/">Looks like this is merged</a> into the 1.3 version of the plugin<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<p><code>kapt</code> is <a href="http://blog.jetbrains.com/kotlin/2015/06/better-annotation-processing-supporting-stubs-in-kapt/">the annotation processing tool for Kotlin</a><a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
 
@@ -199,21 +209,15 @@
   
 
 
-<time datetime="2015-07-14T22:46:56-04:00" pubdate data-updated="true">Jul 14<span>th</span>, 2015</time>
+<time datetime="2016-02-17T13:43:25-05:00" pubdate data-updated="true">Feb 17<span>th</span>, 2016</time>
       
-
-<span class="categories">
-  
-    <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/development/'>Development</a>
-  
-</span>
 
 
     </p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://michaelevans.org/blog/2015/07/14/improving-your-code-with-android-support-annotations/" data-via="m_evans10" data-counturl="http://michaelevans.org/blog/2015/07/14/improving-your-code-with-android-support-annotations/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://michaelevans.org/blog/2016/02/17/using-dagger-1-and-kotlin/" data-via="m_evans10" data-counturl="http://michaelevans.org/blog/2016/02/17/using-dagger-1-and-kotlin/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -226,10 +230,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2015/05/07/android-ripples-with-rounded-corners/" title="Previous Post: Android Ripples with Rounded Corners">&laquo; Android Ripples with Rounded Corners</a>
+        <a class="basic-alignment left" href="/blog/2016/01/06/android-studio-tips-and-tricks/" title="Previous Post: Android Studio Tips and Tricks">&laquo; Android Studio Tips and Tricks</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2015/08/03/using-espresso-for-easy-ui-testing/" title="Next Post: Using Espresso for Easy UI Testing">Using Espresso for Easy UI Testing &raquo;</a>
       
     </p>
   </footer>
@@ -333,8 +335,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://michaelevans.org/blog/2015/07/14/improving-your-code-with-android-support-annotations/';
-        var disqus_url = 'http://michaelevans.org/blog/2015/07/14/improving-your-code-with-android-support-annotations/';
+        var disqus_identifier = 'http://michaelevans.org/blog/2016/02/17/using-dagger-1-and-kotlin/';
+        var disqus_url = 'http://michaelevans.org/blog/2016/02/17/using-dagger-1-and-kotlin/';
         var disqus_script = 'embed.js';
       
     (function () {

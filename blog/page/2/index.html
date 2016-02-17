@@ -10,7 +10,7 @@
   <meta name="author" content="Michael Evans">
 
   
-  <meta name="description" content="Today is December 31st, and I decided to write up a blog post, reflecting on the year that I&rsquo;ve had. I&rsquo;ve learned a lot over the last &hellip;">
+  <meta name="description" content="I haven&rsquo;t updated my blog in a while, but this is a tip/trick that&rsquo;s so good that I had to share. It&rsquo;s not a very widely known &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -79,6 +79,56 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/03/03/adb-over-wifi/">ADB Over WiFi</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-03-03T22:30:38-05:00" pubdate data-updated="true">Mar 3<span>rd</span>, 2014</time>
+        
+         | <a href="/blog/2014/03/03/adb-over-wifi/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I haven&rsquo;t updated my blog in a while, but this is a tip/trick that&rsquo;s so good that I had to share. It&rsquo;s not a very widely known feature, but once you try it, you&rsquo;ll wonder how you lived with out it: using ADB over WiFi! That&rsquo;s right, no more plugging in all your devices to your computer to debug/etc. Best of all, no root required.</p>
+
+<p>It&rsquo;s also ingeniusly simple. First, connect the device you want to use via a USB cable.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>adb tcpip 5555
+</span><span class='line'>(Feel free to unplug it now)
+</span><span class='line'>adb connect &lt;IP address of your device&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&rsquo;s it! Enjoy your tether-free development.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -487,53 +537,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/04/29/hands-on-with-google-glass/">Hands on With Google Glass</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-04-29T16:36:00-04:00" pubdate data-updated="true">Apr 29<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/04/29/hands-on-with-google-glass/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>The Pickup</h3>
-
-<p>Last Wednesday I took the trip up to NYC, to the top floor of Chelsea Market to pick up a device that many have waited anxiously for. A device unlike anything else we&rsquo;ve seen before: Google&rsquo;s Glass. This is the Explorer Edition of the device, which is targeted towards developers, who attended Google&rsquo;s IO conference last year. I was fortunate to be invited to pick up my device on the first day of New York&rsquo;s pickups, which followed several pickup days in Mountain View the previous week.</p>
-
-<p><img class="center" src="/images/2013/04/29/s_9e3e2acb-a746-4606-a034-1df2c8e2a3cc-0.jpeg" width="500" height="500" title="The View #throughglass" ></p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/04/29/hands-on-with-google-glass/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -551,6 +554,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/02/17/using-dagger-1-and-kotlin/">Using Dagger 1 and Kotlin</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/01/06/android-studio-tips-and-tricks/">Android Studio Tips and Tricks</a>
       </li>
     
@@ -564,10 +571,6 @@
     
       <li class="post">
         <a href="/blog/2015/08/03/using-espresso-for-easy-ui-testing/">Using Espresso for Easy UI Testing</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/07/14/improving-your-code-with-android-support-annotations/">Improving your code with Android Support Annotations</a>
       </li>
     
   </ul>
