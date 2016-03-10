@@ -1,0 +1,764 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="msvalidate.01" content="275BF9CDA457668389C1F9916C380DD0" />
+  <title>Changelog for N Support Libraries - Michael Evans</title>
+  <meta name="author" content="Michael Evans">
+
+  
+  <meta name="description" content="Changelog for N Support Libraries">
+  <meta name="keywords" content="Android">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://michaelevans.org/blog/2016/03/09/changelog-for-n-support-libraries/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Michael Evans" type="application/atom+xml">
+  <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-28589266-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Michael Evans</a></h1>
+  
+    <h2>A bunch of technobabble.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:michaelevans.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Changelog for N Support Libraries</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-03-09T19:38:46-05:00" pubdate data-updated="true">Mar 9<span>th</span>, 2016</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Pssst! If you&rsquo;re an Android developer, you might not have heard yet&hellip;the <a href="http://android-developers.blogspot.com/2016/03/first-preview-of-android-n-developer.html">N Preview started today</a>! As part of the festivities, a new alpha version of the support libraries was released. There was no changelog that I could find, so I decided to make one. Here&rsquo;s what has changed (so far) in the public API of a few of these libraries:</p>
+
+<!-- more -->
+
+
+<h2>Support-V4:</h2>
+
+<div><script src='https://gist.github.com/5d7c55382198640345dc.js?file=support-v4.diff'></script>
+<noscript><pre><code>diff -U 0 -N support-v4-23.2.0_df13b086/android.support.v4.app.FragmentController support-v4-24.0.0-alpha1_41849fd4/android.support.v4.app.FragmentController
+--- support-v4-23.2.0_df13b086/android.support.v4.app.FragmentController    2016-03-09 19:28:24.000000000 -0500
++++ support-v4-24.0.0-alpha1_41849fd4/android.support.v4.app.FragmentController 2016-03-09 19:28:24.000000000 -0500
+@@ -11,0 +12 @@
++  public void restoreAllState(android.os.Parcelable, android.support.v4.app.FragmentManagerNonConfig);
+@@ -12,0 +14 @@
++  public android.support.v4.app.FragmentManagerNonConfig retainNestedNonConfig();
+diff -U 0 -N support-v4-23.2.0_df13b086/android.support.v4.app.FragmentManagerNonConfig support-v4-24.0.0-alpha1_41849fd4/android.support.v4.app.FragmentManagerNonConfig
+--- support-v4-23.2.0_df13b086/android.support.v4.app.FragmentManagerNonConfig  1969-12-31 19:00:00.000000000 -0500
++++ support-v4-24.0.0-alpha1_41849fd4/android.support.v4.app.FragmentManagerNonConfig   2016-03-09 19:28:24.000000000 -0500
+@@ -0,0 +1,2 @@
++public class android.support.v4.app.FragmentManagerNonConfig {
++}
+diff -U 0 -N support-v4-23.2.0_df13b086/android.support.v4.app.FragmentTransaction support-v4-24.0.0-alpha1_41849fd4/android.support.v4.app.FragmentTransaction
+--- support-v4-23.2.0_df13b086/android.support.v4.app.FragmentTransaction   2016-03-09 19:28:24.000000000 -0500
++++ support-v4-24.0.0-alpha1_41849fd4/android.support.v4.app.FragmentTransaction    2016-03-09 19:28:24.000000000 -0500
+@@ -34,0 +35,2 @@
++  public abstract void commitNow();
++  public abstract void commitNowAllowingStateLoss();
+diff -U 0 -N support-v4-23.2.0_df13b086/android.support.v4.content.ContextCompat support-v4-24.0.0-alpha1_41849fd4/android.support.v4.content.ContextCompat
+--- support-v4-23.2.0_df13b086/android.support.v4.content.ContextCompat 2016-03-09 19:28:24.000000000 -0500
++++ support-v4-24.0.0-alpha1_41849fd4/android.support.v4.content.ContextCompat  2016-03-09 19:28:24.000000000 -0500
+@@ -13,0 +14,2 @@
++  public static android.content.Context createDeviceEncryptedStorageContext(android.content.Context);
++  public static boolean isDeviceEncryptedStorage(android.content.Context);
+diff -U 0 -N support-v4-23.2.0_df13b086/android.support.v4.content.res.TypedArrayUtils support-v4-24.0.0-alpha1_41849fd4/android.support.v4.content.res.TypedArrayUtils
+--- support-v4-23.2.0_df13b086/android.support.v4.content.res.TypedArrayUtils   2016-03-09 19:28:24.000000000 -0500
++++ support-v4-24.0.0-alpha1_41849fd4/android.support.v4.content.res.TypedArrayUtils    2016-03-09 19:28:24.000000000 -0500
+@@ -8,0 +9 @@
++  public static int getAttr(android.content.Context, int, int);
+diff -U 0 -N support-v4-23.2.0_df13b086/android.support.v4.media.session.IMediaSession support-v4-24.0.0-alpha1_41849fd4/android.support.v4.media.session.IMediaSession
+--- support-v4-23.2.0_df13b086/android.support.v4.media.session.IMediaSession   2016-03-09 19:28:24.000000000 -0500
++++ support-v4-24.0.0-alpha1_41849fd4/android.support.v4.media.session.IMediaSession    2016-03-09 19:28:24.000000000 -0500
+@@ -33,0 +34,4 @@
++  public abstract void prepare() throws android.os.RemoteException;
++  public abstract void prepareFromMediaId(java.lang.String, android.os.Bundle) throws android.os.RemoteException;
++  public abstract void prepareFromSearch(java.lang.String, android.os.Bundle) throws android.os.RemoteException;
++  public abstract void prepareFromUri(android.net.Uri, android.os.Bundle) throws android.os.RemoteException;
+diff -U 0 -N support-v4-23.2.0_df13b086/android.support.v4.media.session.MediaControllerCompat$TransportControls support-v4-24.0.0-alpha1_41849fd4/android.support.v4.media.session.MediaControllerCompat$TransportControls
+--- support-v4-23.2.0_df13b086/android.support.v4.media.session.MediaControllerCompat$TransportControls 2016-03-09 19:28:24.000000000 -0500
++++ support-v4-24.0.0-alpha1_41849fd4/android.support.v4.media.session.MediaControllerCompat$TransportControls  2016-03-09 19:28:24.000000000 -0500
+@@ -1,0 +2,4 @@
++  public abstract void prepare();
++  public abstract void prepareFromMediaId(java.lang.String, android.os.Bundle);
++  public abstract void prepareFromSearch(java.lang.String, android.os.Bundle);
++  public abstract void prepareFromUri(android.net.Uri, android.os.Bundle);
+diff -U 0 -N support-v4-23.2.0_df13b086/android.support.v4.media.session.MediaSessionCompat support-v4-24.0.0-alpha1_41849fd4/android.support.v4.media.session.MediaSessionCompat
+--- support-v4-23.2.0_df13b086/android.support.v4.media.session.MediaSessionCompat  2016-03-09 19:28:24.000000000 -0500
++++ support-v4-24.0.0-alpha1_41849fd4/android.support.v4.media.session.MediaSessionCompat   2016-03-09 19:28:24.000000000 -0500
+@@ -4,3 +3,0 @@
+-  public static final java.lang.String ACTION_PLAY_FROM_URI;
+-  public static final java.lang.String ACTION_ARGUMENT_URI;
+-  public static final java.lang.String ACTION_ARGUMENT_EXTRAS;
+diff -U 0 -N support-v4-23.2.0_df13b086/android.support.v4.media.session.MediaSessionCompat$Callback support-v4-24.0.0-alpha1_41849fd4/android.support.v4.media.session.MediaSessionCompat$Callback
+--- support-v4-23.2.0_df13b086/android.support.v4.media.session.MediaSessionCompat$Callback 2016-03-09 19:28:24.000000000 -0500
++++ support-v4-24.0.0-alpha1_41849fd4/android.support.v4.media.session.MediaSessionCompat$Callback  2016-03-09 19:28:24.000000000 -0500
+@@ -4,0 +5,4 @@
++  public void onPrepare();
++  public void onPrepareFromMediaId(java.lang.String, android.os.Bundle);
++  public void onPrepareFromSearch(java.lang.String, android.os.Bundle);
++  public void onPrepareFromUri(android.net.Uri, android.os.Bundle);
+diff -U 0 -N support-v4-23.2.0_df13b086/android.support.v4.media.session.PlaybackStateCompat support-v4-24.0.0-alpha1_41849fd4/android.support.v4.media.session.PlaybackStateCompat
+--- support-v4-23.2.0_df13b086/android.support.v4.media.session.PlaybackStateCompat 2016-03-09 19:28:24.000000000 -0500
++++ support-v4-24.0.0-alpha1_41849fd4/android.support.v4.media.session.PlaybackStateCompat  2016-03-09 19:28:24.000000000 -0500
+@@ -15,0 +16,4 @@
++  public static final long ACTION_PREPARE;
++  public static final long ACTION_PREPARE_FROM_MEDIA_ID;
++  public static final long ACTION_PREPARE_FROM_SEARCH;
++  public static final long ACTION_PREPARE_FROM_URI;
+diff -U 0 -N support-v4-23.2.0_df13b086/android.support.v4.net.TrafficStatsCompat support-v4-24.0.0-alpha1_41849fd4/android.support.v4.net.TrafficStatsCompat
+--- support-v4-23.2.0_df13b086/android.support.v4.net.TrafficStatsCompat    2016-03-09 19:28:24.000000000 -0500
++++ support-v4-24.0.0-alpha1_41849fd4/android.support.v4.net.TrafficStatsCompat 2016-03-09 19:28:24.000000000 -0500
+@@ -8,0 +9,2 @@
++  public static void tagDatagramSocket(java.net.DatagramSocket) throws java.net.SocketException;
++  public static void untagDatagramSocket(java.net.DatagramSocket) throws java.net.SocketException;
+diff -U 0 -N support-v4-23.2.0_df13b086/android.support.v4.os.BuildCompat support-v4-24.0.0-alpha1_41849fd4/android.support.v4.os.BuildCompat
+--- support-v4-23.2.0_df13b086/android.support.v4.os.BuildCompat    1969-12-31 19:00:00.000000000 -0500
++++ support-v4-24.0.0-alpha1_41849fd4/android.support.v4.os.BuildCompat 2016-03-09 19:28:24.000000000 -0500
+@@ -0,0 +1,3 @@
++public class android.support.v4.os.BuildCompat {
++  public static boolean isAtLeastN();
++}
+diff -U 0 -N support-v4-23.2.0_df13b086/android.support.v4.os.UserManagerCompat support-v4-24.0.0-alpha1_41849fd4/android.support.v4.os.UserManagerCompat
+--- support-v4-23.2.0_df13b086/android.support.v4.os.UserManagerCompat  1969-12-31 19:00:00.000000000 -0500
++++ support-v4-24.0.0-alpha1_41849fd4/android.support.v4.os.UserManagerCompat   2016-03-09 19:28:24.000000000 -0500
+@@ -0,0 +1,6 @@
++public class android.support.v4.os.UserManagerCompat {
++  public android.support.v4.os.UserManagerCompat();
++  public static boolean isUserRunningAndLocked(android.content.Context);
++  public static boolean isUserRunningAndUnlocked(android.content.Context);
++  public static boolean isUserUnlocked(android.content.Context);
++}
+diff -U 0 -N support-v4-23.2.0_df13b086/android.support.v4.view.AsyncLayoutInflater support-v4-24.0.0-alpha1_41849fd4/android.support.v4.view.AsyncLayoutInflater
+--- support-v4-23.2.0_df13b086/android.support.v4.view.AsyncLayoutInflater  1969-12-31 19:00:00.000000000 -0500
++++ support-v4-24.0.0-alpha1_41849fd4/android.support.v4.view.AsyncLayoutInflater   2016-03-09 19:28:24.000000000 -0500
+@@ -0,0 +1,4 @@
++public final class android.support.v4.view.AsyncLayoutInflater {
++  public android.support.v4.view.AsyncLayoutInflater(android.content.Context);
++  public void inflate(int, android.view.ViewGroup, android.support.v4.view.AsyncLayoutInflater$OnInflateFinishedListener);
++}
+diff -U 0 -N support-v4-23.2.0_df13b086/android.support.v4.view.AsyncLayoutInflater$OnInflateFinishedListener support-v4-24.0.0-alpha1_41849fd4/android.support.v4.view.AsyncLayoutInflater$OnInflateFinishedListener
+--- support-v4-23.2.0_df13b086/android.support.v4.view.AsyncLayoutInflater$OnInflateFinishedListener    1969-12-31 19:00:00.000000000 -0500
++++ support-v4-24.0.0-alpha1_41849fd4/android.support.v4.view.AsyncLayoutInflater$OnInflateFinishedListener 2016-03-09 19:28:24.000000000 -0500
+@@ -0,0 +1,3 @@
++public interface android.support.v4.view.AsyncLayoutInflater$OnInflateFinishedListener {
++  public abstract void onInflateFinished(android.view.View, int, android.view.ViewGroup);
++}
+diff -U 0 -N support-v4-23.2.0_df13b086/android.support.v4.view.KeyEventCompat support-v4-24.0.0-alpha1_41849fd4/android.support.v4.view.KeyEventCompat
+--- support-v4-23.2.0_df13b086/android.support.v4.view.KeyEventCompat   2016-03-09 19:28:24.000000000 -0500
++++ support-v4-24.0.0-alpha1_41849fd4/android.support.v4.view.KeyEventCompat    2016-03-09 19:28:24.000000000 -0500
+@@ -10,0 +11 @@
++  public static boolean isCtrlPressed(android.view.KeyEvent);
+diff -U 0 -N support-v4-23.2.0_df13b086/android.support.v4.view.MotionEventCompat support-v4-24.0.0-alpha1_41849fd4/android.support.v4.view.MotionEventCompat
+--- support-v4-23.2.0_df13b086/android.support.v4.view.MotionEventCompat    2016-03-09 19:28:24.000000000 -0500
++++ support-v4-24.0.0-alpha1_41849fd4/android.support.v4.view.MotionEventCompat 2016-03-09 19:28:24.000000000 -0500
+@@ -36,0 +37,2 @@
++  public static final int AXIS_RELATIVE_X;
++  public static final int AXIS_RELATIVE_Y;
+@@ -52,0 +55 @@
++  public static final int BUTTON_PRIMARY;
+@@ -60,0 +64 @@
++  public static boolean isFromSource(android.view.MotionEvent, int);
+@@ -62,0 +67 @@
++  public static int getButtonState(android.view.MotionEvent);
+diff -U 0 -N support-v4-23.2.0_df13b086/android.support.v4.view.PointerIconCompat support-v4-24.0.0-alpha1_41849fd4/android.support.v4.view.PointerIconCompat
+--- support-v4-23.2.0_df13b086/android.support.v4.view.PointerIconCompat    1969-12-31 19:00:00.000000000 -0500
++++ support-v4-24.0.0-alpha1_41849fd4/android.support.v4.view.PointerIconCompat 2016-03-09 19:28:24.000000000 -0500
+@@ -0,0 +1,29 @@
++public final class android.support.v4.view.PointerIconCompat {
++  public static final int STYLE_NULL;
++  public static final int STYLE_ARROW;
++  public static final int STYLE_CONTEXT_MENU;
++  public static final int STYLE_HAND;
++  public static final int STYLE_HELP;
++  public static final int STYLE_WAIT;
++  public static final int STYLE_CELL;
++  public static final int STYLE_CROSSHAIR;
++  public static final int STYLE_TEXT;
++  public static final int STYLE_VERTICAL_TEXT;
++  public static final int STYLE_ALIAS;
++  public static final int STYLE_COPY;
++  public static final int STYLE_NO_DROP;
++  public static final int STYLE_ALL_SCROLL;
++  public static final int STYLE_HORIZONTAL_DOUBLE_ARROW;
++  public static final int STYLE_VERTICAL_DOUBLE_ARROW;
++  public static final int STYLE_TOP_RIGHT_DIAGONAL_DOUBLE_ARROW;
++  public static final int STYLE_TOP_LEFT_DIAGONAL_DOUBLE_ARROW;
++  public static final int STYLE_ZOOM_IN;
++  public static final int STYLE_ZOOM_OUT;
++  public static final int STYLE_GRAB;
++  public static final int STYLE_GRABBING;
++  public static final int STYLE_DEFAULT;
++  public java.lang.Object getPointerIcon();
++  public static android.support.v4.view.PointerIconCompat getSystemIcon(android.content.Context, int);
++  public static android.support.v4.view.PointerIconCompat createCustomIcon(android.graphics.Bitmap, float, float);
++  public static android.support.v4.view.PointerIconCompat loadCustomIcon(android.content.res.Resources, int);
++}
+diff -U 0 -N support-v4-23.2.0_df13b086/android.support.v4.view.ViewCompat support-v4-24.0.0-alpha1_41849fd4/android.support.v4.view.ViewCompat
+--- support-v4-23.2.0_df13b086/android.support.v4.view.ViewCompat   2016-03-09 19:28:24.000000000 -0500
++++ support-v4-24.0.0-alpha1_41849fd4/android.support.v4.view.ViewCompat    2016-03-09 19:28:24.000000000 -0500
+@@ -1 +1 @@
+-public final class android.support.v4.view.ViewCompat {
++public class android.support.v4.view.ViewCompat {
+@@ -141,0 +142,4 @@
++  public static void setPointerCapture(android.view.View);
++  public static boolean hasPointerCapture(android.view.View);
++  public static void releasePointerCapture(android.view.View);
++  public static void setPointerIcon(android.view.View, android.support.v4.view.PointerIconCompat);
+diff -U 0 -N support-v4-23.2.0_df13b086/android.support.v4.view.ViewCompat$FocusDirection support-v4-24.0.0-alpha1_41849fd4/android.support.v4.view.ViewCompat$FocusDirection
+--- support-v4-23.2.0_df13b086/android.support.v4.view.ViewCompat$FocusDirection    1969-12-31 19:00:00.000000000 -0500
++++ support-v4-24.0.0-alpha1_41849fd4/android.support.v4.view.ViewCompat$FocusDirection 2016-03-09 19:28:24.000000000 -0500
+@@ -0,0 +1,2 @@
++public interface android.support.v4.view.ViewCompat$FocusDirection extends java.lang.annotation.Annotation {
++}
+diff -U 0 -N support-v4-23.2.0_df13b086/android.support.v4.view.ViewCompat$FocusRealDirection support-v4-24.0.0-alpha1_41849fd4/android.support.v4.view.ViewCompat$FocusRealDirection
+--- support-v4-23.2.0_df13b086/android.support.v4.view.ViewCompat$FocusRealDirection    1969-12-31 19:00:00.000000000 -0500
++++ support-v4-24.0.0-alpha1_41849fd4/android.support.v4.view.ViewCompat$FocusRealDirection 2016-03-09 19:28:24.000000000 -0500
+@@ -0,0 +1,2 @@
++public interface android.support.v4.view.ViewCompat$FocusRealDirection extends java.lang.annotation.Annotation {
++}
+diff -U 0 -N support-v4-23.2.0_df13b086/android.support.v4.view.ViewCompat$FocusRelativeDirection support-v4-24.0.0-alpha1_41849fd4/android.support.v4.view.ViewCompat$FocusRelativeDirection
+--- support-v4-23.2.0_df13b086/android.support.v4.view.ViewCompat$FocusRelativeDirection    1969-12-31 19:00:00.000000000 -0500
++++ support-v4-24.0.0-alpha1_41849fd4/android.support.v4.view.ViewCompat$FocusRelativeDirection 2016-03-09 19:28:24.000000000 -0500
+@@ -0,0 +1,2 @@
++public interface android.support.v4.view.ViewCompat$FocusRelativeDirection extends java.lang.annotation.Annotation {
++}
+diff -U 0 -N support-v4-23.2.0_df13b086/android.support.v4.view.accessibility.AccessibilityNodeInfoCompat support-v4-24.0.0-alpha1_41849fd4/android.support.v4.view.accessibility.AccessibilityNodeInfoCompat
+--- support-v4-23.2.0_df13b086/android.support.v4.view.accessibility.AccessibilityNodeInfoCompat    2016-03-09 19:28:24.000000000 -0500
++++ support-v4-24.0.0-alpha1_41849fd4/android.support.v4.view.accessibility.AccessibilityNodeInfoCompat 2016-03-09 19:28:24.000000000 -0500
+@@ -148,0 +149,2 @@
++  public java.lang.CharSequence getRoleDescription();
++  public void setRoleDescription(java.lang.CharSequence);
+diff -U 0 -N support-v4-23.2.0_df13b086/android.support.v4.widget.ExploreByTouchHelper support-v4-24.0.0-alpha1_41849fd4/android.support.v4.widget.ExploreByTouchHelper
+--- support-v4-23.2.0_df13b086/android.support.v4.widget.ExploreByTouchHelper   2016-03-09 19:28:24.000000000 -0500
++++ support-v4-24.0.0-alpha1_41849fd4/android.support.v4.widget.ExploreByTouchHelper    2016-03-09 19:28:24.000000000 -0500
+@@ -6,4 +6,9 @@
+-  public boolean dispatchHoverEvent(android.view.MotionEvent);
+-  public boolean sendEventForVirtualView(int, int);
+-  public void invalidateRoot();
+-  public void invalidateVirtualView(int);
++  public final boolean dispatchHoverEvent(android.view.MotionEvent);
++  public final boolean dispatchKeyEvent(android.view.KeyEvent);
++  public final void onFocusChanged(boolean, int, android.graphics.Rect);
++  public final int getAccessibilityFocusedVirtualViewId();
++  public final int getKeyboardFocusedVirtualViewId();
++  public final boolean sendEventForVirtualView(int, int);
++  public final void invalidateRoot();
++  public final void invalidateVirtualView(int);
++  public final void invalidateVirtualView(int, int);
+@@ -11 +16,4 @@
+-  public void onPopulateNodeForHost(android.support.v4.view.accessibility.AccessibilityNodeInfoCompat);
++  public void onInitializeAccessibilityEvent(android.view.View, android.view.accessibility.AccessibilityEvent);
++  public void onInitializeAccessibilityNodeInfo(android.view.View, android.support.v4.view.accessibility.AccessibilityNodeInfoCompat);
++  public final boolean requestKeyboardFocusForVirtualView(int);
++  public final boolean clearKeyboardFocusForVirtualView(int);
+diff -U 0 -N support-v4-23.2.0_df13b086/android.support.v4.widget.FocusStrategy$BoundsAdapter&lt;T&gt; support-v4-24.0.0-alpha1_41849fd4/android.support.v4.widget.FocusStrategy$BoundsAdapter&lt;T&gt;
+--- support-v4-23.2.0_df13b086/android.support.v4.widget.FocusStrategy$BoundsAdapter&lt;T&gt;   1969-12-31 19:00:00.000000000 -0500
++++ support-v4-24.0.0-alpha1_41849fd4/android.support.v4.widget.FocusStrategy$BoundsAdapter&lt;T&gt;    2016-03-09 19:28:24.000000000 -0500
+@@ -0,0 +1,3 @@
++public interface android.support.v4.widget.FocusStrategy$BoundsAdapter&lt;T&gt; {
++  public abstract void obtainBounds(T, android.graphics.Rect);
++}
+diff -U 0 -N support-v4-23.2.0_df13b086/android.support.v4.widget.FocusStrategy$CollectionAdapter&lt;T, support-v4-24.0.0-alpha1_41849fd4/android.support.v4.widget.FocusStrategy$CollectionAdapter&lt;T,
+--- support-v4-23.2.0_df13b086/android.support.v4.widget.FocusStrategy$CollectionAdapter&lt;T,  1969-12-31 19:00:00.000000000 -0500
++++ support-v4-24.0.0-alpha1_41849fd4/android.support.v4.widget.FocusStrategy$CollectionAdapter&lt;T,   2016-03-09 19:28:24.000000000 -0500
+@@ -0,0 +1,4 @@
++public interface android.support.v4.widget.FocusStrategy$CollectionAdapter&lt;T, V&gt; {
++  public abstract V get(T, int);
++  public abstract int size(T);
++}</code></pre></noscript></div>
+
+
+<h2>AppCompat:</h2>
+
+<div><script src='https://gist.github.com/5d7c55382198640345dc.js?file=appcompat.diff'></script>
+<noscript><pre><code>diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.app.AppCompatDelegateImplV7$PanelFeatureState appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.app.AppCompatDelegateImplV7$PanelFeatureState
+--- appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.app.AppCompatDelegateImplV7$PanelFeatureState   1969-12-31 19:00:00.000000000 -0500
++++ appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.app.AppCompatDelegateImplV7$PanelFeatureState    2016-03-09 19:28:22.000000000 -0500
+@@ -0,0 +1,5 @@
++public final class android.support.v7.app.AppCompatDelegateImplV7$PanelFeatureState {
++  public boolean qwertyMode;
++  public boolean hasPanelItems();
++  public void clearMenuPresenters();
++}
+diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.view.WindowCallbackWrapper appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.view.WindowCallbackWrapper
+--- appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.view.WindowCallbackWrapper  2016-03-09 19:28:22.000000000 -0500
++++ appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.view.WindowCallbackWrapper   2016-03-09 19:28:22.000000000 -0500
+@@ -25,0 +26 @@
++  public void onProvideKeyboardShortcuts(java.util.List&lt;android.view.KeyboardShortcutGroup&gt;, android.view.Menu);
+diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.view.menu.ActionMenuItemView$PopupCallback appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.view.menu.ActionMenuItemView$PopupCallback
+--- appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.view.menu.ActionMenuItemView$PopupCallback  2016-03-09 19:28:22.000000000 -0500
++++ appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.view.menu.ActionMenuItemView$PopupCallback   2016-03-09 19:28:22.000000000 -0500
+@@ -3 +3 @@
+-  public abstract android.support.v7.widget.ListPopupWindow getPopup();
++  public abstract android.support.v7.view.menu.ShowableListMenu getPopup();
+diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.view.menu.CascadingMenuPopup$HorizPosition appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.view.menu.CascadingMenuPopup$HorizPosition
+--- appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.view.menu.CascadingMenuPopup$HorizPosition  1969-12-31 19:00:00.000000000 -0500
++++ appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.view.menu.CascadingMenuPopup$HorizPosition   2016-03-09 19:28:22.000000000 -0500
+@@ -0,0 +1,2 @@
++public interface android.support.v7.view.menu.CascadingMenuPopup$HorizPosition extends java.lang.annotation.Annotation {
++}
+diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.view.menu.ListMenuItemView appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.view.menu.ListMenuItemView
+--- appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.view.menu.ListMenuItemView  2016-03-09 19:28:22.000000000 -0500
++++ appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.view.menu.ListMenuItemView   2016-03-09 19:28:22.000000000 -0500
+@@ -2 +1,0 @@
+-  public android.support.v7.view.menu.ListMenuItemView(android.content.Context, android.util.AttributeSet, int);
+@@ -3,0 +3 @@
++  public android.support.v7.view.menu.ListMenuItemView(android.content.Context, android.util.AttributeSet, int);
+diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.view.menu.MenuAdapter appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.view.menu.MenuAdapter
+--- appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.view.menu.MenuAdapter   1969-12-31 19:00:00.000000000 -0500
++++ appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.view.menu.MenuAdapter    2016-03-09 19:28:22.000000000 -0500
+@@ -0,0 +1,12 @@
++public class android.support.v7.view.menu.MenuAdapter extends android.widget.BaseAdapter {
++  public android.support.v7.view.menu.MenuAdapter(android.support.v7.view.menu.MenuBuilder, android.view.LayoutInflater, boolean);
++  public boolean getForceShowIcon();
++  public void setForceShowIcon(boolean);
++  public int getCount();
++  public android.support.v7.view.menu.MenuBuilder getAdapterMenu();
++  public android.support.v7.view.menu.MenuItemImpl getItem(int);
++  public long getItemId(int);
++  public android.view.View getView(int, android.view.View, android.view.ViewGroup);
++  public void notifyDataSetChanged();
++  public java.lang.Object getItem(int);
++}
+diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.view.menu.MenuBuilder appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.view.menu.MenuBuilder
+--- appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.view.menu.MenuBuilder   2016-03-09 19:28:22.000000000 -0500
++++ appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.view.menu.MenuBuilder    2016-03-09 19:28:22.000000000 -0500
+@@ -60,0 +61 @@
++  public void setOptionalIconsVisible(boolean);
+diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.view.menu.MenuPopupHelper appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.view.menu.MenuPopupHelper
+--- appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.view.menu.MenuPopupHelper   2016-03-09 19:28:22.000000000 -0500
++++ appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.view.menu.MenuPopupHelper    2016-03-09 19:28:22.000000000 -0500
+@@ -1 +1 @@
+-public class android.support.v7.view.menu.MenuPopupHelper implements android.widget.AdapterView$OnItemClickListener,android.view.View$OnKeyListener,android.view.ViewTreeObserver$OnGlobalLayoutListener,android.widget.PopupWindow$OnDismissListener,android.support.v7.view.menu.MenuPresenter {
++public class android.support.v7.view.menu.MenuPopupHelper implements android.support.v7.view.menu.MenuHelper {
+@@ -5,0 +6 @@
++  public void setOnDismissListener(android.widget.PopupWindow$OnDismissListener);
+@@ -11 +12,2 @@
+-  public android.support.v7.widget.ListPopupWindow getPopup();
++  public void show(int, int);
++  public android.support.v7.view.menu.MenuPopup getPopup();
+@@ -12,0 +15 @@
++  public boolean tryShow(int, int);
+@@ -14 +16,0 @@
+-  public void onDismiss();
+@@ -16,15 +18 @@
+-  public void onItemClick(android.widget.AdapterView&lt;?&gt;, android.view.View, int, long);
+-  public boolean onKey(android.view.View, int, android.view.KeyEvent);
+-  public void onGlobalLayout();
+-  public void initForMenu(android.content.Context, android.support.v7.view.menu.MenuBuilder);
+-  public android.support.v7.view.menu.MenuView getMenuView(android.view.ViewGroup);
+-  public void updateMenuView(boolean);
+-  public void setCallback(android.support.v7.view.menu.MenuPresenter$Callback);
+-  public boolean onSubMenuSelected(android.support.v7.view.menu.SubMenuBuilder);
+-  public void onCloseMenu(android.support.v7.view.menu.MenuBuilder, boolean);
+-  public boolean flagActionItems();
+-  public boolean expandItemActionView(android.support.v7.view.menu.MenuBuilder, android.support.v7.view.menu.MenuItemImpl);
+-  public boolean collapseItemActionView(android.support.v7.view.menu.MenuBuilder, android.support.v7.view.menu.MenuItemImpl);
+-  public int getId();
+-  public android.os.Parcelable onSaveInstanceState();
+-  public void onRestoreInstanceState(android.os.Parcelable);
++  public void setPresenterCallback(android.support.v7.view.menu.MenuPresenter$Callback);
+diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.view.menu.ShowableListMenu appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.view.menu.ShowableListMenu
+--- appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.view.menu.ShowableListMenu  1969-12-31 19:00:00.000000000 -0500
++++ appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.view.menu.ShowableListMenu   2016-03-09 19:28:22.000000000 -0500
+@@ -0,0 +1,6 @@
++public interface android.support.v7.view.menu.ShowableListMenu {
++  public abstract void show();
++  public abstract void dismiss();
++  public abstract boolean isShowing();
++  public abstract android.widget.ListView getListView();
++}
+diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.AppCompatSeekBar appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.widget.AppCompatSeekBar
+--- appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.AppCompatSeekBar 2016-03-09 19:28:22.000000000 -0500
++++ appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.widget.AppCompatSeekBar  2016-03-09 19:28:22.000000000 -0500
+@@ -4,0 +5 @@
++  public void jumpDrawablesToCurrentState();
+diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.ForwardingListener appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.widget.ForwardingListener
+--- appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.ForwardingListener   1969-12-31 19:00:00.000000000 -0500
++++ appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.widget.ForwardingListener    2016-03-09 19:28:22.000000000 -0500
+@@ -0,0 +1,5 @@
++public abstract class android.support.v7.widget.ForwardingListener implements android.view.View$OnTouchListener {
++  public android.support.v7.widget.ForwardingListener(android.view.View);
++  public abstract android.support.v7.view.menu.ShowableListMenu getPopup();
++  public boolean onTouch(android.view.View, android.view.MotionEvent);
++}
+diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.ListPopupWindow appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.widget.ListPopupWindow
+--- appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.ListPopupWindow  2016-03-09 19:28:22.000000000 -0500
++++ appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.widget.ListPopupWindow   2016-03-09 19:28:22.000000000 -0500
+@@ -1 +1 @@
+-public class android.support.v7.widget.ListPopupWindow {
++public class android.support.v7.widget.ListPopupWindow implements android.support.v7.view.menu.ShowableListMenu {
+@@ -33,0 +34 @@
++  public void setEpicenterBounds(android.graphics.Rect);
+diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.ListPopupWindow$ForwardingListener appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.widget.ListPopupWindow$ForwardingListener
+--- appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.ListPopupWindow$ForwardingListener   2016-03-09 19:28:22.000000000 -0500
++++ appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.widget.ListPopupWindow$ForwardingListener    1969-12-31 19:00:00.000000000 -0500
+@@ -1,5 +0,0 @@
+-public abstract class android.support.v7.widget.ListPopupWindow$ForwardingListener implements android.view.View$OnTouchListener {
+-  public android.support.v7.widget.ListPopupWindow$ForwardingListener(android.view.View);
+-  public abstract android.support.v7.widget.ListPopupWindow getPopup();
+-  public boolean onTouch(android.view.View, android.view.MotionEvent);
+-}
+diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.MenuItemHoverListener appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.widget.MenuItemHoverListener
+--- appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.MenuItemHoverListener    1969-12-31 19:00:00.000000000 -0500
++++ appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.widget.MenuItemHoverListener 2016-03-09 19:28:22.000000000 -0500
+@@ -0,0 +1,4 @@
++public interface android.support.v7.widget.MenuItemHoverListener {
++  public abstract void onItemHoverExit(android.support.v7.view.menu.MenuBuilder, android.view.MenuItem);
++  public abstract void onItemHoverEnter(android.support.v7.view.menu.MenuBuilder, android.view.MenuItem);
++}
+diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.MenuPopupWindow appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.widget.MenuPopupWindow
+--- appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.MenuPopupWindow  1969-12-31 19:00:00.000000000 -0500
++++ appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.widget.MenuPopupWindow   2016-03-09 19:28:22.000000000 -0500
+@@ -0,0 +1,9 @@
++public class android.support.v7.widget.MenuPopupWindow extends android.support.v7.widget.ListPopupWindow implements android.support.v7.widget.MenuItemHoverListener {
++  public android.support.v7.widget.MenuPopupWindow(android.content.Context, android.util.AttributeSet, int, int);
++  public void setEnterTransition(java.lang.Object);
++  public void setExitTransition(java.lang.Object);
++  public void setHoverListener(android.support.v7.widget.MenuItemHoverListener);
++  public void setTouchModal(boolean);
++  public void onItemHoverEnter(android.support.v7.view.menu.MenuBuilder, android.view.MenuItem);
++  public void onItemHoverExit(android.support.v7.view.menu.MenuBuilder, android.view.MenuItem);
++}
+diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.MenuPopupWindow$MenuDropDownListView appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.widget.MenuPopupWindow$MenuDropDownListView
+--- appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.MenuPopupWindow$MenuDropDownListView 1969-12-31 19:00:00.000000000 -0500
++++ appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.widget.MenuPopupWindow$MenuDropDownListView  2016-03-09 19:28:22.000000000 -0500
+@@ -0,0 +1,12 @@
++public class android.support.v7.widget.MenuPopupWindow$MenuDropDownListView extends android.support.v7.widget.DropDownListView {
++  public android.support.v7.widget.MenuPopupWindow$MenuDropDownListView(android.content.Context, boolean);
++  public void setHoverListener(android.support.v7.widget.MenuItemHoverListener);
++  public void clearSelection();
++  public boolean onKeyDown(int, android.view.KeyEvent);
++  public boolean onHoverEvent(android.view.MotionEvent);
++  public boolean hasFocus();
++  public boolean isFocused();
++  public boolean hasWindowFocus();
++  public boolean isInTouchMode();
++  public boolean onForwardedEvent(android.view.MotionEvent, int);
++}
+diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.PopupMenu appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.widget.PopupMenu
+--- appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.PopupMenu    2016-03-09 19:28:22.000000000 -0500
++++ appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.widget.PopupMenu 2016-03-09 19:28:22.000000000 -0500
+@@ -1 +1 @@
+-public class android.support.v7.widget.PopupMenu implements android.support.v7.view.menu.MenuBuilder$Callback,android.support.v7.view.menu.MenuPresenter$Callback {
++public class android.support.v7.widget.PopupMenu {
+@@ -15,5 +14,0 @@
+-  public boolean onMenuItemSelected(android.support.v7.view.menu.MenuBuilder, android.view.MenuItem);
+-  public void onCloseMenu(android.support.v7.view.menu.MenuBuilder, boolean);
+-  public boolean onOpenSubMenu(android.support.v7.view.menu.MenuBuilder);
+-  public void onCloseSubMenu(android.support.v7.view.menu.SubMenuBuilder);
+-  public void onMenuModeChange(android.support.v7.view.menu.MenuBuilder);
+diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.TintTypedArray appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.widget.TintTypedArray
+--- appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.TintTypedArray   2016-03-09 19:28:22.000000000 -0500
++++ appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.widget.TintTypedArray    2016-03-09 19:28:22.000000000 -0500
+@@ -3,0 +4 @@
++  public static android.support.v7.widget.TintTypedArray obtainStyledAttributes(android.content.Context, int, int[]);
+diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.Toolbar appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.widget.Toolbar
+--- appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.Toolbar  2016-03-09 19:28:22.000000000 -0500
++++ appcompat-v7-24.0.0-alpha1_4f276de6/android.support.v7.widget.Toolbar   2016-03-09 19:28:22.000000000 -0500
+@@ -6,0 +7,9 @@
++  public void setTitleMargin(int, int, int, int);
++  public int getTitleMarginStart();
++  public void setTitleMarginStart(int);
++  public int getTitleMarginTop();
++  public void setTitleMarginTop(int);
++  public int getTitleMarginEnd();
++  public void setTitleMarginEnd(int);
++  public int getTitleMarginBottom();
++  public void setTitleMarginBottom(int);</code></pre></noscript></div>
+
+
+<h2>Design:</h2>
+
+<div><script src='https://gist.github.com/5d7c55382198640345dc.js?file=design.diff'></script>
+<noscript><pre><code>diff -U 0 -N design-23.2.0_c138856a/android.support.design.widget.FloatingActionButton design-24.0.0-alpha1_c951a944/android.support.design.widget.FloatingActionButton
+--- design-23.2.0_c138856a/android.support.design.widget.FloatingActionButton   2016-03-09 19:28:22.000000000 -0500
++++ design-24.0.0-alpha1_c951a944/android.support.design.widget.FloatingActionButton    2016-03-09 19:28:22.000000000 -0500
+@@ -21,0 +22 @@
++  public boolean onTouchEvent(android.view.MotionEvent);</code></pre></noscript></div>
+
+
+<p>There are no API changes in RecyclerView nor my personal <a href="http://michaelevans.org/blog/2015/07/14/improving-your-code-with-android-support-annotations/">favorite support library</a> &ndash; Support Annotations.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Michael Evans</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-03-09T19:38:46-05:00" pubdate data-updated="true">Mar 9<span>th</span>, 2016</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/development/'>Development</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://michaelevans.org/blog/2016/03/09/changelog-for-n-support-libraries/" data-via="m_evans10" data-counturl="http://michaelevans.org/blog/2016/03/09/changelog-for-n-support-libraries/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/02/17/using-dagger-1-and-kotlin/" title="Previous Post: Using Dagger 1 and Kotlin">&laquo; Using Dagger 1 and Kotlin</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/03/09/changelog-for-n-support-libraries/">Changelog for N Support Libraries</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/02/17/using-dagger-1-and-kotlin/">Using Dagger 1 and Kotlin</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/01/06/android-studio-tips-and-tricks/">Android Studio Tips and Tricks</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/09/15/testing-intents-with-espresso-intents/">Testing Intents with Espresso Intents</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/09/09/droidcon-nyc-2015-at-annotationprocessors-byexample/">Droidcon NYC 2015: @AnnotationProcessors("ByExample")</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/MichaelEvans">@MichaelEvans</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'MichaelEvans',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/114052868601022948953?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - Michael Evans -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mevans';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://michaelevans.org/blog/2016/03/09/changelog-for-n-support-libraries/';
+        var disqus_url = 'http://michaelevans.org/blog/2016/03/09/changelog-for-n-support-libraries/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

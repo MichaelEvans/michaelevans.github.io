@@ -10,7 +10,7 @@
   <meta name="author" content="Michael Evans">
 
   
-  <meta name="description" content="I haven&rsquo;t updated my blog in a while, but this is a tip/trick that&rsquo;s so good that I had to share. It&rsquo;s not a very widely known &hellip;">
+  <meta name="description" content="A few months back I wrote a blog post about my 2013 in Review. One thing I wanted to add to the post was a link to the #AutoAwesomed video, which was &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -79,6 +79,74 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/04/13/embedding-google-plus-posts-in-octopress/">Embedding Google+ Posts in Octopress</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-04-13T13:46:25-04:00" pubdate data-updated="true">Apr 13<span>th</span>, 2014</time>
+        
+         | <a href="/blog/2014/04/13/embedding-google-plus-posts-in-octopress/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>A few months back I wrote a blog post about my <a href="http://www.michaelevans.org/blog/2013/12/31/2013-in-review/">2013 in Review</a>. One thing I wanted to add to the post was a link to the #AutoAwesomed video, which was generated from photos and videos I took during the year, which were backed up to Google+.</p>
+
+<p>Fortunately for me, Google allows you to embed posts into your pages using a technique which is documented <a href="https://developers.google.com/+/web/embedded-post/">here</a>. The problem with this method, for me at least, is that my blog is created using <a href="http://octopress.org/">Octopress</a>, and posts are written in Markdown and then rendered to HTML. Octopress does, however, allow you to write plugins which can help us with this issue.</p>
+
+<p>Here&rsquo;s the <a href="https://gist.github.com/MichaelEvans/10590514">plugin</a> in all it&rsquo;s glory:</p>
+
+<div><script src='https://gist.github.com/10590514.js?file=google_plus.rb'></script>
+<noscript><pre><code>module Jekyll
+
+  class GooglePlusEmbedTag &lt; Liquid::Tag
+    @post = nil
+    @height = &#39;&#39;
+    @width = &#39;&#39;
+
+    def initialize(tag_name, markup, tokens)
+      if markup =~ /(https:\/\/plus.google.com\/\d+\/posts\/\w+)/i
+        @url  = $1
+      end
+      super
+    end
+
+    def render(context)
+      &quot;&lt;div align=&#39;center&#39;&gt;&lt;div class=&#39;g-post&#39; data-href=&#39;#{@url}&#39;&gt;&lt;/div&gt;&lt;/div&gt;&quot;
+    end
+  end
+end
+
+Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)</code></pre></noscript></div>
+
+
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -492,51 +560,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/06/11/running-crouton-on-a-chromebook-pixel/">Running Crouton on a Chromebook Pixel</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-06-11T21:22:00-04:00" pubdate data-updated="true">Jun 11<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/06/11/running-crouton-on-a-chromebook-pixel/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>So a few weeks back at Google IO, Google handed out an awesome laptop to attendees, the <a href="https://play.google.com/store/devices/details?id=chromebook_pixel_wifi">Chromebook Pixel</a>. For those who aren&rsquo;t familiar with it, the Pixel is a laptop running Google&rsquo;s ChromeOS, with the highest resolution screen available on a laptop (2560x1700). Unfortunately for me (and owners of the other Chromebooks), there&rsquo;s a few things you can&rsquo;t do in Chrome, like writing software in the new Android Studio!</p>
-
-<p>In order to work around this limitation in ChromeOS, a developer at Google named David Schneider developed a set of scripts called <a href="https://github.com/dnschneid/crouton">crouton</a>. Crouton allows you to run Ubuntu inside a your ChromeOS system, so that you can easily swap back and forth between the operating systems. This is not limited to the Pixel, so if you&rsquo;re using another model Chromebook, even dating back to the CR-48, this guide should work for you.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/06/11/running-crouton-on-a-chromebook-pixel/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -554,6 +577,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/03/09/changelog-for-n-support-libraries/">Changelog for N Support Libraries</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/02/17/using-dagger-1-and-kotlin/">Using Dagger 1 and Kotlin</a>
       </li>
     
@@ -567,10 +594,6 @@
     
       <li class="post">
         <a href="/blog/2015/09/09/droidcon-nyc-2015-at-annotationprocessors-byexample/">Droidcon NYC 2015: @AnnotationProcessors(&#8220;ByExample&#8221;)</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/08/03/using-espresso-for-easy-ui-testing/">Using Espresso for Easy UI Testing</a>
       </li>
     
   </ul>
