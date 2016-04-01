@@ -10,7 +10,7 @@
   <meta name="author" content="Michael Evans">
 
   
-  <meta name="description" content="Pssst! If you&rsquo;re an Android developer, you might not have heard yet&hellip;the N Preview started today! As part of the festivities, a new alpha &hellip;">
+  <meta name="description" content="If you want to integrate your Android app with most of Google Play Services nowadays, you&rsquo;ll find that you are instructed to set up the Google &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -79,6 +79,53 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/">Using Build Types With the Google Services Gradle Plugin</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-03-31T21:11:55-04:00" pubdate data-updated="true">Mar 31<span>st</span>, 2016</time>
+        
+         | <a href="/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>If you want to integrate your Android app with most of Google Play Services nowadays, you&rsquo;ll find that you are instructed to set up the <a href="https://developers.google.com/android/guides/google-services-plugin">Google Services Gradle plugin</a> to handle configuring dependencies. The plugin allows you to drop a JSON file into your project, and then the plugin will do a bunch of the configuration for your project, such as handling the API keys.</p>
+
+<p>This is all well and good—unless you&rsquo;re like me (<a href="https://github.com/googlesamples/google-services/issues/54">and countless others</a>) and want to use a different configuration for your debug and release builds. This would be useful, as an example, if you use Google Play Services for GCM and would like to have development builds recieve pushes from non-production systems.</p>
+
+<p>It seems that the plugin is configured in such a way that it supports build flavors, but it does not yet support build types. However, with a little Gradle magic, we can hack that support in.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -548,66 +595,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/06/07/building-obs-studio-for-os-x/">Building OBS Studio for OS X</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-06-07T22:59:38-04:00" pubdate data-updated="true">Jun 7<span>th</span>, 2014</time>
-        
-         | <a href="/blog/2014/06/07/building-obs-studio-for-os-x/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Recently I&rsquo;ve been watching a bunch of streams on <a href="http://www.twitch.tv/">Twitch</a>, and was investigating the best options to stream from OS X. Sadly most of the ones I found were very expensive, until I saw that <a href="http://obsproject.com/">Open Broadcaster Software</a>, which was previously only for Windows, was <a href="https://github.com/jp9000/obs-studio">being rewritten</a> to work with OS X and Linux. However, it&rsquo;s still highly beta/under development and as a result, there&rsquo;s not a lot of documentation on how to build it.</p>
-
-<p>Here&rsquo;s how I did it:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>brew install ffmpeg glew cmake qt5
-</span><span class='line'>git clone https://github.com/jp9000/obs-studio.git
-</span><span class='line'>cd obs-studio
-</span><span class='line'>mkdir cmbuild && cd cmbuild
-</span><span class='line'>export CMAKE_PREFIX_PATH=/usr/local/Cellar/qt5/5.2.1/lib/cmake
-</span><span class='line'>cmake .. && make
-</span><span class='line'>cpack</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This will leave you with a disk image named <code>obs-studio-x64-&lt;sha1-hash&gt;.dmg</code>, which you can mount and install, just like any other OS X application.</p>
-
-<p>Happy Streaming!</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -623,6 +610,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/">Using Build Types with the Google Services Gradle Plugin</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/03/09/changelog-for-n-support-libraries/">Changelog for N Support Libraries</a>
       </li>
     
@@ -636,10 +627,6 @@
     
       <li class="post">
         <a href="/blog/2015/09/15/testing-intents-with-espresso-intents/">Testing Intents with Espresso Intents</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/09/09/droidcon-nyc-2015-at-annotationprocessors-byexample/">Droidcon NYC 2015: @AnnotationProcessors(&#8220;ByExample&#8221;)</a>
       </li>
     
   </ul>

@@ -10,7 +10,7 @@
   <meta name="author" content="Michael Evans">
 
   
-  <meta name="description" content="A few months back I wrote a blog post about my 2013 in Review. One thing I wanted to add to the post was a link to the #AutoAwesomed video, which was &hellip;">
+  <meta name="description" content="Recently I&rsquo;ve been watching a bunch of streams on Twitch, and was investigating the best options to stream from OS X. Sadly most of the ones I &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -79,6 +79,66 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/06/07/building-obs-studio-for-os-x/">Building OBS Studio for OS X</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-06-07T22:59:38-04:00" pubdate data-updated="true">Jun 7<span>th</span>, 2014</time>
+        
+         | <a href="/blog/2014/06/07/building-obs-studio-for-os-x/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Recently I&rsquo;ve been watching a bunch of streams on <a href="http://www.twitch.tv/">Twitch</a>, and was investigating the best options to stream from OS X. Sadly most of the ones I found were very expensive, until I saw that <a href="http://obsproject.com/">Open Broadcaster Software</a>, which was previously only for Windows, was <a href="https://github.com/jp9000/obs-studio">being rewritten</a> to work with OS X and Linux. However, it&rsquo;s still highly beta/under development and as a result, there&rsquo;s not a lot of documentation on how to build it.</p>
+
+<p>Here&rsquo;s how I did it:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>brew install ffmpeg glew cmake qt5
+</span><span class='line'>git clone https://github.com/jp9000/obs-studio.git
+</span><span class='line'>cd obs-studio
+</span><span class='line'>mkdir cmbuild && cd cmbuild
+</span><span class='line'>export CMAKE_PREFIX_PATH=/usr/local/Cellar/qt5/5.2.1/lib/cmake
+</span><span class='line'>cmake .. && make
+</span><span class='line'>cpack</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will leave you with a disk image named <code>obs-studio-x64-&lt;sha1-hash&gt;.dmg</code>, which you can mount and install, just like any other OS X application.</p>
+
+<p>Happy Streaming!</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -513,53 +573,6 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/06/12/getting-mavericks-compressed-memory-feature-in-ubuntu/">Getting Mavericks&#8217; Compressed Memory Feature in Ubuntu</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-06-12T00:16:00-04:00" pubdate data-updated="true">Jun 12<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/06/12/getting-mavericks-compressed-memory-feature-in-ubuntu/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>On Monday, Apple announced a new update for it&rsquo;s desktop operating system, which will be named OS X Mavericks. As part of the annoucement, they touched on a few performance related features, including a new power saving API, which was called App Nap, as well as a memory compression feature, which would allow compress the memory of programs that are not currently active.</p>
-
-<p>According to <a href="http://arstechnica.com/apple/2013/06/how-os-x-mavericks-works-its-power-saving-magic/">Ars Technica</a>, Apple is using a technique called Timer Coalescing to create App Nap. Apps that are not active will have their processes set to a lower priority, and therefore use less CPU/disk/etc, and thereby save power. This feature has been around on Linux for a long time, and apparently has been part of Windows as well.</p>
-
-<p>I had not heard, however, of this compressed memory technique, although apparently it had been done many years ago by a program called &ldquo;RamDoubler&rdquo;. After some quick Googling, it seems that this is available via a kernel module called &ldquo;zram&rdquo;.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/06/12/getting-mavericks-compressed-memory-feature-in-ubuntu/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -577,6 +590,10 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/">Using Build Types with the Google Services Gradle Plugin</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/03/09/changelog-for-n-support-libraries/">Changelog for N Support Libraries</a>
       </li>
     
@@ -590,10 +607,6 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
     
       <li class="post">
         <a href="/blog/2015/09/15/testing-intents-with-espresso-intents/">Testing Intents with Espresso Intents</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/09/09/droidcon-nyc-2015-at-annotationprocessors-byexample/">Droidcon NYC 2015: @AnnotationProcessors(&#8220;ByExample&#8221;)</a>
       </li>
     
   </ul>
