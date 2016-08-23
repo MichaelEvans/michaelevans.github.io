@@ -4,7 +4,7 @@
   <title><![CDATA[Michael Evans]]></title>
   <link href="http://michaelevans.org/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2016-08-23T18:45:00-04:00</updated>
+  <updated>2016-08-23T19:01:12-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -35,7 +35,60 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Long story short, if you pass the right extras to this activity, and you&rsquo;ll get access to the Night Mode settings (as well as the infamous Quick Tile!). Fortunately for us, this is pretty trivial to accomplish with <code>adb</code> via <code>adb -d shell am start  --ez show_night_mode true com.android.systemui/.tuner.TunerActivity</code>, but not everyone who wants this feature is familiar with <code>adb</code>. So I published an app to the Play Store that does exactly that &ndash; click one button, and get access to those settings! You can find the app on the Play Store <a href="https://play.google.com/store/apps/details?id=org.michaelevans.nightmodeenabler">here</a>.</p>
+<p>Long story short, if you pass the right extras to this activity, and you&rsquo;ll get access to the Night Mode settings (as well as the infamous Quick Tile!).</p>
+
+<p>Fortunately for us, this is pretty trivial to accomplish with <code>adb</code> via <code>adb -d shell am start  --ez show_night_mode true com.android.systemui/.tuner.TunerActivity</code>, but not everyone who wants this feature is familiar with <code>adb</code>. So I published an app to the Play Store that does exactly that &ndash; click one button, and get access to those settings! You can find the app on the Play Store <a href="https://play.google.com/store/apps/details?id=org.michaelevans.nightmodeenabler">here</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Using Build Types with the Google Services Gradle Plugin]]></title>
+    <link href="http://michaelevans.org/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/"/>
+    <updated>2016-03-31T21:11:55-04:00</updated>
+    <id>http://michaelevans.org/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin</id>
+    <content type="html"><![CDATA[<p>If you want to integrate your Android app with most of Google Play Services nowadays, you&rsquo;ll find that you are instructed to set up the <a href="https://developers.google.com/android/guides/google-services-plugin">Google Services Gradle plugin</a> to handle configuring dependencies. The plugin allows you to drop a JSON file into your project, and then the plugin will do a bunch of the configuration for your project, such as handling the API keys.</p>
+
+<p>This is all well and good—unless you&rsquo;re like me (<a href="https://github.com/googlesamples/google-services/issues/54">and countless others</a>) and want to use a different configuration for your debug and release builds. This would be useful, as an example, if you use Google Play Services for GCM and would like to have development builds recieve pushes from non-production systems.</p>
+
+<p>It seems that the plugin is configured in such a way that it supports build flavors, but it does not yet support build types. However, with a little Gradle magic, we can hack that support in.</p>
+
+<!-- more -->
+
+
+<p><strong>Disclaimer: This approach worked for me—but as with any hack, it is subject to break.</strong></p>
+
+<p>So how can we go about doing this? We want to put the debug JSON file into the root of our app module during debug builds and use the release one for release builds. If you don&rsquo;t do that, or if you attempt to put it in <code>app/debug</code> and <code>app/release</code>, you&rsquo;ll get an error that says <code>File google-services.json is missing from module root folder. The Google Services Plugin cannot function without it</code>.</p>
+
+<p>This error is thrown by a task named <code>process{VariantName}GoogleServices</code>. What we could do to solve this is swap the file in before that task is run! Using a little Groovy magic, I came up with this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">android</span><span class="o">.</span><span class="na">applicationVariants</span><span class="o">.</span><span class="na">all</span> <span class="o">{</span> <span class="n">variant</span> <span class="o">-&gt;</span>
+</span><span class='line'>    <span class="kt">def</span> <span class="n">hackTask</span> <span class="o">=</span> <span class="n">task</span><span class="o">(</span><span class="s2">&quot;hackGps${variant.name.capitalize()}&quot;</span><span class="o">)</span> <span class="o">&lt;&lt;</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">copy</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">from</span> <span class="n">rootProject</span><span class="o">.</span><span class="na">file</span><span class="o">(</span><span class="s2">&quot;config/${variant.buildType.name}/google-services.json&quot;</span><span class="o">)</span>
+</span><span class='line'>            <span class="n">into</span> <span class="s2">&quot;${projectDir}&quot;</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="kt">def</span> <span class="n">googleTask</span> <span class="o">=</span> <span class="n">tasks</span><span class="o">.</span><span class="na">findByName</span><span class="o">(</span><span class="s2">&quot;process${variant.name.capitalize()}GoogleServices&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">googleTask</span><span class="o">.</span><span class="na">dependsOn</span> <span class="n">hackTask</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>For each one of your variants, this code will create a new task &ndash; <code>hackGps{VariantName}</code>, which copies a <code>google-services.json</code> file from a <code>config</code> directory into the root of your app module. Then it finds the corresponding Google Services task, and hooks itself in to run right before that! Now when you assemble your application, the right <code>google-services.json</code> file will be in the right place, ready to be picked up by the plugin.</p>
+
+<p><em>You might also want to .gitignore the <code>app/google-services.json</code> file, so that you don&rsquo;t keep committing the changed file to git</em></p>
+
+<p>Hopefully Google will fix this issue in an upcoming release of the Google Services plugin, but until then &ndash; this technique should work!</p>
 ]]></content>
   </entry>
   
@@ -1831,515 +1884,6 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
 <p>Next time we can take a look at adding some delete functionality, or maybe tabs for looking over completed/incomplete tasks. Another possiblity is adding social sign in, using Twitter and Facebook. Other suggestions are welcome!</p>
 
 <p><strong>You can find the source on Github <a href="https://github.com/MichaelEvans/Parse-Android-Todo">here</a>.</strong></p>
-
-<hr />
-
-<p>Like this post? Questions, concerns or mistakes? Any other Android tutorials you&rsquo;d like to hear about? Let me know on <a href="https://twitter.com/m_evans10">Twitter</a> or <a href="https://plus.google.com/114052868601022948953/posts">Google Plus</a>, or leave a comment below.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Tutorial: Building an Android To-Do List app using Parse]]></title>
-    <link href="http://michaelevans.org/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse/"/>
-    <updated>2013-08-14T22:08:00-04:00</updated>
-    <id>http://michaelevans.org/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse</id>
-    <content type="html"><![CDATA[<p>For a while now I&rsquo;ve been using <a href="http://www.parse.com">Parse</a> for small apps, it allows you to iterate quickly and create a backend for an app without too much work. It also seems like a perfect jumping off point for a series of Android tutorials, where we&rsquo;ll be building a &ldquo;Todo List&rdquo; application. (This tutorial assumes that you have <a href="http://developer.android.com/tools/sdk/eclipse-adt.html">Eclipse and the ADT</a> installed already.)</p>
-
-<!-- more -->
-
-
-<h2>The Setup</h2>
-
-<p>First thing you&rsquo;ll want to do is sign up for Parse, and create a new Application. I called mine &ldquo;Todo&rdquo; here, but you can call it anything you&rsquo;d like. After you pick a name, you&rsquo;ll be presented a screen like the following, which contains your API keys. Do not lose these, this is how your app will connect to the Parse services. (I have removed my keys in the screenshot below.)</p>
-
-<p><img class="center" src="http://michaelevans.org/images/2013/08/14/parse_keys.png" width="300" height="500" title="Parse Keys" ></p>
-
-<p>Next, you&rsquo;ll want to download the Parse libraries from <a href="https://parse.com/downloads/android/Parse/latest">here</a>.</p>
-
-<p>Back in Eclipse, open the New Project Wizard and create a new Android application. I set the minimum SDK version to Honeycomb in the screenshot below, but feel free to pick something newer if you&rsquo;d like.</p>
-
-<p><img class="center" src="http://michaelevans.org/images/2013/08/14/android_wizard.png" width="500" height="500" title="Android New Project Wizard" ></p>
-
-<p>You&rsquo;ll then be taken to a screen to create your starting activity. Choose Blank Activity, and feel free to name it whatever you like.</p>
-
-<p><img class="center" src="http://michaelevans.org/images/2013/08/14/android_wizard_3.png" width="500" height="500" title="Android New Project Wizard" ></p>
-
-<p>After you complete the wizard, you&rsquo;ll have a new project in your workspace. Copy the Parse jar file that you downloaded before to the <code>libs/</code> directory, and you&rsquo;ll be all set to begin coding.</p>
-
-<h2>Let&rsquo;s Code</h2>
-
-<h3>Parse Setup</h3>
-
-<p>First thing we&rsquo;ll add is the code to set up Parse. In the onCreate method of your Activity, add the following (remember to replace APP_ID and CLIENT_ID with the keys you got from Parse earlier):</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">Parse</span><span class="o">.</span><span class="na">initialize</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="s">&quot;APP_ID&quot;</span><span class="o">,</span> <span class="s">&quot;CLIENT_ID&quot;</span><span class="o">);</span>
-</span><span class='line'><span class="n">ParseAnalytics</span><span class="o">.</span><span class="na">trackAppOpened</span><span class="o">(</span><span class="n">getIntent</span><span class="o">());</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>That second line is optional, but it adds analytics tracking to your app, which is a nice feature to get for free. In addition to that initializer code, we&rsquo;ll need to add get some permissions for our app. Add the following two permissions to your AndroidManifest.xml file, above the <code>&lt;application&gt;</code> tag:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">&lt;</span><span class="n">uses</span><span class="o">-</span><span class="n">permission</span> <span class="nl">android:</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;android.permission.INTERNET&quot;</span> <span class="o">/&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="n">uses</span><span class="o">-</span><span class="n">permission</span> <span class="nl">android:</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;android.permission.ACCESS_NETWORK_STATE&quot;</span> <span class="o">/&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Data Model</h3>
-
-<p>Now we&rsquo;re able to interact with Parse using the included library. The next thing we&rsquo;ll want to do is to declare a Task model. This object will represent an individual Task Object in Parse&rsquo;s datastore. Create a new class named Task.java, and fill it out like the following:</p>
-
-<figure class='code'><figcaption><span>Task.java</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">com.parse.ParseClassName</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">com.parse.ParseObject</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nd">@ParseClassName</span><span class="o">(</span><span class="s">&quot;Task&quot;</span><span class="o">)</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Task</span> <span class="kd">extends</span> <span class="n">ParseObject</span><span class="o">{</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="nf">Task</span><span class="o">(){</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isCompleted</span><span class="o">(){</span>
-</span><span class='line'>      <span class="k">return</span> <span class="nf">getBoolean</span><span class="o">(</span><span class="s">&quot;completed&quot;</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setCompleted</span><span class="o">(</span><span class="kt">boolean</span> <span class="n">complete</span><span class="o">){</span>
-</span><span class='line'>      <span class="n">put</span><span class="o">(</span><span class="s">&quot;completed&quot;</span><span class="o">,</span> <span class="n">complete</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getDescription</span><span class="o">(){</span>
-</span><span class='line'>      <span class="k">return</span> <span class="nf">getString</span><span class="o">(</span><span class="s">&quot;description&quot;</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setDescription</span><span class="o">(</span><span class="n">String</span> <span class="n">description</span><span class="o">){</span>
-</span><span class='line'>      <span class="n">put</span><span class="o">(</span><span class="s">&quot;description&quot;</span><span class="o">,</span> <span class="n">description</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The annotation tells Parse what &ldquo;table&rdquo; that our object corresponds with, and then we are providing methods to get and set two properties: a description, and a completed status. In addition to those, Parse will give us created_at and updated_at fields for free.</p>
-
-<p>Now that we&rsquo;ve declared our model, we need to register this class with our activity. Below the initialization code, add a line like this:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">ParseObject</span><span class="o">.</span><span class="na">registerSubclass</span><span class="o">(</span><span class="n">Task</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>The Layout</h3>
-
-<p>This tells Parse to use the annotation that we declared at the top of the model. The next thing we want to do is set up the layout for our activity. This XML file will represent the UI of our application. Open up the todo_activity.xml file, and replace the contents with this:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;LinearLayout</span> <span class="na">xmlns:android=</span><span class="s">&quot;http://schemas.android.com/apk/res/android&quot;</span>
-</span><span class='line'>    <span class="na">xmlns:tools=</span><span class="s">&quot;http://schemas.android.com/tools&quot;</span>
-</span><span class='line'>    <span class="na">android:layout_width=</span><span class="s">&quot;match_parent&quot;</span>
-</span><span class='line'>    <span class="na">android:layout_height=</span><span class="s">&quot;match_parent&quot;</span>
-</span><span class='line'>    <span class="na">android:orientation=</span><span class="s">&quot;vertical&quot;</span>
-</span><span class='line'>    <span class="na">android:paddingLeft=</span><span class="s">&quot;@dimen/activity_horizontal_margin&quot;</span>
-</span><span class='line'>    <span class="na">android:paddingRight=</span><span class="s">&quot;@dimen/activity_horizontal_margin&quot;</span>
-</span><span class='line'>    <span class="na">tools:context=</span><span class="s">&quot;.TodoActivity&quot;</span> <span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;LinearLayout</span>
-</span><span class='line'>        <span class="na">android:layout_width=</span><span class="s">&quot;match_parent&quot;</span>
-</span><span class='line'>        <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
-</span><span class='line'>        <span class="na">android:orientation=</span><span class="s">&quot;horizontal&quot;</span> <span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="nt">&lt;EditText</span>
-</span><span class='line'>            <span class="na">android:id=</span><span class="s">&quot;@+id/task_input&quot;</span>
-</span><span class='line'>            <span class="na">android:layout_width=</span><span class="s">&quot;0dp&quot;</span>
-</span><span class='line'>            <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
-</span><span class='line'>            <span class="na">android:layout_weight=</span><span class="s">&quot;1&quot;</span>
-</span><span class='line'>            <span class="na">android:ems=</span><span class="s">&quot;10&quot;</span>
-</span><span class='line'>            <span class="na">android:inputType=</span><span class="s">&quot;text&quot;</span>
-</span><span class='line'>            <span class="na">android:hint=</span><span class="s">&quot;Enter a Task&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;requestFocus</span> <span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/EditText&gt;</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="nt">&lt;Button</span>
-</span><span class='line'>            <span class="na">android:id=</span><span class="s">&quot;@+id/submit_button&quot;</span>
-</span><span class='line'>            <span class="na">android:layout_width=</span><span class="s">&quot;wrap_content&quot;</span>
-</span><span class='line'>            <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
-</span><span class='line'>            <span class="na">android:onClick=</span><span class="s">&quot;createTask&quot;</span>
-</span><span class='line'>            <span class="na">android:text=</span><span class="s">&quot;Submit&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/LinearLayout&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;ListView</span>
-</span><span class='line'>        <span class="na">android:id=</span><span class="s">&quot;@+id/task_list&quot;</span>
-</span><span class='line'>        <span class="na">android:layout_width=</span><span class="s">&quot;match_parent&quot;</span>
-</span><span class='line'>        <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;/LinearLayout&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Here we are declaring a layout that contains an input field and a button (for creating new tasks), as well as a ListView for showing the existing tasks. If you run what we&rsquo;ve done so far, you should end up with an application on your device that looks like this:</p>
-
-<p><img class="center" src="http://michaelevans.org/images/2013/08/14/step1.png" width="300" height="500" title="First Run" ></p>
-
-<p>You can type in the input box, but if you hit the submit button, you&rsquo;ll notice the app will crash. Why&rsquo;s that? Because we said in our XML that the button will perform the <code>createTask</code> method when you click on it, but we never declared that method in our activity. Let&rsquo;s do that now.</p>
-
-<p>In your onCreate method, let&rsquo;s get a reference to the EditText and ListView, since we&rsquo;ll be using these later. You can do that by declaring using the <code>findViewById()</code> method. We&rsquo;ll save the results of these calls as private variables. For example:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">mTaskInput</span> <span class="o">=</span> <span class="o">(</span><span class="n">EditText</span><span class="o">)</span> <span class="n">findViewById</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">task_input</span><span class="o">);</span>
-</span><span class='line'><span class="n">mListView</span> <span class="o">=</span> <span class="o">(</span><span class="n">ListView</span><span class="o">)</span> <span class="n">findViewById</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">task_list</span><span class="o">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Then we can create the createTask method:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">createTask</span><span class="o">(</span><span class="n">View</span> <span class="n">v</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">if</span> <span class="o">(</span><span class="n">mTaskInput</span><span class="o">.</span><span class="na">getText</span><span class="o">().</span><span class="na">length</span><span class="o">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">){</span>
-</span><span class='line'>          <span class="n">Task</span> <span class="n">t</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Task</span><span class="o">();</span>
-</span><span class='line'>          <span class="n">t</span><span class="o">.</span><span class="na">setDescription</span><span class="o">(</span><span class="n">mTaskInput</span><span class="o">.</span><span class="na">getText</span><span class="o">().</span><span class="na">toString</span><span class="o">());</span>
-</span><span class='line'>          <span class="n">t</span><span class="o">.</span><span class="na">setCompleted</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
-</span><span class='line'>          <span class="n">t</span><span class="o">.</span><span class="na">saveEventually</span><span class="o">();</span>
-</span><span class='line'>          <span class="n">mTaskInput</span><span class="o">.</span><span class="na">setText</span><span class="o">(</span><span class="s">&quot;&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>  <span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>What we are doing here is checking to see if the input has anything in it (don&rsquo;t want to create a task without a description), creating a new Task object, setting its fields, and then calling <code>saveEventually()</code>. This is a convenience method from Parse, that will queue this object to be saved. That way, if the user doesn&rsquo;t have a network connection, the task will be uploaded later when they are back online. Finally, we empty out the input field so that it&rsquo;s ready for another task.</p>
-
-<p>Now if you type in a task and hit save, the input field will be blank, but if you go to your Parse Console, you&rsquo;ll see the data in the data browser:</p>
-
-<p><img class="center" src="http://michaelevans.org/images/2013/08/14/parse_console.png" width="800" height="800" title="Parse Console" ></p>
-
-<p>Now let&rsquo;s set up the app to fetch the Tasks from Parse.</p>
-
-<h3>Querying</h3>
-
-<p>First let&rsquo;s set up a TaskAdapter. An adapter is what you add to a ListView to decide what kind of behavior the list will have (layout of each row, etc.) Create a new class called TaskAdapter that extends from ArrayAdapter like the following:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">android.content.Context</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">android.graphics.Paint</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">android.view.LayoutInflater</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">android.view.View</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">android.view.ViewGroup</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">android.widget.ArrayAdapter</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">android.widget.TextView</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">TaskAdapter</span> <span class="kd">extends</span> <span class="n">ArrayAdapter</span><span class="o">&lt;</span><span class="n">Task</span><span class="o">&gt;</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">Context</span> <span class="n">mContext</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Task</span><span class="o">&gt;</span> <span class="n">mTasks</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="nf">TaskAdapter</span><span class="o">(</span><span class="n">Context</span> <span class="n">context</span><span class="o">,</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Task</span><span class="o">&gt;</span> <span class="n">objects</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="kd">super</span><span class="o">(</span><span class="n">context</span><span class="o">,</span> <span class="n">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">task_row_item</span><span class="o">,</span> <span class="n">objects</span><span class="o">);</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">mContext</span> <span class="o">=</span> <span class="n">context</span><span class="o">;</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">mTasks</span> <span class="o">=</span> <span class="n">objects</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">View</span> <span class="nf">getView</span><span class="o">(</span><span class="kt">int</span> <span class="n">position</span><span class="o">,</span> <span class="n">View</span> <span class="n">convertView</span><span class="o">,</span> <span class="n">ViewGroup</span> <span class="n">parent</span><span class="o">){</span>
-</span><span class='line'>      <span class="k">if</span><span class="o">(</span><span class="n">convertView</span> <span class="o">==</span> <span class="kc">null</span><span class="o">){</span>
-</span><span class='line'>          <span class="n">LayoutInflater</span> <span class="n">mLayoutInflater</span> <span class="o">=</span> <span class="n">LayoutInflater</span><span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="n">mContext</span><span class="o">);</span>
-</span><span class='line'>          <span class="n">convertView</span> <span class="o">=</span> <span class="n">mLayoutInflater</span><span class="o">.</span><span class="na">inflate</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">task_row_item</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="n">Task</span> <span class="n">task</span> <span class="o">=</span> <span class="n">mTasks</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">position</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="n">TextView</span> <span class="n">descriptionView</span> <span class="o">=</span> <span class="o">(</span><span class="n">TextView</span><span class="o">)</span> <span class="n">convertView</span><span class="o">.</span><span class="na">findViewById</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">task_description</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="n">descriptionView</span><span class="o">.</span><span class="na">setText</span><span class="o">(</span><span class="n">task</span><span class="o">.</span><span class="na">getDescription</span><span class="o">());</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="k">if</span><span class="o">(</span><span class="n">task</span><span class="o">.</span><span class="na">isCompleted</span><span class="o">()){</span>
-</span><span class='line'>          <span class="n">descriptionView</span><span class="o">.</span><span class="na">setPaintFlags</span><span class="o">(</span><span class="n">descriptionView</span><span class="o">.</span><span class="na">getPaintFlags</span><span class="o">()</span> <span class="o">|</span> <span class="n">Paint</span><span class="o">.</span><span class="na">STRIKE_THRU_TEXT_FLAG</span><span class="o">);</span>
-</span><span class='line'>      <span class="o">}</span><span class="k">else</span><span class="o">{</span>
-</span><span class='line'>          <span class="n">descriptionView</span><span class="o">.</span><span class="na">setPaintFlags</span><span class="o">(</span><span class="n">descriptionView</span><span class="o">.</span><span class="na">getPaintFlags</span><span class="o">()</span> <span class="o">&amp;</span> <span class="o">(~</span><span class="n">Paint</span><span class="o">.</span><span class="na">STRIKE_THRU_TEXT_FLAG</span><span class="o">));</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="k">return</span> <span class="n">convertView</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This class will take an array of Tasks, and for each row in the ListView, set a TextView with the id <code>task_description</code> to the description value, and set a paint flag for Strikethrough if the task is completed. You&rsquo;ll also notice that this class inflates a layout called <code>task_row_item</code>, which we can create now.</p>
-
-<p>In the <code>res/layouts/</code> folder, create a file called &lsquo;task_row_item.xml&rsquo;, and fill it with the following content:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;LinearLayout</span> <span class="na">xmlns:android=</span><span class="s">&quot;http://schemas.android.com/apk/res/android&quot;</span>
-</span><span class='line'>    <span class="na">android:layout_width=</span><span class="s">&quot;match_parent&quot;</span>
-</span><span class='line'>    <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
-</span><span class='line'>    <span class="na">android:paddingTop=</span><span class="s">&quot;@dimen/activity_vertical_margin&quot;</span>
-</span><span class='line'>    <span class="na">android:paddingBottom=</span><span class="s">&quot;@dimen/activity_vertical_margin&quot;</span>
-</span><span class='line'>    <span class="na">android:orientation=</span><span class="s">&quot;horizontal&quot;</span> <span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;TextView</span>
-</span><span class='line'>        <span class="na">android:id=</span><span class="s">&quot;@+id/task_description&quot;</span>
-</span><span class='line'>        <span class="na">android:layout_width=</span><span class="s">&quot;0dp&quot;</span>
-</span><span class='line'>        <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
-</span><span class='line'>        <span class="na">android:layout_gravity=</span><span class="s">&quot;center_vertical&quot;</span>
-</span><span class='line'>        <span class="na">android:layout_weight=</span><span class="s">&quot;1&quot;</span>
-</span><span class='line'>        <span class="na">android:textAppearance=</span><span class="s">&quot;?android:attr/textAppearanceMedium&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;/LinearLayout&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This is just a basic TextView which will hold the description of the item. Now that we have the adapter set up, let&rsquo;s create one and apply it to our ListView. Back in the onCreate method of our Activity, create an instance of our TaskAdapter, and set its initial contents to a new ArrayList of Tasks, and then set the adapter of our ListView to this adapter.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">mAdapter</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TaskAdapter</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Task</span><span class="o">&gt;());</span>
-</span><span class='line'><span class="n">mListView</span><span class="o">.</span><span class="na">setAdapter</span><span class="o">(</span><span class="n">mAdapter</span><span class="o">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>You&rsquo;ll notice that nothing happens if you run the application again, since we didn&rsquo;t yet fetch any data from Parse. Create a new method called <code>updateData()</code> and put in the following code: (be sure to make a call to this method at the end of <code>onCreate()</code>)</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">updateData</span><span class="o">(){</span>
-</span><span class='line'>  <span class="n">ParseQuery</span><span class="o">&lt;</span><span class="n">Task</span><span class="o">&gt;</span> <span class="n">query</span> <span class="o">=</span> <span class="n">ParseQuery</span><span class="o">.</span><span class="na">getQuery</span><span class="o">(</span><span class="n">Task</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
-</span><span class='line'>  <span class="n">query</span><span class="o">.</span><span class="na">findInBackground</span><span class="o">(</span><span class="k">new</span> <span class="n">FindCallback</span><span class="o">&lt;</span><span class="n">Task</span><span class="o">&gt;()</span> <span class="o">{</span>
-</span><span class='line'>          
-</span><span class='line'>      <span class="nd">@Override</span>
-</span><span class='line'>      <span class="kd">public</span> <span class="kt">void</span> <span class="nf">done</span><span class="o">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Task</span><span class="o">&gt;</span> <span class="n">tasks</span><span class="o">,</span> <span class="n">ParseException</span> <span class="n">error</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>          <span class="k">if</span><span class="o">(</span><span class="n">tasks</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">){</span>
-</span><span class='line'>              <span class="n">mAdapter</span><span class="o">.</span><span class="na">clear</span><span class="o">();</span>
-</span><span class='line'>              <span class="n">mAdapter</span><span class="o">.</span><span class="na">addAll</span><span class="o">(</span><span class="n">tasks</span><span class="o">);</span>
-</span><span class='line'>          <span class="o">}</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>  <span class="o">});</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This will query Parse for all the Task objects, and return a list of them. Then we will clear the existing set of Tasks from our adapter, and replace the existing list with those. Now if you run the app, you&rsquo;ll be greeted with something like the following:</p>
-
-<p><img class="center" src="http://michaelevans.org/images/2013/08/14/step2.png" width="300" height="500" title="Step 2" ></p>
-
-<p>Let&rsquo;s also add this to our <code>createTask()</code> method, to insert the Task we just created at the top of the list:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">mAdapter</span><span class="o">.</span><span class="na">insert</span><span class="o">(</span><span class="n">t</span><span class="o">,</span> <span class="mi">0</span><span class="o">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This will provide the user with an immediate hint of what happened, rather than uploading it, and waiting to resync the data or something.</p>
-
-<p>Now we&rsquo;re starting to have a functional app! Let&rsquo;s add one more feature though. When you tap on a ListView row, the &ldquo;completed&rdquo; status of the task should toggle.</p>
-
-<h3>Let&rsquo;s Toggle!</h3>
-
-<p>Let&rsquo;s register an OnItemClickListener for our class, so that we&rsquo;ll get a callback whenever a list item is clicked. We can do that with a call to</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">mListView</span><span class="o">.</span><span class="na">setOnItemClickListener</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Then we just make our Activity implement the <code>OnItemClickListener</code> interface, and override the <code>onItemClick</code> method. We can use some code like this:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Override</span>
-</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">onItemClick</span><span class="o">(</span><span class="n">AdapterView</span><span class="o">&lt;?&gt;</span> <span class="n">parent</span><span class="o">,</span> <span class="n">View</span> <span class="n">view</span><span class="o">,</span> <span class="kt">int</span> <span class="n">position</span><span class="o">,</span> <span class="kt">long</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">Task</span> <span class="n">task</span> <span class="o">=</span> <span class="n">mAdapter</span><span class="o">.</span><span class="na">getItem</span><span class="o">(</span><span class="n">position</span><span class="o">);</span>
-</span><span class='line'>  <span class="n">TextView</span> <span class="n">taskDescription</span> <span class="o">=</span> <span class="o">(</span><span class="n">TextView</span><span class="o">)</span> <span class="n">view</span><span class="o">.</span><span class="na">findViewById</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">task_description</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">task</span><span class="o">.</span><span class="na">setCompleted</span><span class="o">(!</span><span class="n">task</span><span class="o">.</span><span class="na">isCompleted</span><span class="o">());</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">if</span><span class="o">(</span><span class="n">task</span><span class="o">.</span><span class="na">isCompleted</span><span class="o">()){</span>
-</span><span class='line'>      <span class="n">taskDescription</span><span class="o">.</span><span class="na">setPaintFlags</span><span class="o">(</span><span class="n">taskDescription</span><span class="o">.</span><span class="na">getPaintFlags</span><span class="o">()</span> <span class="o">|</span> <span class="n">Paint</span><span class="o">.</span><span class="na">STRIKE_THRU_TEXT_FLAG</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span><span class="k">else</span><span class="o">{</span>
-</span><span class='line'>      <span class="n">taskDescription</span><span class="o">.</span><span class="na">setPaintFlags</span><span class="o">(</span><span class="n">taskDescription</span><span class="o">.</span><span class="na">getPaintFlags</span><span class="o">()</span> <span class="o">&amp;</span> <span class="o">(~</span><span class="n">Paint</span><span class="o">.</span><span class="na">STRIKE_THRU_TEXT_FLAG</span><span class="o">));</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">task</span><span class="o">.</span><span class="na">saveEventually</span><span class="o">();</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This will toggle the completion status of the clicked item, and then update the strikethrough, just as we did in the ArrayAdapter before. Then we&rsquo;ll make another call to <code>saveEventually()</code>, to update that task on Parse&rsquo;s servers, when a network connection is available.</p>
-
-<p>That&rsquo;s it! Now you should be able to launch the application, and create, complete and un-complete tasks as you wish!</p>
-
-<p><img class="center" src="http://michaelevans.org/images/2013/08/14/step3.png" width="300" height="500" title="Step 2" ></p>
-
-<h2>Optimizations/Improvements</h2>
-
-<p>Let&rsquo;s make some quick improvements to the app. First, let&rsquo;s extract the hardcoded strings in our layout to a strings.xml file, so that we can support other languages. Change the text in the <code>android:text=</code> attributes to something like <code>@string/submit_text</code>, and create a <code>strings.xml</code> file in <code>res/values</code> where these strings will live. This allows you to create other values folders for quick localization.</p>
-
-<p>The other optimization that we&rsquo;ll make is regarding the caching. You&rsquo;ll notice that if you leave the application and come back, you&rsquo;re left with a blank white screen while the Tasks are loaded from Parse. This is a bit ugly, and leaves a bad user experience. We can mitigate that by adding caching, where the results of our query will be saved locally so that we have results instantly, and then we can request the updated tasks from the network. With Parse, this is dead simple. Add the following snippet to your <code>query</code> object before you do a findInBackground:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">query</span><span class="o">.</span><span class="na">setCachePolicy</span><span class="o">(</span><span class="n">CachePolicy</span><span class="o">.</span><span class="na">CACHE_THEN_NETWORK</span><span class="o">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now when you load up the app, you&rsquo;ll see the tasks from last time in the list, while the network is being queried.</p>
-
-<h2>Possibilities for Next Time</h2>
-
-<p>Next time we can take a look at adding multi-user support (so that not everyone shares a task list), and possibly some fancier UI, like a swipe-to-remove feature. Feel free to make other suggestions of things you&rsquo;d like to see!</p>
-
-<p><strong>You can download the APK for this tutorial <a href="https://app.box.com/s/e79stk16p1b92w937e6q">here</a>, and find the source on Github <a href="https://github.com/MichaelEvans/Parse-Android-Todo">here</a>.</strong></p>
 
 <hr />
 

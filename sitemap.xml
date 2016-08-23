@@ -181,15 +181,21 @@
         <lastmod>2016-07-07T00:35:46-04:00</lastmod>
     </url>
     <url>
+        <loc>
+            http://michaelevans.org/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/
+        </loc>
+        <lastmod>2016-08-23T18:46:06-04:00</lastmod>
+    </url>
+    <url>
         <loc>http://michaelevans.org/blog/2016/08/23/enabling-night-mode-on-android-nougat/</loc>
-        <lastmod>2016-08-23T18:43:57-04:00</lastmod>
+        <lastmod>2016-08-23T19:00:45-04:00</lastmod>
     </url>
     <url>
         <loc>http://michaelevans.org/blog/archives/</loc>
-        <lastmod>2016-08-23T18:43:57-04:00</lastmod>
+        <lastmod>2016-08-23T19:00:45-04:00</lastmod>
     </url>
     <url>
         <loc>http://michaelevans.org/</loc>
-        <lastmod>2016-08-23T18:43:57-04:00</lastmod>
+        <lastmod>2016-08-23T19:00:45-04:00</lastmod>
     </url>
 </urlset>

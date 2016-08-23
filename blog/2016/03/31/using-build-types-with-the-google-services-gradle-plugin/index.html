@@ -6,12 +6,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="msvalidate.01" content="275BF9CDA457668389C1F9916C380DD0" />
-  <title>Nexus Q Review - Michael Evans</title>
+  <title>Using Build Types with the Google Services Gradle Plugin - Michael Evans</title>
   <meta name="author" content="Michael Evans">
 
   
-  <meta name="description" content="Review of the Nexus Q from Google IO">
-  <meta name="keywords" content="Google, Review, Nexus Q, Nexus Q Review, Google IO">
+  <meta name="description" content="Using Build Types with the Google Services Gradle Plugin">
+  <meta name="keywords" content="Android, Development">
 
   <!-- http://t.co/dKP3o1e -->
   <meta name="HandheldFriendly" content="True">
@@ -19,7 +19,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://michaelevans.org/blog/2012/09/07/nexus-q-review/">
+  <link rel="canonical" href="http://michaelevans.org/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -82,7 +82,7 @@
   
   <header>
     
-      <h1 class="entry-title">Nexus Q Review</h1>
+      <h1 class="entry-title">Using Build Types With the Google Services Gradle Plugin</h1>
     
     
       <p class="meta">
@@ -98,7 +98,7 @@
   
 
 
-<time datetime="2012-09-07T20:11:00-04:00" pubdate data-updated="true">Sep 7<span>th</span>, 2012</time>
+<time datetime="2016-03-31T21:11:55-04:00" pubdate data-updated="true">Mar 31<span>st</span>, 2016</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -107,25 +107,49 @@
   </header>
 
 
-<div class="entry-content"><p>It’s a <em>what</em>? Ever since I returned from Google I/O, this is what people have been saying when they see the newest addition to my TV setup, the Nexus Q. It’s hard to blame them though, since it just looks so different, for a home theatre device. unlike those bland, black boxes that most living rooms are filled with, the Nexus Q is a heavy (about two pounds) sphere, which is lit by a ring of 32 LEDs. The top side of the Q spins freely to function as a volume knob, and can be tapped to mute.</p>
+<div class="entry-content"><p>If you want to integrate your Android app with most of Google Play Services nowadays, you&rsquo;ll find that you are instructed to set up the <a href="https://developers.google.com/android/guides/google-services-plugin">Google Services Gradle plugin</a> to handle configuring dependencies. The plugin allows you to drop a JSON file into your project, and then the plugin will do a bunch of the configuration for your project, such as handling the API keys.</p>
 
-<p><img src="/images/2012/09/07/q.jpeg" width="400" height="400" title="Nexus Q" ></p>
+<p>This is all well and good—unless you&rsquo;re like me (<a href="https://github.com/googlesamples/google-services/issues/54">and countless others</a>) and want to use a different configuration for your debug and release builds. This would be useful, as an example, if you use Google Play Services for GCM and would like to have development builds recieve pushes from non-production systems.</p>
 
-<p>On the back of the Q, things are less clean. There’s both micro HDMI and optical audio out, ethernet and a micro USB port for “encouraged hacking”. There’s also a set of banana connectors to allow you to hook up speakers to the built in 25-watt amplifier.</p>
+<p>It seems that the plugin is configured in such a way that it supports build flavors, but it does not yet support build types. However, with a little Gradle magic, we can hack that support in.</p>
 
-<p>So how’s the UI of the Nexus Q, you might ask. Does it look as smooth as Jelly Bean does on the other devices that I <a href="/blog/2012/07/03/nexus-7-review/">showed you a few weeks ago</a>? Funny thing is, the Nexus Q doesn’t have a UI of it’s own; it requires an Android device to set up. All you need to do is tap an NFC enabled device to the sphere, and it will take you to download the Nexus Q app from Google Play. Start up the app, log in with your Google account, and you’re all set to use the Q.</p>
+<!-- more -->
 
-<p>Since the Q doesn’t have it’s own UI, let’s take a look at the <a href="https://play.google.com/store/apps/details?id=com.google.android.setupwarlock">Nexus Q app for Android</a>.</p>
 
-<p><img src="/images/2012/09/07/qapp.jpeg" width="400" height="400" title="Nexus Q App" ></p>
+<p><strong>Disclaimer: This approach worked for me—but as with any hack, it is subject to break.</strong></p>
 
-<p>You don&rsquo;t really use the app for anything after setting up the Q initially, all the media is controlled through the Play Music, Play Movies and Youtube apps. All you need to do is hit the little triangle that will appear when you&rsquo;re on the same network as a Q.</p>
+<p>So how can we go about doing this? We want to put the debug JSON file into the root of our app module during debug builds and use the release one for release builds. If you don&rsquo;t do that, or if you attempt to put it in <code>app/debug</code> and <code>app/release</code>, you&rsquo;ll get an error that says <code>File google-services.json is missing from module root folder. The Google Services Plugin cannot function without it</code>.</p>
 
-<p><img src="/images/2012/09/07/music.png" width="400" height="400" title="Play Music with Q" ></p>
+<p>This error is thrown by a task named <code>process{VariantName}GoogleServices</code>. What we could do to solve this is swap the file in before that task is run! Using a little Groovy magic, I came up with this:</p>
 
-<p>My biggest complaint about the Q is the way you set it up to involve your friends. First you need to enable guest mode from the Q app, and then manually invite all the people you want to have access, which actually sends them an <strong>email</strong> to download the app. This seems like such a convoluted process, and I doubt people will actually care to do this. Not only that, but I see no way of revoking someone’s ability to use the Q after you’ve invited them. We all know that one person who takes their music privileges a little too far, but it seems that the only recourse in that event is to turn guest mode off all together.</p>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">android</span><span class="o">.</span><span class="na">applicationVariants</span><span class="o">.</span><span class="na">all</span> <span class="o">{</span> <span class="n">variant</span> <span class="o">-&gt;</span>
+</span><span class='line'>    <span class="kt">def</span> <span class="n">hackTask</span> <span class="o">=</span> <span class="n">task</span><span class="o">(</span><span class="s2">&quot;hackGps${variant.name.capitalize()}&quot;</span><span class="o">)</span> <span class="o">&lt;&lt;</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">copy</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">from</span> <span class="n">rootProject</span><span class="o">.</span><span class="na">file</span><span class="o">(</span><span class="s2">&quot;config/${variant.buildType.name}/google-services.json&quot;</span><span class="o">)</span>
+</span><span class='line'>            <span class="n">into</span> <span class="s2">&quot;${projectDir}&quot;</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="kt">def</span> <span class="n">googleTask</span> <span class="o">=</span> <span class="n">tasks</span><span class="o">.</span><span class="na">findByName</span><span class="o">(</span><span class="s2">&quot;process${variant.name.capitalize()}GoogleServices&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">googleTask</span><span class="o">.</span><span class="na">dependsOn</span> <span class="n">hackTask</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>Is it work $300 right now? Probably not, no. Unless you’re a huge consumer of Play media, you’ll probably be better off with a Roku, or something like that. Even if you <strong>are</strong> a consumer of Play content, you’re probably better off with a Google TV, since after all, that does other things.</p>
+
+<p>For each one of your variants, this code will create a new task &ndash; <code>hackGps{VariantName}</code>, which copies a <code>google-services.json</code> file from a <code>config</code> directory into the root of your app module. Then it finds the corresponding Google Services task, and hooks itself in to run right before that! Now when you assemble your application, the right <code>google-services.json</code> file will be in the right place, ready to be picked up by the plugin.</p>
+
+<p><em>You might also want to .gitignore the <code>app/google-services.json</code> file, so that you don&rsquo;t keep committing the changed file to git</em></p>
+
+<p>Hopefully Google will fix this issue in an upcoming release of the Google Services plugin, but until then &ndash; this technique should work!</p>
 </div>
 
 
@@ -148,12 +172,12 @@
   
 
 
-<time datetime="2012-09-07T20:11:00-04:00" pubdate data-updated="true">Sep 7<span>th</span>, 2012</time>
+<time datetime="2016-03-31T21:11:55-04:00" pubdate data-updated="true">Mar 31<span>st</span>, 2016</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/nexus-q/'>Nexus Q</a>, <a class='category' href='/blog/categories/review/'>Review</a>
+    <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/development/'>Development</a>, <a class='category' href='/blog/categories/gradle/'>Gradle</a>
   
 </span>
 
@@ -162,7 +186,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://michaelevans.org/blog/2012/09/07/nexus-q-review/" data-via="m_evans10" data-counturl="http://michaelevans.org/blog/2012/09/07/nexus-q-review/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://michaelevans.org/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/" data-via="m_evans10" data-counturl="http://michaelevans.org/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -175,10 +199,10 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2012/07/03/nexus-7-review/" title="Previous Post: Nexus 7 Review">&laquo; Nexus 7 Review</a>
+        <a class="basic-alignment left" href="/blog/2016/03/09/changelog-for-n-support-libraries/" title="Previous Post: Changelog for N Support Libraries">&laquo; Changelog for N Support Libraries</a>
       
       
-        <a class="basic-alignment right" href="/blog/2012/12/20/vmware-easy-install-stuck-on-ubuntu-12-dot-04/" title="Next Post: VMware 'Easy Install' stuck on Ubuntu 12.04">VMware 'Easy Install' stuck on Ubuntu 12.04 &raquo;</a>
+        <a class="basic-alignment right" href="/blog/2016/08/23/enabling-night-mode-on-android-nougat/" title="Next Post: Enabling Night Mode on Android Nougat">Enabling Night Mode on Android Nougat &raquo;</a>
       
     </p>
   </footer>
@@ -282,8 +306,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://michaelevans.org/blog/2012/09/07/nexus-q-review/';
-        var disqus_url = 'http://michaelevans.org/blog/2012/09/07/nexus-q-review/';
+        var disqus_identifier = 'http://michaelevans.org/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/';
+        var disqus_url = 'http://michaelevans.org/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/';
         var disqus_script = 'embed.js';
       
     (function () {

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Development | Michael Evans]]></title>
   <link href="http://michaelevans.org/blog/categories/development/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2016-08-23T18:45:00-04:00</updated>
+  <updated>2016-08-23T19:01:12-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -12,6 +12,50 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Using Build Types with the Google Services Gradle Plugin]]></title>
+    <link href="http://michaelevans.org/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/"/>
+    <updated>2016-03-31T21:11:55-04:00</updated>
+    <id>http://michaelevans.org/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin</id>
+    <content type="html"><![CDATA[<p>If you want to integrate your Android app with most of Google Play Services nowadays, you&rsquo;ll find that you are instructed to set up the <a href="https://developers.google.com/android/guides/google-services-plugin">Google Services Gradle plugin</a> to handle configuring dependencies. The plugin allows you to drop a JSON file into your project, and then the plugin will do a bunch of the configuration for your project, such as handling the API keys.</p>
+
+<p>This is all well and good—unless you&rsquo;re like me (<a href="https://github.com/googlesamples/google-services/issues/54">and countless others</a>) and want to use a different configuration for your debug and release builds. This would be useful, as an example, if you use Google Play Services for GCM and would like to have development builds recieve pushes from non-production systems.</p>
+
+<p>It seems that the plugin is configured in such a way that it supports build flavors, but it does not yet support build types. However, with a little Gradle magic, we can hack that support in.</p>
+
+<!-- more -->
+
+
+<p><strong>Disclaimer: This approach worked for me—but as with any hack, it is subject to break.</strong></p>
+
+<p>So how can we go about doing this? We want to put the debug JSON file into the root of our app module during debug builds and use the release one for release builds. If you don&rsquo;t do that, or if you attempt to put it in <code>app/debug</code> and <code>app/release</code>, you&rsquo;ll get an error that says <code>File google-services.json is missing from module root folder. The Google Services Plugin cannot function without it</code>.</p>
+
+<p>This error is thrown by a task named <code>process{VariantName}GoogleServices</code>. What we could do to solve this is swap the file in before that task is run! Using a little Groovy magic, I came up with this:</p>
+
+<p>```groovy
+android.applicationVariants.all { variant &ndash;></p>
+
+<pre><code>def hackTask = task("hackGps${variant.name.capitalize()}") &lt;&lt; {
+    copy {
+        from rootProject.file("config/${variant.buildType.name}/google-services.json")
+        into "${projectDir}"
+    }
+}
+def googleTask = tasks.findByName("process${variant.name.capitalize()}GoogleServices")
+googleTask.dependsOn hackTask
+</code></pre>
+
+<p>}
+```</p>
+
+<p>For each one of your variants, this code will create a new task &ndash; <code>hackGps{VariantName}</code>, which copies a <code>google-services.json</code> file from a <code>config</code> directory into the root of your app module. Then it finds the corresponding Google Services task, and hooks itself in to run right before that! Now when you assemble your application, the right <code>google-services.json</code> file will be in the right place, ready to be picked up by the plugin.</p>
+
+<p><em>You might also want to .gitignore the <code>app/google-services.json</code> file, so that you don&rsquo;t keep committing the changed file to git</em></p>
+
+<p>Hopefully Google will fix this issue in an upcoming release of the Google Services plugin, but until then &ndash; this technique should work!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Changelog for N Support Libraries]]></title>
@@ -632,128 +676,6 @@ intended(allOf(hasAction(Intent.ACTION_DIAL), hasData(INTENT_DATA_PHONE_NUMBER))
 <p><iframe width="640" height="510" src="http://www.youtube.com/embed/dBUAqPs0TB0 " frameborder="0" webkitAllowFullScreen mozallowfullscreen allowfullscreen></iframe></p>
 
 <p><script async="true" class="speakerdeck-embed" data-id="95e696d902d845dcb5079e0691eb5f3f" data-ratio="1.77777777777778" src="//speakerdeck.com/assets/embed.js"> </script></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Using Espresso for Easy UI Testing]]></title>
-    <link href="http://michaelevans.org/blog/2015/08/03/using-espresso-for-easy-ui-testing/"/>
-    <updated>2015-08-03T22:16:49-04:00</updated>
-    <id>http://michaelevans.org/blog/2015/08/03/using-espresso-for-easy-ui-testing</id>
-    <content type="html"><![CDATA[<p>One thing that I notice when I talk to Android developers is that a lot of them don&rsquo;t put an emphasis on testing. They say that it&rsquo;s too hard to write them or that they are too hard to integrate and set up, or give a bunch of other reasons why they don&rsquo;t. But it&rsquo;s actually pretty simple to write <a href="https://code.google.com/p/android-test-kit/wiki/Espresso">Espresso</a> tests, and they really aren&rsquo;t that hard to integrate with your code base.</p>
-
-<!-- more -->
-
-
-<h2>Easy to write</h2>
-
-<p>Espresso tests are dead simple to write. They come in three parts.</p>
-
-<ol>
-<li>ViewMatchers &ndash; something to find the view to act upon/assert something about</li>
-<li>ViewActions &ndash; something to perform an action (type text, click a button)</li>
-<li>ViewAssertions &ndash; something to verify what you expect</li>
-</ol>
-
-
-<p>For example, the following test would type the name &ldquo;Steve&rdquo; into an EditText with the id <code>name_field</code>, click a Button with the id <code>greet_button</code> and then verify that the text &ldquo;Hello Steve!&rdquo; appears on the screen:</p>
-
-<p><code>java
-@Test
-public void testSayHello() {
-  onView(withId(R.id.name_field)).perform(typeText("Steve"));
-  onView(withId(R.id.greet_button)).perform(click());
-  onView(withText("Hello Steve!")).check(matches(isDisplayed()));
-}
-</code></p>
-
-<p>Seems simple enough right? But what about when other threads are involved?</p>
-
-<h2>Integration</h2>
-
-<p>From the Espresso documentation:</p>
-
-<p><blockquote><p>The centerpiece of Espresso is its ability to seamlessly synchronize all test operations with the application under test. By default, Espresso waits for UI events in the current message queue to process and default AsyncTasks* to complete before it moves on to the next test operation. This should address the majority of application/test synchronization in your application.&ldquo;</p></blockquote></p>
-
-<p>But if you&rsquo;re like me, you&rsquo;re not writing AsyncTasks to handle your background operations. My go-to tool for making HTTP requests (probably one of the most common uses of AsyncTask) is <a href="http://square.github.io/retrofit/">Retrofit</a>. So what can we do? Espresso has an API called <code>registerIdlingResource</code>, which allows you to synchronize your custom logic with Espresso.</p>
-
-<p>With this knowledge, one way you might approach this is to implement a mock version of your Retrofit interface, and then use something like this:</p>
-
-<p>```java
-public class MockApiService implements ApiService, IdlingResource {</p>
-
-<pre><code>private final ApiService api;
-private final AtomicInteger counter;
-private final List&lt;ResourceCallback&gt; callbacks;
-
-public MockApiService(ApiService api) {
-    this.api = api;
-    this.callbacks = new ArrayList&lt;&gt;(); 
-    this.counter = new AtomicInteger(0);
-}
-
-@Override
-public Response doWork() {
-    counter.incrementAndGet();
-    return decrementAndNotify(api.doWork());
-}
-
-@Override
-public String getName() {
-    return this.getClass().getName();
-}
-
-@Override
-public boolean isIdleNow() {
-    return counter.get() == 0;
-}
-
-@Override
-public void registerIdleTransitionCallback(ResourceCallback resourceCallback) {
-    callbacks.add(resourceCallback);
-}
-
-private &lt;T&gt; T decrementAndNotify(T data) {
-    counter.decrementAndGet();
-    notifyIdle();
-    return data;
-}
-
-private void notifyIdle() {
-    if (counter.get() == 0) {
-        for (ResourceCallback cb : callbacks) {
-            cb.onTransitionToIdle();
-        }
-    }
-}
-</code></pre>
-
-<p>}
-```</p>
-
-<p>This tells Espresso that your app is idle after the methods are called. But you should immediately see the problem here &ndash; you&rsquo;ll end up writing a TON of boilerplate. As you have more methods in your interface, and lot of repeated increment and decrement code&hellip;there must be a better way. (There is!)</p>
-
-<p>The &ldquo;trick&rdquo; lies right in the selling point in the Espresso documentation, &ldquo;Espresso waits for UI events&hellip; and default <em><strong>AsyncTasks</strong></em> to complete&rdquo;. If we could somehow execute our Retrofit requests on the AsyncTasks' ThreadPoolExecutor, we&rsquo;d get sychronization for free!</p>
-
-<p>Fortunately, Retrofit&rsquo;s <code>RestAdapter.Builder</code> class has just such a method!</p>
-
-<p><code>java
-new RestAdapter.Builder()
-   .setExecutors(AsyncTask.THREAD_POOL_EXECUTOR, new MainThreadExecutor())
-   .build();
-</code></p>
-
-<p>And it&rsquo;s that simple &ndash; Now you have no excuse not to write some Espresso tests!</p>
-
-<h4>More Resources</h4>
-
-<ul>
-<li><a href="https://code.google.com/p/android-test-kit/wiki/EspressoV2CheatSheet">The Espresso V2 Cheatsheet</a></li>
-<li><a href="http://blog.sqisland.com/2015/04/espresso-custom-idling-resource.html">Read more about writing custom idling resources</a></li>
-</ul>
-
-
-<p>Thanks to <a href="https://twitter.com/queencodemonkey">Huyen Tue Dao</a> for editing this post!</p>
 ]]></content>
   </entry>
   
