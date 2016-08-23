@@ -10,7 +10,7 @@
   <meta name="author" content="Michael Evans">
 
   
-  <meta name="description" content="If you want to integrate your Android app with most of Google Play Services nowadays, you&rsquo;ll find that you are instructed to set up the Google &hellip;">
+  <meta name="description" content="If you&rsquo;re like me, you loved the Night Mode feature that was added to the Nougat Developer Preview a few months ago. You might have been &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,7 +85,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/">Using Build Types With the Google Services Gradle Plugin</a></h1>
+      <h1 class="entry-title"><a href="/blog/2016/08/23/enabling-night-mode-on-android-nougat/">Enabling Night Mode on Android Nougat</a></h1>
     
     
       <p class="meta">
@@ -101,27 +101,35 @@
   
 
 
-<time datetime="2016-03-31T21:11:55-04:00" pubdate data-updated="true">Mar 31<span>st</span>, 2016</time>
+<time datetime="2016-08-23T18:27:01-04:00" pubdate data-updated="true">Aug 23<span>rd</span>, 2016</time>
         
-         | <a href="/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/#disqus_thread">Comments</a>
+         | <a href="/blog/2016/08/23/enabling-night-mode-on-android-nougat/#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>If you want to integrate your Android app with most of Google Play Services nowadays, you&rsquo;ll find that you are instructed to set up the <a href="https://developers.google.com/android/guides/google-services-plugin">Google Services Gradle plugin</a> to handle configuring dependencies. The plugin allows you to drop a JSON file into your project, and then the plugin will do a bunch of the configuration for your project, such as handling the API keys.</p>
+  <div class="entry-content"><p>If you&rsquo;re like me, you loved the <a href="http://www.androidpolice.com/2016/03/09/android-n-feature-spotlight-night-mode-is-back-with-expanded-features-including-red-filter-and-brightness/">Night Mode feature</a> that was added to the Nougat Developer Preview a few months ago. You might have been disappointed when you found out that it was missing in later preview builds, and was probably going to be removed <a href="https://www.reddit.com/r/androiddev/comments/4tm8i6/were_on_the_android_engineering_team_and_built/d5igc5t">because it wasn&rsquo;t ready</a>.</p>
 
-<p>This is all well and good—unless you&rsquo;re like me (<a href="https://github.com/googlesamples/google-services/issues/54">and countless others</a>) and want to use a different configuration for your debug and release builds. This would be useful, as an example, if you use Google Play Services for GCM and would like to have development builds recieve pushes from non-production systems.</p>
+<p>When the source code for Nougat was released this morning, my friend <a href="https://twitter.com/vishnurajeevan">Vishnu</a> found this interesting snippet in the <a href="https://android.googlesource.com/platform/frameworks/base/+/android-7.0.0_r1/packages/SystemUI/src/com/android/systemui/tuner/TunerActivity.java#42">SystemUI source</a> (better known to end users as the System UI Tuner):</p>
 
-<p>It seems that the plugin is configured in such a way that it supports build flavors, but it does not yet support build types. However, with a little Gradle magic, we can hack that support in.</p>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kt">boolean</span> <span class="n">showNightMode</span> <span class="o">=</span> <span class="n">getIntent</span><span class="o">().</span><span class="na">getBooleanExtra</span><span class="o">(</span>
+</span><span class='line'>    <span class="n">NightModeFragment</span><span class="o">.</span><span class="na">EXTRA_SHOW_NIGHT_MODE</span><span class="o">,</span> <span class="kc">false</span><span class="o">);</span>
+</span><span class='line'><span class="kd">final</span> <span class="n">PreferenceFragment</span> <span class="n">fragment</span> <span class="o">=</span> <span class="n">showNightMode</span> <span class="o">?</span> <span class="k">new</span> <span class="n">NightModeFragment</span><span class="o">()</span>
+</span><span class='line'>    <span class="o">:</span> <span class="n">showDemoMode</span> <span class="o">?</span> <span class="k">new</span> <span class="n">DemoModeFragment</span><span class="o">()</span>
+</span><span class='line'>    <span class="o">:</span> <span class="k">new</span> <span class="n">TunerFragment</span><span class="o">();</span>
+</span></code></pre></td></tr></table></div></figure>
 
+
+<p>Long story short, if you pass the right extras to this activity, and you&rsquo;ll get access to the Night Mode settings (as well as the infamous Quick Tile!). Fortunately for us, this is pretty trivial to accomplish with <code>adb</code> via <code>adb -d shell am start  --ez show_night_mode true com.android.systemui/.tuner.TunerActivity</code>, but not everyone who wants this feature is familiar with <code>adb</code>. So I published an app to the Play Store that does exactly that &ndash; click one button, and get access to those settings! You can find the app on the Play Store <a href="https://play.google.com/store/apps/details?id=org.michaelevans.nightmodeenabler">here</a>.</p>
 </div>
   
-  
-    <footer>
-      <a rel="full-article" href="/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/">Read on &rarr;</a>
-    </footer>
   
 
 
@@ -610,7 +618,7 @@
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/">Using Build Types with the Google Services Gradle Plugin</a>
+        <a href="/blog/2016/08/23/enabling-night-mode-on-android-nougat/">Enabling Night Mode on Android Nougat</a>
       </li>
     
       <li class="post">
