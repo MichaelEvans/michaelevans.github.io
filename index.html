@@ -10,7 +10,7 @@
   <meta name="author" content="Michael Evans">
 
   
-  <meta name="description" content="If you&rsquo;re like me, you loved the Night Mode feature that was added to the Nougat Developer Preview a few months ago. You might have been &hellip;">
+  <meta name="description" content="Today Google released their alpha of ViewPager2, a signal of the nail in the coffin for the original ViewPager, originally released in 2011! Since &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -79,6 +79,55 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2019/02/07/hands-on-with-viewpager2/">Hands on With ViewPager2</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2019-02-07T21:38:07-05:00" pubdate data-updated="true">Feb 7<span>th</span>, 2019</time>
+        
+         | <a href="/blog/2019/02/07/hands-on-with-viewpager2/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Today Google released their alpha of <a href="https://developer.android.com/jetpack/androidx/releases/viewpager2#1.0.0-alpha01">ViewPager2</a>, a signal of the nail in the coffin for the original ViewPager, originally <a href="https://android-developers.googleblog.com/2011/08/horizontal-view-swiping-with-viewpager.html">released in 2011</a>!</p>
+
+<p>Since then, I think it&rsquo;s safe to say that most developers have needed to make a ViewPager. Despite how prolific it is, it certainly isn&rsquo;t the most straightforward widget to include. I think we all have at least once wondered whether we should use a <code>FragmentPagerAdapter</code> or a <code>FragmentStatePagerAdapter</code>. Or wondered if we can use a <a href="https://www.bignerdranch.com/blog/viewpager-without-fragments/">ViewPager <em>without</em> Fragments</a>.</p>
+
+<p>And API confusion aside, we&rsquo;ve still had long standing, feature requests. <a href="https://issuetracker.google.com/issues/36973591">RTL support</a>? <a href="https://issuetracker.google.com/issues/36952939">Vertical orientation</a>? There are numerous <a href="https://github.com/duolingo/rtl-viewpager">open source</a> <a href="https://github.com/kaelaela/VerticalViewPager">solutions</a> for these, but nothing official from the support library (now AndroidX)&hellip;until now!</p>
+
+<p>Let&rsquo;s dive in and try to set up ViewPager2! You&rsquo;ll need your project configured with AndroidX already, as well as supporting minSdkVersion 14 or higher.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2019/02/07/hands-on-with-viewpager2/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -492,102 +541,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/05/07/android-ripples-with-rounded-corners/">Android Ripples With Rounded Corners</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-05-07T22:55:36-04:00" pubdate data-updated="true">May 7<span>th</span>, 2015</time>
-        
-         | <a href="/blog/2015/05/07/android-ripples-with-rounded-corners/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>So recently I was trying to add a ripple to a view that had rounded corners. Simple enough right? Let&rsquo;s just say I have a FrameLayout with the background similar to this one:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;?xml version="1.0" encoding="utf-8"?&gt;
-</span><span class='line'>&lt;shape xmlns:android="http://schemas.android.com/apk/res/android"
-</span><span class='line'>    android:shape="rectangle"&gt;
-</span><span class='line'>    &lt;solid android:color="@android:color/transparent"/&gt;
-</span><span class='line'>    &lt;corners android:radius="15dp" /&gt;
-</span><span class='line'>    &lt;stroke
-</span><span class='line'>        android:width="1px"
-</span><span class='line'>        android:color="#000000" /&gt;
-</span><span class='line'>&lt;/shape&gt;</span></code></pre></td></tr></table></div></figure>
-
-
-<p>It&rsquo;s not quite as simple as setting the foreground to <code>?attr/selectableItemBackground</code>, or else you&rsquo;ll see the ripple surpasses the corners (which doesn&rsquo;t look <em>so</em> bad when your border radius is small, but this would look terrible with a circlular view):</p>
-
-<p><img class="center" src="/images/2015/05/07/before.gif" width="600" height="600" title="Rounded Corner Fail!" ></p>
-
-<p>The solution for this lies in the special mask layer of the <a href="https://developer.android.com/reference/android/graphics/drawable/RippleDrawable.html">RippleDrawable</a>. You specify the mask layer via the <code>android:id</code> value set to <code>@android:id/mask</code>. For the example above, you can set the mask to the same size/shape as the view you&rsquo;re masking, and then the ripple will only show for that area. For something like our example above, you&rsquo;d use something like this:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;?xml version="1.0" encoding="utf-8"?&gt;
-</span><span class='line'>&lt;ripple xmlns:android="http://schemas.android.com/apk/res/android"
-</span><span class='line'>    android:color="?android:attr/colorControlHighlight"&gt;
-</span><span class='line'>    &lt;item android:id="@android:id/mask"&gt;
-</span><span class='line'>        &lt;shape android:shape="rectangle"&gt;
-</span><span class='line'>            &lt;solid android:color="#000000" /&gt;
-</span><span class='line'>            &lt;corners android:radius="15dp" /&gt;
-</span><span class='line'>        &lt;/shape&gt;
-</span><span class='line'>    &lt;/item&gt;
-</span><span class='line'>    &lt;item android:drawable="@drawable/rounded_corners" /&gt;
-</span><span class='line'>&lt;/ripple&gt;</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now when you tap on the view, you&rsquo;ll see something like this:</p>
-
-<p><img class="center" src="/images/2015/05/07/after.gif" width="600" height="600" title="Rounded Corners!" ></p>
-
-<p><em>Huzzah!</em></p>
-
-<p>Another tip: if you don&rsquo;t set a click listener for a FrameLayout (like we used in this example), the pressed state will never be used!</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -603,6 +556,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2019/02/07/hands-on-with-viewpager2/">Hands on with ViewPager2</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/08/23/enabling-night-mode-on-android-nougat/">Enabling Night Mode on Android Nougat</a>
       </li>
     
@@ -616,10 +573,6 @@
     
       <li class="post">
         <a href="/blog/2016/02/17/using-dagger-1-and-kotlin/">Using Dagger 1 and Kotlin</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/01/06/android-studio-tips-and-tricks/">Android Studio Tips and Tricks</a>
       </li>
     
   </ul>
@@ -673,7 +626,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2016 - Michael Evans -
+  Copyright &copy; 2019 - Michael Evans -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

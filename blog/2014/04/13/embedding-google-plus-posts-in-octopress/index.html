@@ -118,8 +118,8 @@
 
   class GooglePlusEmbedTag &lt; Liquid::Tag
     @post = nil
-    @height = &#39;&#39;
-    @width = &#39;&#39;
+    @height = ''
+    @width = ''
 
     def initialize(tag_name, markup, tokens)
       if markup =~ /(https:\/\/plus.google.com\/\d+\/posts\/\w+)/i
@@ -129,12 +129,12 @@
     end
 
     def render(context)
-      &quot;&lt;div align=&#39;center&#39;&gt;&lt;div class=&#39;g-post&#39; data-href=&#39;#{@url}&#39;&gt;&lt;/div&gt;&lt;/div&gt;&quot;
+      &quot;&lt;div align='center'&gt;&lt;div class='g-post' data-href='#{@url}'&gt;&lt;/div&gt;&lt;/div&gt;&quot;
     end
   end
 end
 
-Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)</code></pre></noscript></div>
+Liquid::Template.register_tag('google_plus', Jekyll::GooglePlusEmbedTag)</code></pre></noscript></div>
 
 
 
@@ -205,6 +205,10 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2019/02/07/hands-on-with-viewpager2/">Hands on with ViewPager2</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/08/23/enabling-night-mode-on-android-nougat/">Enabling Night Mode on Android Nougat</a>
       </li>
     
@@ -218,10 +222,6 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
     
       <li class="post">
         <a href="/blog/2016/02/17/using-dagger-1-and-kotlin/">Using Dagger 1 and Kotlin</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/01/06/android-studio-tips-and-tricks/">Android Studio Tips and Tricks</a>
       </li>
     
   </ul>
@@ -276,7 +276,7 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2016 - Michael Evans -
+  Copyright &copy; 2019 - Michael Evans -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

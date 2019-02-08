@@ -4,7 +4,7 @@
   <title><![CDATA[Michael Evans]]></title>
   <link href="http://michaelevans.org/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2016-08-23T19:01:12-04:00</updated>
+  <updated>2019-02-08T00:12:04-05:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -12,6 +12,90 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Hands on with ViewPager2]]></title>
+    <link href="http://michaelevans.org/blog/2019/02/07/hands-on-with-viewpager2/"/>
+    <updated>2019-02-07T21:38:07-05:00</updated>
+    <id>http://michaelevans.org/blog/2019/02/07/hands-on-with-viewpager2</id>
+    <content type="html"><![CDATA[<p>Today Google released their alpha of <a href="https://developer.android.com/jetpack/androidx/releases/viewpager2#1.0.0-alpha01">ViewPager2</a>, a signal of the nail in the coffin for the original ViewPager, originally <a href="https://android-developers.googleblog.com/2011/08/horizontal-view-swiping-with-viewpager.html">released in 2011</a>!</p>
+
+<p>Since then, I think it&rsquo;s safe to say that most developers have needed to make a ViewPager. Despite how prolific it is, it certainly isn&rsquo;t the most straightforward widget to include. I think we all have at least once wondered whether we should use a <code>FragmentPagerAdapter</code> or a <code>FragmentStatePagerAdapter</code>. Or wondered if we can use a <a href="https://www.bignerdranch.com/blog/viewpager-without-fragments/">ViewPager <em>without</em> Fragments</a>.</p>
+
+<p>And API confusion aside, we&rsquo;ve still had long standing, feature requests. <a href="https://issuetracker.google.com/issues/36973591">RTL support</a>? <a href="https://issuetracker.google.com/issues/36952939">Vertical orientation</a>? There are numerous <a href="https://github.com/duolingo/rtl-viewpager">open source</a> <a href="https://github.com/kaelaela/VerticalViewPager">solutions</a> for these, but nothing official from the support library (now AndroidX)&hellip;until now!</p>
+
+<p>Let&rsquo;s dive in and try to set up ViewPager2! You&rsquo;ll need your project configured with AndroidX already, as well as supporting minSdkVersion 14 or higher.</p>
+
+<!-- more -->
+
+
+<p>The first thing we&rsquo;ll need to do is add the library to our build.gradle dependencies.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>implementation 'androidx.viewpager2:viewpager2:1.0.0-alpha01'</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you&rsquo;re familiar with RecyclerView, setting up ViewPager2 will be very familiar. We start off by creating an adapter:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>class CheesePagerAdapter(private val cheeseStrings: Array&lt;String&gt;) : RecyclerView.Adapter&lt;CheeseViewHolder&gt;() {
+</span><span class='line'>    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CheeseViewHolder {
+</span><span class='line'>        return CheeseViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.cheese_list_item, parent, false))
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>    override fun onBindViewHolder(holder: CheeseViewHolder, position: Int) {
+</span><span class='line'>        holder.cheeseName.text = cheeseStrings[position]
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>    override fun getItemCount() = cheeseStrings.size
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>and pair it with a RecyclerView.ViewHolder.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>class CheeseViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+</span><span class='line'>
+</span><span class='line'>    val cheeseName: TextView = view.findViewById(R.id.cheese_name)
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Finally, just like RecyclerView, we set the adapter of our ViewPager2 to be an instance of the RecyclerView adapter. However, you&rsquo;ll note that there&rsquo;s no need for a LayoutManager.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>viewPager.adapter = CheesePagerAdapter(Cheeses.CheeseStrings)</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And with that, we have a working ViewPager2!</p>
+
+<p><img class="center" src="http://michaelevans.org/images/2019/02/07/Horizontal.gif" width="600" height="600" title="Horizontal ViewPager2" ></p>
+
+<p>We can even set the orientation to scroll vertically with just one line:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>viewPager.orientation = ViewPager2.ORIENTATION_VERTICAL</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img class="center" src="http://michaelevans.org/images/2019/02/07/Vertical.gif" width="600" height="600" title="Vertical ViewPager2" ></p>
+
+<p>Based on the release notes there are a lot of issues left to fix before this moves to a final release &ndash; but this is a long awaited update for one of those oldest support library components.</p>
+
+<p>The sample code for this post can be found <a href="https://github.com/MichaelEvans/ViewPager2Sample">here</a>. Thanks to Chris Banes&#8217; <a href="https://github.com/chrisbanes/cheesesquare">CheeseSquare</a> for the sample data for this demo!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Enabling Night Mode on Android Nougat]]></title>
@@ -1230,8 +1314,8 @@ diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.Toolbar appc
 
   class GooglePlusEmbedTag &lt; Liquid::Tag
     @post = nil
-    @height = &#39;&#39;
-    @width = &#39;&#39;
+    @height = ''
+    @width = ''
 
     def initialize(tag_name, markup, tokens)
       if markup =~ /(https:\/\/plus.google.com\/\d+\/posts\/\w+)/i
@@ -1241,12 +1325,12 @@ diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.Toolbar appc
     end
 
     def render(context)
-      &quot;&lt;div align=&#39;center&#39;&gt;&lt;div class=&#39;g-post&#39; data-href=&#39;#{@url}&#39;&gt;&lt;/div&gt;&lt;/div&gt;&quot;
+      &quot;&lt;div align='center'&gt;&lt;div class='g-post' data-href='#{@url}'&gt;&lt;/div&gt;&lt;/div&gt;&quot;
     end
   end
 end
 
-Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)</code></pre></noscript></div>
+Liquid::Template.register_tag('google_plus', Jekyll::GooglePlusEmbedTag)</code></pre></noscript></div>
 
 
 
@@ -1521,373 +1605,6 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
 <p><img class="left" src="http://michaelevans.org/images/2013/09/16/details.png" width="240" height="400" title="Details" ></p>
 
 <p>I&rsquo;m also planning to add some other cool features, like a notification when a &ldquo;favorite&rdquo; station is low on bikes, or when a &ldquo;favorite&rdquo; station is full (so you know you&rsquo;ll have to bring the bike elsewhere). I&rsquo;m also looking into adding some directions/searching feature, so you can navigate your way around the city without having to leave the application.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Parse Android To-do App Tutorial - Part Two - Users]]></title>
-    <link href="http://michaelevans.org/blog/2013/08/20/parse-android-todo-app-tutorial-part-two-users/"/>
-    <updated>2013-08-20T21:13:00-04:00</updated>
-    <id>http://michaelevans.org/blog/2013/08/20/parse-android-todo-app-tutorial-part-two-users</id>
-    <content type="html"><![CDATA[<p>Last week <a href="http://michaelevans.org/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse/">I posted a tutorial</a> on how to create a really basic Android To-do list application using <a href="http://www.parse.com">Parse</a>. It allowed a user to create tasks, and then toggle their completion status. Then, this information was synced to a server, so that the tasks will be kept up to date on multiple devices. The biggest issue with this app so far, was that there was no concept of users, so all tasks were shared among everyone. This week, we&rsquo;re going to introduce two new screens (which are very similar to one another), the registration and login screens.</p>
-
-<!-- more -->
-
-
-<h3>The Setup</h3>
-
-<p>The first thing we&rsquo;re have to do is two create two new activities, as I mentioned before. I called these <code>LoginActivity</code> and <code>RegisterActivity</code>. For simplicity sake, I&rsquo;ll assume that you used the New Activity Wizard, like we did last week to create the TodoActivity. You can also try the &ldquo;LoginActivity&rdquo; template from the wizard, but we&rsquo;ll skip that for this tutorial.</p>
-
-<h3>Let&rsquo;s Code</h3>
-
-<p>Once you have both those activities set up, let&rsquo;s fill up their layouts. We need to add the following items to these layouts: two <code>EditText</code> fields for a username and password, two <code>TextViews</code> to be the labels for these inputs, and two <code>Buttons</code>, one to sign in/sign up, and one to switch from the sign up to sign in screen and vice versa.</p>
-
-<p>Here&rsquo;s what my registration layout looks like:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;LinearLayout</span> <span class="na">xmlns:android=</span><span class="s">&quot;http://schemas.android.com/apk/res/android&quot;</span>
-</span><span class='line'>    <span class="na">xmlns:tools=</span><span class="s">&quot;http://schemas.android.com/tools&quot;</span>
-</span><span class='line'>    <span class="na">android:layout_width=</span><span class="s">&quot;match_parent&quot;</span>
-</span><span class='line'>    <span class="na">android:layout_height=</span><span class="s">&quot;match_parent&quot;</span>
-</span><span class='line'>    <span class="na">android:orientation=</span><span class="s">&quot;vertical&quot;</span>
-</span><span class='line'>    <span class="na">android:paddingBottom=</span><span class="s">&quot;@dimen/activity_vertical_margin&quot;</span>
-</span><span class='line'>    <span class="na">android:paddingLeft=</span><span class="s">&quot;@dimen/activity_horizontal_margin&quot;</span>
-</span><span class='line'>    <span class="na">android:paddingRight=</span><span class="s">&quot;@dimen/activity_horizontal_margin&quot;</span>
-</span><span class='line'>    <span class="na">android:paddingTop=</span><span class="s">&quot;@dimen/activity_vertical_margin&quot;</span>
-</span><span class='line'>    <span class="na">tools:context=</span><span class="s">&quot;.RegisterActivity&quot;</span> <span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;LinearLayout</span>
-</span><span class='line'>        <span class="na">android:layout_width=</span><span class="s">&quot;match_parent&quot;</span>
-</span><span class='line'>        <span class="na">android:layout_height=</span><span class="s">&quot;0dp&quot;</span>
-</span><span class='line'>        <span class="na">android:layout_weight=</span><span class="s">&quot;1&quot;</span>
-</span><span class='line'>        <span class="na">android:gravity=</span><span class="s">&quot;center_vertical&quot;</span>
-</span><span class='line'>        <span class="na">android:orientation=</span><span class="s">&quot;vertical&quot;</span> <span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="nt">&lt;TextView</span>
-</span><span class='line'>            <span class="na">android:layout_width=</span><span class="s">&quot;match_parent&quot;</span>
-</span><span class='line'>            <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
-</span><span class='line'>            <span class="na">android:text=</span><span class="s">&quot;@string/username&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="nt">&lt;EditText</span>
-</span><span class='line'>            <span class="na">android:id=</span><span class="s">&quot;@+id/register_username&quot;</span>
-</span><span class='line'>            <span class="na">android:layout_width=</span><span class="s">&quot;match_parent&quot;</span>
-</span><span class='line'>            <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
-</span><span class='line'>            <span class="na">android:ems=</span><span class="s">&quot;10&quot;</span>
-</span><span class='line'>            <span class="na">android:inputType=</span><span class="s">&quot;text&quot;</span> <span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>            <span class="nt">&lt;requestFocus</span> <span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/EditText&gt;</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="nt">&lt;TextView</span>
-</span><span class='line'>            <span class="na">android:layout_width=</span><span class="s">&quot;match_parent&quot;</span>
-</span><span class='line'>            <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
-</span><span class='line'>            <span class="na">android:text=</span><span class="s">&quot;Password:&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="nt">&lt;EditText</span>
-</span><span class='line'>            <span class="na">android:id=</span><span class="s">&quot;@+id/register_password&quot;</span>
-</span><span class='line'>            <span class="na">android:layout_width=</span><span class="s">&quot;match_parent&quot;</span>
-</span><span class='line'>            <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
-</span><span class='line'>            <span class="na">android:ems=</span><span class="s">&quot;10&quot;</span>
-</span><span class='line'>            <span class="na">android:inputType=</span><span class="s">&quot;textPassword&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="nt">&lt;Button</span>
-</span><span class='line'>            <span class="na">android:id=</span><span class="s">&quot;@+id/sign_up&quot;</span>
-</span><span class='line'>            <span class="na">android:layout_width=</span><span class="s">&quot;wrap_content&quot;</span>
-</span><span class='line'>            <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
-</span><span class='line'>            <span class="na">android:layout_gravity=</span><span class="s">&quot;right&quot;</span>
-</span><span class='line'>            <span class="na">android:onClick=</span><span class="s">&quot;register&quot;</span>
-</span><span class='line'>            <span class="na">android:text=</span><span class="s">&quot;Sign Up&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/LinearLayout&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;Button</span>
-</span><span class='line'>        <span class="na">android:id=</span><span class="s">&quot;@+id/signInButton&quot;</span>
-</span><span class='line'>        <span class="na">android:layout_width=</span><span class="s">&quot;match_parent&quot;</span>
-</span><span class='line'>        <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
-</span><span class='line'>        <span class="na">android:textSize=</span><span class="s">&quot;17sp&quot;</span>
-</span><span class='line'>        <span class="na">android:onClick=</span><span class="s">&quot;showLogin&quot;</span>
-</span><span class='line'>        <span class="na">android:text=</span><span class="s">&quot;Already Have An Account? Log In!&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;/LinearLayout&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The login screen is very similar to that of the registration screen, with the same widgets in the same places, just different ids and labels, so we&rsquo;re just going to go over the registration screen in this tutorial and leave the login screen up as an exercise to the reader. (The code will be available on <a href="https://github.com/MichaelEvans/Parse-Android-Todo">Github</a> if you get stuck). We&rsquo;re going to want to implement that <code>register</code> function in our RegisterActivity, so let&rsquo;s do that next.</p>
-
-<p><img class="center" src="http://michaelevans.org/images/2013/08/20/login.png" width="300" height="500" title="Logging In" ></p>
-
-<p>After declaring and binding variables to the two <code>EditText</code> fields (we&rsquo;ll call those <code>mUsernameField</code> and <code>mPasswordField</code>), we create our register function:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">register</span><span class="o">(</span><span class="kd">final</span> <span class="n">View</span> <span class="n">v</span><span class="o">){</span>
-</span><span class='line'>  <span class="k">if</span><span class="o">(</span><span class="n">mUsernameField</span><span class="o">.</span><span class="na">getText</span><span class="o">().</span><span class="na">length</span><span class="o">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">mPasswordField</span><span class="o">.</span><span class="na">getText</span><span class="o">().</span><span class="na">length</span><span class="o">()</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span>
-</span><span class='line'>      <span class="k">return</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">v</span><span class="o">.</span><span class="na">setEnabled</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
-</span><span class='line'>  <span class="n">ParseUser</span> <span class="n">user</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ParseUser</span><span class="o">();</span>
-</span><span class='line'>  <span class="n">user</span><span class="o">.</span><span class="na">setUsername</span><span class="o">(</span><span class="n">mUsernameField</span><span class="o">.</span><span class="na">getText</span><span class="o">().</span><span class="na">toString</span><span class="o">());</span>
-</span><span class='line'>  <span class="n">user</span><span class="o">.</span><span class="na">setPassword</span><span class="o">(</span><span class="n">mPasswordField</span><span class="o">.</span><span class="na">getText</span><span class="o">().</span><span class="na">toString</span><span class="o">());</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">user</span><span class="o">.</span><span class="na">signUpInBackground</span><span class="o">(</span><span class="k">new</span> <span class="n">SignUpCallback</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="nd">@Override</span>
-</span><span class='line'>      <span class="kd">public</span> <span class="kt">void</span> <span class="nf">done</span><span class="o">(</span><span class="n">ParseException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>          <span class="k">if</span> <span class="o">(</span><span class="n">e</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>              <span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Intent</span><span class="o">(</span><span class="n">RegisterActivity</span><span class="o">.</span><span class="na">this</span><span class="o">,</span> <span class="n">TodoActivity</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
-</span><span class='line'>              <span class="n">startActivity</span><span class="o">(</span><span class="n">intent</span><span class="o">);</span>
-</span><span class='line'>              <span class="n">finish</span><span class="o">();</span>
-</span><span class='line'>          <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-</span><span class='line'>              <span class="c1">// Sign up didn&#39;t succeed. Look at the ParseException</span>
-</span><span class='line'>              <span class="c1">// to figure out what went wrong</span>
-</span><span class='line'>              <span class="n">v</span><span class="o">.</span><span class="na">setEnabled</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
-</span><span class='line'>          <span class="o">}</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>  <span class="o">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><img class="center" src="http://michaelevans.org/images/2013/08/20/registering.png" width="300" height="500" title="Registering" ></p>
-
-<p>What&#8217; were doing here is a) bailing out early if the user fails to fill in one of the fields, b) disabling the button while the network request is running, so the user can&rsquo;t try to register multiple times by accident, c) creating a ParseUser object with the username and password from the <code>EditText</code> fields, and then calling <code>signUpInBackground</code>, with a callback which is run when the request is complete. If there is an error for any reason, we re-enable the registration button, so that the user can fix any issues and resubmit. (We&rsquo;ll get to error handling a little later.) If there isn&rsquo;t an error, we start the TodoActivity that we <a href="http://michaelevans.org/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse/">created last week</a>.</p>
-
-<p>Huzzah! If you sign up, you now see a users table in your Parse console!</p>
-
-<p><img class="center" src="http://michaelevans.org/images/2013/08/20/users.png" width="800" height="800" title="Users Console" ></p>
-
-<h3>Making Things Belong</h3>
-
-<p>Now we need to make some changes to the TodoActivity. The first thing we need to do is make the query that fetches the data only return Tasks where the user is the same as the logged in user. We can do that by adding the following line that will modify our ParseQuery:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">query</span><span class="o">.</span><span class="na">whereEqualTo</span><span class="o">(</span><span class="s">&quot;user&quot;</span><span class="o">,</span> <span class="n">ParseUser</span><span class="o">.</span><span class="na">getCurrentUser</span><span class="o">());</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>We also need to make the Tasks belong to a user where they are created, which we can do by adding the following two statements when we are creating our new Tasks (we&rsquo;re also going to add the setters and getter for the user object on the Task model):</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">t</span><span class="o">.</span><span class="na">setACL</span><span class="o">(</span><span class="k">new</span> <span class="n">ParseACL</span><span class="o">(</span><span class="n">ParseUser</span><span class="o">.</span><span class="na">getCurrentUser</span><span class="o">()));</span>
-</span><span class='line'><span class="n">t</span><span class="o">.</span><span class="na">setUser</span><span class="o">(</span><span class="n">ParseUser</span><span class="o">.</span><span class="na">getCurrentUser</span><span class="o">());</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>These lines will make the Task only read/writeable by the owner, and set the user associated with them to the current user. Take a peek in your Parse console, and you&rsquo;ll see the Tasks now have an owner!</p>
-
-<p><img class="center" src="http://michaelevans.org/images/2013/08/20/tasks.png" width="800" height="800" title="Tasks now belong!" ></p>
-
-<p>We also want to make it possible for a user to log out. We&rsquo;ll do this by providing an option in the action bar settings menu. We can do this by adding an entry in the <code>res/menu/todo.xml</code> file like the following:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;item</span>
-</span><span class='line'>    <span class="na">android:id=</span><span class="s">&quot;@+id/action_logout&quot;</span>
-</span><span class='line'>    <span class="na">android:orderInCategory=</span><span class="s">&quot;100&quot;</span>
-</span><span class='line'>    <span class="na">android:showAsAction=</span><span class="s">&quot;never&quot;</span>
-</span><span class='line'>    <span class="na">android:title=</span><span class="s">&quot;@string/action_logout&quot;</span><span class="nt">/&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Then all we need to do is wire up this action bar item. When options items are selected, there&rsquo;s a method that will be called in your activity named <code>onOptionsItemSelected</code>. We&rsquo;ll just fill this function out like this:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">onOptionsItemSelected</span><span class="o">(</span><span class="n">MenuItem</span> <span class="n">item</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>  <span class="k">switch</span> <span class="o">(</span><span class="n">item</span><span class="o">.</span><span class="na">getItemId</span><span class="o">())</span> <span class="o">{</span>
-</span><span class='line'>  <span class="k">case</span> <span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">action_logout</span><span class="o">:</span>
-</span><span class='line'>      <span class="n">ParseUser</span><span class="o">.</span><span class="na">logOut</span><span class="o">();</span>
-</span><span class='line'>      <span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Intent</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">LoginActivity</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">startActivity</span><span class="o">(</span><span class="n">intent</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">finish</span><span class="o">();</span>
-</span><span class='line'>      <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>  <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If the user selects the logout option, call the <code>logout()</code> method, and then send them back to the login screen.</p>
-
-<p>The last thing we need to do in the TodoActivity is prevent a user from accessing this class while no one is logged in. We can do that back up in the <code>onCreate</code> method:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">ParseUser</span> <span class="n">currentUser</span> <span class="o">=</span> <span class="n">ParseUser</span><span class="o">.</span><span class="na">getCurrentUser</span><span class="o">();</span>
-</span><span class='line'><span class="k">if</span><span class="o">(</span><span class="n">currentUser</span> <span class="o">==</span> <span class="kc">null</span><span class="o">){</span>
-</span><span class='line'>  <span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Intent</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">LoginActivity</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
-</span><span class='line'>  <span class="n">startActivity</span><span class="o">(</span><span class="n">intent</span><span class="o">);</span>
-</span><span class='line'>  <span class="n">finish</span><span class="o">();</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If there is no user currenty logged in, stop the TodoActivity, and forward us to the LoginActivity.</p>
-
-<h3>Error Handling</h3>
-
-<p>As I alluded to before, we&rsquo;re also going to want to add error handling. This way, if the user puts in bad credentials, or they try to register a username that&rsquo;s already taken, they&rsquo;ll get an informative error message. Let&rsquo;s do this by adding a <code>TextView</code> in our layout to display the message: (You&rsquo;ll also want to add a <code>colors.xml</code> file that will declare what <code>@color/red</code> is.)</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;TextView</span>
-</span><span class='line'>  <span class="na">android:id=</span><span class="s">&quot;@+id/error_messages&quot;</span>
-</span><span class='line'>  <span class="na">android:layout_width=</span><span class="s">&quot;wrap_content&quot;</span>
-</span><span class='line'>  <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
-</span><span class='line'>  <span class="na">android:layout_gravity=</span><span class="s">&quot;center_horizontal&quot;</span>
-</span><span class='line'>  <span class="na">android:textColor=</span><span class="s">&quot;@color/red&quot;</span>
-</span><span class='line'>  <span class="na">android:textAppearance=</span><span class="s">&quot;?android:attr/textAppearanceMedium&quot;</span> <span class="nt">/&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Then we&rsquo;ll bind a variable to that view, and add the following error handling to the else statement from our <code>signUpInBackground</code> call:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="k">switch</span><span class="o">(</span><span class="n">e</span><span class="o">.</span><span class="na">getCode</span><span class="o">()){</span>
-</span><span class='line'><span class="k">case</span> <span class="n">ParseException</span><span class="o">.</span><span class="na">USERNAME_TAKEN</span><span class="o">:</span>
-</span><span class='line'>  <span class="n">mErrorField</span><span class="o">.</span><span class="na">setText</span><span class="o">(</span><span class="s">&quot;Sorry, this username has already been taken.&quot;</span><span class="o">);</span>
-</span><span class='line'>  <span class="k">break</span><span class="o">;</span>
-</span><span class='line'><span class="k">case</span> <span class="n">ParseException</span><span class="o">.</span><span class="na">USERNAME_MISSING</span><span class="o">:</span>
-</span><span class='line'>  <span class="n">mErrorField</span><span class="o">.</span><span class="na">setText</span><span class="o">(</span><span class="s">&quot;Sorry, you must supply a username to register.&quot;</span><span class="o">);</span>
-</span><span class='line'>  <span class="k">break</span><span class="o">;</span>
-</span><span class='line'><span class="k">case</span> <span class="n">ParseException</span><span class="o">.</span><span class="na">PASSWORD_MISSING</span><span class="o">:</span>
-</span><span class='line'>  <span class="n">mErrorField</span><span class="o">.</span><span class="na">setText</span><span class="o">(</span><span class="s">&quot;Sorry, you must supply a password to register.&quot;</span><span class="o">);</span>
-</span><span class='line'>  <span class="k">break</span><span class="o">;</span>
-</span><span class='line'><span class="k">default</span><span class="o">:</span>
-</span><span class='line'>  <span class="n">mErrorField</span><span class="o">.</span><span class="na">setText</span><span class="o">(</span><span class="n">e</span><span class="o">.</span><span class="na">getLocalizedMessage</span><span class="o">());</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'><span class="n">v</span><span class="o">.</span><span class="na">setEnabled</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This will set some nice messages that will explain what the error is, or fall back to the message that Parse sends us, if it&rsquo;s some other type of problem.</p>
-
-<p><img class="center" src="http://michaelevans.org/images/2013/08/20/error_handling.png" width="300" height="500" title="Pretty Error Handling" ></p>
-
-<h3>Possibilities for Next Time</h3>
-
-<p>Next time we can take a look at adding some delete functionality, or maybe tabs for looking over completed/incomplete tasks. Another possiblity is adding social sign in, using Twitter and Facebook. Other suggestions are welcome!</p>
-
-<p><strong>You can find the source on Github <a href="https://github.com/MichaelEvans/Parse-Android-Todo">here</a>.</strong></p>
-
-<hr />
-
-<p>Like this post? Questions, concerns or mistakes? Any other Android tutorials you&rsquo;d like to hear about? Let me know on <a href="https://twitter.com/m_evans10">Twitter</a> or <a href="https://plus.google.com/114052868601022948953/posts">Google Plus</a>, or leave a comment below.</p>
 ]]></content>
   </entry>
   

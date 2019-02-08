@@ -10,7 +10,7 @@
   <meta name="author" content="Michael Evans">
 
   
-  <meta name="description" content="A few months ago, the Android design team reviewed apps that they thought were good-looking, and were referred to as the &ldquo;Beautiful Design &hellip;">
+  <meta name="description" content="So recently I was trying to add a ripple to a view that had rounded corners. Simple enough right? Let&rsquo;s just say I have a FrameLayout with the &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -79,6 +79,102 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/05/07/android-ripples-with-rounded-corners/">Android Ripples With Rounded Corners</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-05-07T22:55:36-04:00" pubdate data-updated="true">May 7<span>th</span>, 2015</time>
+        
+         | <a href="/blog/2015/05/07/android-ripples-with-rounded-corners/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>So recently I was trying to add a ripple to a view that had rounded corners. Simple enough right? Let&rsquo;s just say I have a FrameLayout with the background similar to this one:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+</span><span class='line'>&lt;shape xmlns:android="http://schemas.android.com/apk/res/android"
+</span><span class='line'>    android:shape="rectangle"&gt;
+</span><span class='line'>    &lt;solid android:color="@android:color/transparent"/&gt;
+</span><span class='line'>    &lt;corners android:radius="15dp" /&gt;
+</span><span class='line'>    &lt;stroke
+</span><span class='line'>        android:width="1px"
+</span><span class='line'>        android:color="#000000" /&gt;
+</span><span class='line'>&lt;/shape&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It&rsquo;s not quite as simple as setting the foreground to <code>?attr/selectableItemBackground</code>, or else you&rsquo;ll see the ripple surpasses the corners (which doesn&rsquo;t look <em>so</em> bad when your border radius is small, but this would look terrible with a circlular view):</p>
+
+<p><img class="center" src="/images/2015/05/07/before.gif" width="600" height="600" title="Rounded Corner Fail!" ></p>
+
+<p>The solution for this lies in the special mask layer of the <a href="https://developer.android.com/reference/android/graphics/drawable/RippleDrawable.html">RippleDrawable</a>. You specify the mask layer via the <code>android:id</code> value set to <code>@android:id/mask</code>. For the example above, you can set the mask to the same size/shape as the view you&rsquo;re masking, and then the ripple will only show for that area. For something like our example above, you&rsquo;d use something like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+</span><span class='line'>&lt;ripple xmlns:android="http://schemas.android.com/apk/res/android"
+</span><span class='line'>    android:color="?android:attr/colorControlHighlight"&gt;
+</span><span class='line'>    &lt;item android:id="@android:id/mask"&gt;
+</span><span class='line'>        &lt;shape android:shape="rectangle"&gt;
+</span><span class='line'>            &lt;solid android:color="#000000" /&gt;
+</span><span class='line'>            &lt;corners android:radius="15dp" /&gt;
+</span><span class='line'>        &lt;/shape&gt;
+</span><span class='line'>    &lt;/item&gt;
+</span><span class='line'>    &lt;item android:drawable="@drawable/rounded_corners" /&gt;
+</span><span class='line'>&lt;/ripple&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now when you tap on the view, you&rsquo;ll see something like this:</p>
+
+<p><img class="center" src="/images/2015/05/07/after.gif" width="600" height="600" title="Rounded Corners!" ></p>
+
+<p><em>Huzzah!</em></p>
+
+<p>Another tip: if you don&rsquo;t set a click listener for a FrameLayout (like we used in this example), the pressed state will never be used!</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -245,8 +341,8 @@
 
   class GooglePlusEmbedTag &lt; Liquid::Tag
     @post = nil
-    @height = &#39;&#39;
-    @width = &#39;&#39;
+    @height = ''
+    @width = ''
 
     def initialize(tag_name, markup, tokens)
       if markup =~ /(https:\/\/plus.google.com\/\d+\/posts\/\w+)/i
@@ -256,12 +352,12 @@
     end
 
     def render(context)
-      &quot;&lt;div align=&#39;center&#39;&gt;&lt;div class=&#39;g-post&#39; data-href=&#39;#{@url}&#39;&gt;&lt;/div&gt;&lt;/div&gt;&quot;
+      &quot;&lt;div align='center'&gt;&lt;div class='g-post' data-href='#{@url}'&gt;&lt;/div&gt;&lt;/div&gt;&quot;
     end
   end
 end
 
-Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)</code></pre></noscript></div>
+Liquid::Template.register_tag('google_plus', Jekyll::GooglePlusEmbedTag)</code></pre></noscript></div>
 
 
 
@@ -551,49 +647,6 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/08/20/parse-android-todo-app-tutorial-part-two-users/">Parse Android To-do App Tutorial - Part Two - Users</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-08-20T21:13:00-04:00" pubdate data-updated="true">Aug 20<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/08/20/parse-android-todo-app-tutorial-part-two-users/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Last week <a href="http://michaelevans.org/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse/">I posted a tutorial</a> on how to create a really basic Android To-do list application using <a href="http://www.parse.com">Parse</a>. It allowed a user to create tasks, and then toggle their completion status. Then, this information was synced to a server, so that the tasks will be kept up to date on multiple devices. The biggest issue with this app so far, was that there was no concept of users, so all tasks were shared among everyone. This week, we&rsquo;re going to introduce two new screens (which are very similar to one another), the registration and login screens.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/08/20/parse-android-todo-app-tutorial-part-two-users/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -611,6 +664,10 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2019/02/07/hands-on-with-viewpager2/">Hands on with ViewPager2</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/08/23/enabling-night-mode-on-android-nougat/">Enabling Night Mode on Android Nougat</a>
       </li>
     
@@ -624,10 +681,6 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
     
       <li class="post">
         <a href="/blog/2016/02/17/using-dagger-1-and-kotlin/">Using Dagger 1 and Kotlin</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/01/06/android-studio-tips-and-tricks/">Android Studio Tips and Tricks</a>
       </li>
     
   </ul>
@@ -681,7 +734,7 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2016 - Michael Evans -
+  Copyright &copy; 2019 - Michael Evans -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
