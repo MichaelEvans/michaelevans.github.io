@@ -6,11 +6,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="msvalidate.01" content="275BF9CDA457668389C1F9916C380DD0" />
-  <title>Hands on with ViewPager2 - Michael Evans</title>
+  <title>Stop Repeating Yourself: Sharing test code across Android Modules - Michael Evans</title>
   <meta name="author" content="Michael Evans">
 
   
-  <meta name="description" content="Hands on with ViewPager2">
+  <meta name="description" content="Stop Repeating Yourself: Sharing test code across Android Modules">
   <meta name="keywords" content="Android">
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +19,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://michaelevans.org/blog/2019/02/07/hands-on-with-viewpager2/">
+  <link rel="canonical" href="http://michaelevans.org/blog/2019/09/21/stop-repeating-yourself-sharing-test-code-across-android-modules/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -82,7 +82,7 @@
   
   <header>
     
-      <h1 class="entry-title">Hands on With ViewPager2</h1>
+      <h1 class="entry-title">Stop Repeating Yourself: Sharing Test Code Across Android Modules</h1>
     
     
       <p class="meta">
@@ -98,7 +98,7 @@
   
 
 
-<time datetime="2019-02-07T21:38:07-05:00" pubdate data-updated="true">Feb 7<span>th</span>, 2019</time>
+<time datetime="2019-09-21T21:34:52-04:00" pubdate data-updated="true">Sep 21<span>st</span>, 2019</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -107,24 +107,18 @@
   </header>
 
 
-<div class="entry-content"><p>Today Google released their alpha of <a href="https://developer.android.com/jetpack/androidx/releases/viewpager2#1.0.0-alpha01">ViewPager2</a>, a signal of the nail in the coffin for the original ViewPager, originally <a href="https://android-developers.googleblog.com/2011/08/horizontal-view-swiping-with-viewpager.html">released in 2011</a>!</p>
+<div class="entry-content"><p>It seems like nowadays, the <a href="https://jeroenmols.com/blog/2019/03/06/modularizationwhy/">best advice</a> <a href="https://robinhood.engineering/breaking-up-the-app-module-monolith-the-story-of-robinhoods-android-app-707fb993a50c">is to modularize</a> <a href="https://www.youtube.com/watch?v=PZBg5DIzNww">your Android app</a>. It&rsquo;s a great suggestion for many reasons, including but not limited to:</p>
 
-<p>Since then, I think it&rsquo;s safe to say that most developers have needed to make a ViewPager. Despite how prolific it is, it certainly isn&rsquo;t the most straightforward widget to include. I think we all have at least once wondered whether we should use a <code>FragmentPagerAdapter</code> or a <code>FragmentStatePagerAdapter</code>. Or wondered if we can use a <a href="https://www.bignerdranch.com/blog/viewpager-without-fragments/">ViewPager <em>without</em> Fragments</a>.</p>
+<pre><code>- improved build performance
+- enables on-demand delivery
+- pushes you to build reusable, discrete components
+</code></pre>
 
-<p>And API confusion aside, we&rsquo;ve still had long standing, feature requests. <a href="https://issuetracker.google.com/issues/36973591">RTL support</a>? <a href="https://issuetracker.google.com/issues/36952939">Vertical orientation</a>? There are numerous <a href="https://github.com/duolingo/rtl-viewpager">open source</a> <a href="https://github.com/kaelaela/VerticalViewPager">solutions</a> for these, but nothing official from the support library (now AndroidX)&hellip;until now!</p>
+<p>Sounds great, right? Are there any downsides? There is one in particular which has been a a pain point for many.</p>
 
-<p>Let&rsquo;s dive in and try to set up ViewPager2! You&rsquo;ll need your project configured with AndroidX already, as well as supporting minSdkVersion 14 or higher.</p>
+<p>Often times when you&rsquo;re writing tests, you&rsquo;ll want to use some <a href="https://testing.googleblog.com/2013/07/testing-on-toilet-know-your-test-doubles.html">test doubles</a> like fakes or fixtures in order to help simulate the system under test. Maybe you have a <code>FakeUser</code> instance that you use in your tests to avoid having to mock a <code>User</code> every time your test calls for one. Generally these classes live alongside tests in <code>src/test</code> directories and are used to test out your code within a module.</p>
 
-<!-- more -->
-
-
-<p>The first thing we&rsquo;ll need to do is add the library to our build.gradle dependencies.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>implementation 'androidx.viewpager2:viewpager2:1.0.0-alpha01'</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If you&rsquo;re familiar with RecyclerView, setting up ViewPager2 will be very familiar. We start off by creating an adapter:</p>
+<p>For example, maybe you have a model object like:</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -137,52 +131,88 @@
 <span class='line-number'>9</span>
 <span class='line-number'>10</span>
 <span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>class CheesePagerAdapter(private val cheeseStrings: Array&lt;String&gt;) : RecyclerView.Adapter&lt;CheeseViewHolder&gt;() {
-</span><span class='line'>    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CheeseViewHolder {
-</span><span class='line'>        return CheeseViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.cheese_list_item, parent, false))
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>public class User {
+</span><span class='line'>    private final String firstName;
+</span><span class='line'>    private final String lastName;
+</span><span class='line'>
+</span><span class='line'>    public User(String firstName, String lastName) {
+</span><span class='line'>        this.firstName = firstName;
+</span><span class='line'>        this.lastName = lastName;
 </span><span class='line'>    }
 </span><span class='line'>
-</span><span class='line'>    override fun onBindViewHolder(holder: CheeseViewHolder, position: Int) {
-</span><span class='line'>        holder.cheeseName.text = cheeseStrings[position]
+</span><span class='line'>    public String getFirstName() {
+</span><span class='line'>        return firstName;
 </span><span class='line'>    }
 </span><span class='line'>
-</span><span class='line'>    override fun getItemCount() = cheeseStrings.size
+</span><span class='line'>    public String getLastName() {
+</span><span class='line'>        return lastName;
+</span><span class='line'>    }
 </span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
 
 
-<p>and pair it with a RecyclerView.ViewHolder.</p>
+<p>You might have some code in <code>src/test</code> that creates a bunch of fake users for your tests like:</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>class CheeseViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-</span><span class='line'>
-</span><span class='line'>    val cheeseName: TextView = view.findViewById(R.id.cheese_name)
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>class TheOfficeFixtures {
+</span><span class='line'>        public static User manager = new User("Michael", "Scott");
+</span><span class='line'>        public static User assistantToTheRegionalManager = new User("Dwight", "Schrute");
+</span><span class='line'>    }
 </span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
 
 
-<p>Finally, just like RecyclerView, we set the adapter of our ViewPager2 to be an instance of the RecyclerView adapter. However, you&rsquo;ll note that there&rsquo;s no need for a LayoutManager.</p>
+<p>This works great if you&rsquo;re testing code <em>within</em> a module, but as soon as you&rsquo;d like to use these fake users in other modules, you&rsquo;ll note that these classes aren&rsquo;t shared!</p>
+
+<p>This code can&rsquo;t be shared between modules because Gradle doesn&rsquo;t expose the output of your test source set as a build artifact. There are all kinds of solutions for this problem out there, including <a href="https://treatwell.engineering/mock-factory-for-android-testing-in-multi-module-system-7654f45808be">creating a special module for all your fixtures</a>, and using <a href="https://stackoverflow.com/questions/5644011/multi-project-test-dependencies-with-gradle">gradle dependency hacks</a> to wire up source sets.</p>
+
+<p>However, that&rsquo;s not necessary anymore! As of version 5.6, Gradle now ships a new &lsquo;test-fixtures&rsquo; plugin! This plugin creates a new <code>testFixtures</code> source set, and configures that source set so that:</p>
+
+<pre><code>- classes in this set can see the main source set classes
+- test sources can see the test fixtures classes
+</code></pre>
+
+<h3>Using the Plugin</h3>
+
+<p>You can apply the <code>java-test-fixtures</code> plugin in your build.gradle script:</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>viewPager.adapter = CheesePagerAdapter(Cheeses.CheeseStrings)</span></code></pre></td></tr></table></div></figure>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>plugins {
+</span><span class='line'>    id 'java-test-fixtures'
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
 
 
-<p>And with that, we have a working ViewPager2!</p>
+<p>This plugin will define the necessary source set, and handle all the wiring up of test artifacts. We can now  move those test fixtures from <code>src/test/java</code> to <code>src/testFixtures/java</code>, and that&rsquo;s it! These classes will be ready to be consumed by other modules.</p>
 
-<p><img class="center" src="/images/2019/02/07/Horizontal.gif" width="600" height="600" title="Horizontal ViewPager2" ></p>
+<h3>Wiring it all together</h3>
 
-<p>We can even set the orientation to scroll vertically with just one line:</p>
+<p>Finally, we need to use a special keyword to pull these new fixtures in as a dependency for our tests. In our  gradle configuration, we add a test dependency (either API or Implementation) like so:</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>viewPager.orientation = ViewPager2.ORIENTATION_VERTICAL</span></code></pre></td></tr></table></div></figure>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>dependencies {
+</span><span class='line'>    testImplementation(testFixtures(project(":lib")))
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
 
 
-<p><img class="center" src="/images/2019/02/07/Vertical.gif" width="600" height="600" title="Vertical ViewPager2" ></p>
+<p>And that&rsquo;s it! Our other module can now consume these test fixtures without any sort of intermediate modules or workarounds.</p>
 
-<p>Based on the release notes there are a lot of issues left to fix before this moves to a final release &ndash; but this is a long awaited update for one of those oldest support library components.</p>
+<p>If you&rsquo;d like to check out the complete configuration with examples sharing fixtures between both Kotlin and Java modules to a shared &ldquo;app&rdquo; module, I&rsquo;ve uploaded a sample project demonstrating how to use this new configuration <a href="https://github.com/MichaelEvans/TestFixturesExample">here</a>.</p>
 
-<p>The sample code for this post can be found <a href="https://github.com/MichaelEvans/ViewPager2Sample">here</a>. Thanks to Chris Banes&#8217; <a href="https://github.com/chrisbanes/cheesesquare">CheeseSquare</a> for the sample data for this demo!</p>
+<h2>Important Caveat</h2>
+
+<p>It&rsquo;s important to note that this feature is currently only available with the <code>java-library</code> plugin, and has limited functionality in Kotlin modules, and not yet available for Android modules. There are currently feature requests on <a href="https://youtrack.jetbrains.com/issue/KT-33877">YouTrack</a> and the <a href="https://issuetracker.google.com/issues/139438142">Android Issue Tracker</a> to take advantage of this new functionality.</p>
 </div>
 
 
@@ -205,12 +235,12 @@
   
 
 
-<time datetime="2019-02-07T21:38:07-05:00" pubdate data-updated="true">Feb 7<span>th</span>, 2019</time>
+<time datetime="2019-09-21T21:34:52-04:00" pubdate data-updated="true">Sep 21<span>st</span>, 2019</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/android/'>Android</a>
+    <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/testing/'>Testing</a>
   
 </span>
 
@@ -219,7 +249,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://michaelevans.org/blog/2019/02/07/hands-on-with-viewpager2/" data-via="m_evans10" data-counturl="http://michaelevans.org/blog/2019/02/07/hands-on-with-viewpager2/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://michaelevans.org/blog/2019/09/21/stop-repeating-yourself-sharing-test-code-across-android-modules/" data-via="m_evans10" data-counturl="http://michaelevans.org/blog/2019/09/21/stop-repeating-yourself-sharing-test-code-across-android-modules/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -232,10 +262,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2016/08/23/enabling-night-mode-on-android-nougat/" title="Previous Post: Enabling Night Mode on Android Nougat">&laquo; Enabling Night Mode on Android Nougat</a>
+        <a class="basic-alignment left" href="/blog/2019/02/07/hands-on-with-viewpager2/" title="Previous Post: Hands on with ViewPager2">&laquo; Hands on with ViewPager2</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2019/09/21/stop-repeating-yourself-sharing-test-code-across-android-modules/" title="Next Post: Stop Repeating Yourself: Sharing test code across Android Modules">Stop Repeating Yourself: Sharing test code across Android Modules &raquo;</a>
       
     </p>
   </footer>
@@ -339,8 +367,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://michaelevans.org/blog/2019/02/07/hands-on-with-viewpager2/';
-        var disqus_url = 'http://michaelevans.org/blog/2019/02/07/hands-on-with-viewpager2/';
+        var disqus_identifier = 'http://michaelevans.org/blog/2019/09/21/stop-repeating-yourself-sharing-test-code-across-android-modules/';
+        var disqus_url = 'http://michaelevans.org/blog/2019/09/21/stop-repeating-yourself-sharing-test-code-across-android-modules/';
         var disqus_script = 'embed.js';
       
     (function () {

@@ -10,7 +10,7 @@
   <meta name="author" content="Michael Evans">
 
   
-  <meta name="description" content="Today Google released their alpha of ViewPager2, a signal of the nail in the coffin for the original ViewPager, originally released in 2011! Since &hellip;">
+  <meta name="description" content="It seems like nowadays, the best advice is to modularize your Android app. It&rsquo;s a great suggestion for many reasons, including but not limited &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -79,6 +79,149 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2019/09/21/stop-repeating-yourself-sharing-test-code-across-android-modules/">Stop Repeating Yourself: Sharing Test Code Across Android Modules</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2019-09-21T21:34:52-04:00" pubdate data-updated="true">Sep 21<span>st</span>, 2019</time>
+        
+         | <a href="/blog/2019/09/21/stop-repeating-yourself-sharing-test-code-across-android-modules/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>It seems like nowadays, the <a href="https://jeroenmols.com/blog/2019/03/06/modularizationwhy/">best advice</a> <a href="https://robinhood.engineering/breaking-up-the-app-module-monolith-the-story-of-robinhoods-android-app-707fb993a50c">is to modularize</a> <a href="https://www.youtube.com/watch?v=PZBg5DIzNww">your Android app</a>. It&rsquo;s a great suggestion for many reasons, including but not limited to:</p>
+
+<pre><code>- improved build performance
+- enables on-demand delivery
+- pushes you to build reusable, discrete components
+</code></pre>
+
+<p>Sounds great, right? Are there any downsides? There is one in particular which has been a a pain point for many.</p>
+
+<p>Often times when you&rsquo;re writing tests, you&rsquo;ll want to use some <a href="https://testing.googleblog.com/2013/07/testing-on-toilet-know-your-test-doubles.html">test doubles</a> like fakes or fixtures in order to help simulate the system under test. Maybe you have a <code>FakeUser</code> instance that you use in your tests to avoid having to mock a <code>User</code> every time your test calls for one. Generally these classes live alongside tests in <code>src/test</code> directories and are used to test out your code within a module.</p>
+
+<p>For example, maybe you have a model object like:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>public class User {
+</span><span class='line'>    private final String firstName;
+</span><span class='line'>    private final String lastName;
+</span><span class='line'>
+</span><span class='line'>    public User(String firstName, String lastName) {
+</span><span class='line'>        this.firstName = firstName;
+</span><span class='line'>        this.lastName = lastName;
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>    public String getFirstName() {
+</span><span class='line'>        return firstName;
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>    public String getLastName() {
+</span><span class='line'>        return lastName;
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You might have some code in <code>src/test</code> that creates a bunch of fake users for your tests like:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>class TheOfficeFixtures {
+</span><span class='line'>        public static User manager = new User("Michael", "Scott");
+</span><span class='line'>        public static User assistantToTheRegionalManager = new User("Dwight", "Schrute");
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This works great if you&rsquo;re testing code <em>within</em> a module, but as soon as you&rsquo;d like to use these fake users in other modules, you&rsquo;ll note that these classes aren&rsquo;t shared!</p>
+
+<p>This code can&rsquo;t be shared between modules because Gradle doesn&rsquo;t expose the output of your test source set as a build artifact. There are all kinds of solutions for this problem out there, including <a href="https://treatwell.engineering/mock-factory-for-android-testing-in-multi-module-system-7654f45808be">creating a special module for all your fixtures</a>, and using <a href="https://stackoverflow.com/questions/5644011/multi-project-test-dependencies-with-gradle">gradle dependency hacks</a> to wire up source sets.</p>
+
+<p>However, that&rsquo;s not necessary anymore! As of version 5.6, Gradle now ships a new &lsquo;test-fixtures&rsquo; plugin! This plugin creates a new <code>testFixtures</code> source set, and configures that source set so that:</p>
+
+<pre><code>- classes in this set can see the main source set classes
+- test sources can see the test fixtures classes
+</code></pre>
+
+<h3>Using the Plugin</h3>
+
+<p>You can apply the <code>java-test-fixtures</code> plugin in your build.gradle script:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>plugins {
+</span><span class='line'>    id 'java-test-fixtures'
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This plugin will define the necessary source set, and handle all the wiring up of test artifacts. We can now  move those test fixtures from <code>src/test/java</code> to <code>src/testFixtures/java</code>, and that&rsquo;s it! These classes will be ready to be consumed by other modules.</p>
+
+<h3>Wiring it all together</h3>
+
+<p>Finally, we need to use a special keyword to pull these new fixtures in as a dependency for our tests. In our  gradle configuration, we add a test dependency (either API or Implementation) like so:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>dependencies {
+</span><span class='line'>    testImplementation(testFixtures(project(":lib")))
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And that&rsquo;s it! Our other module can now consume these test fixtures without any sort of intermediate modules or workarounds.</p>
+
+<p>If you&rsquo;d like to check out the complete configuration with examples sharing fixtures between both Kotlin and Java modules to a shared &ldquo;app&rdquo; module, I&rsquo;ve uploaded a sample project demonstrating how to use this new configuration <a href="https://github.com/MichaelEvans/TestFixturesExample">here</a>.</p>
+
+<h2>Important Caveat</h2>
+
+<p>It&rsquo;s important to note that this feature is currently only available with the <code>java-library</code> plugin, and has limited functionality in Kotlin modules, and not yet available for Android modules. There are currently feature requests on <a href="https://youtrack.jetbrains.com/issue/KT-33877">YouTrack</a> and the <a href="https://issuetracker.google.com/issues/139438142">Android Issue Tracker</a> to take advantage of this new functionality.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -494,53 +637,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/07/14/improving-your-code-with-android-support-annotations/">Improving Your Code With Android Support Annotations</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-07-14T22:46:56-04:00" pubdate data-updated="true">Jul 14<span>th</span>, 2015</time>
-        
-         | <a href="/blog/2015/07/14/improving-your-code-with-android-support-annotations/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>If you haven&rsquo;t heard of the Android Support Annotations library yet, you&rsquo;re missing out on a neat new package that will help you catch bugs in your apps. Included in the library is a number of Java annotations, that will help Android Studio check your code for possible errors and report them to you. There are quite a few of them, so I only plan to go over a few of them here, but you should definitely <a href="http://tools.android.com/tech-docs/support-annotations">check out the docs</a> for more info about the rest.</p>
-
-<h2>@NonNull / @Nullable</h2>
-
-<p><code>@NonNull</code> and <code>@Nullable</code> are probably the most basic of the support annotations, but also some of the most helpful! Annotate a parameter or method with either of these to denote if the parameter or method&rsquo;s return value can be null or not, and voila, now Android Studio can give us a nice warning that we&rsquo;re doing something unsafe.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2015/07/14/improving-your-code-with-android-support-annotations/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -556,6 +652,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2019/09/21/stop-repeating-yourself-sharing-test-code-across-android-modules/">Stop Repeating Yourself: Sharing test code across Android Modules</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2019/02/07/hands-on-with-viewpager2/">Hands on with ViewPager2</a>
       </li>
     
@@ -569,10 +669,6 @@
     
       <li class="post">
         <a href="/blog/2016/03/09/changelog-for-n-support-libraries/">Changelog for N Support Libraries</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/02/17/using-dagger-1-and-kotlin/">Using Dagger 1 and Kotlin</a>
       </li>
     
   </ul>
