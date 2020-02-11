@@ -10,7 +10,7 @@
   <meta name="author" content="Michael Evans">
 
   
-  <meta name="description" content="It seems like nowadays, the best advice is to modularize your Android app. It&rsquo;s a great suggestion for many reasons, including but not limited &hellip;">
+  <meta name="description" content="Recently, I was doing some code cleanup and noticed that there were some data in the database that was no longer needed. I think most developers &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -79,6 +79,51 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2020/02/10/dropping-columns-like-its-hot/">Dropping Columns Like It&#8217;s Hot</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2020-02-10T20:03:03-05:00" pubdate data-updated="true">Feb 10<span>th</span>, 2020</time>
+        
+         | <a href="/blog/2020/02/10/dropping-columns-like-its-hot/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Recently, I was doing some code cleanup and noticed that there were some data in the database that was no longer needed. I think most developers clean up their codebase of deprecated patterns and unused code, but I personally have not done a good job of ensuring that the same cleanup happens for unused columns in my databases.</p>
+
+<p>Dropping tables that are no longer used is pretty easy (especially if you can just use something like Room&rsquo;s <a href="https://developer.android.com/training/data-storage/room/migrating-db-versions">Migrations</a>) but when trying to remove unused columns, I ran into an unexpected problem. I thought to myself, it’s pretty easy to add or rename a column, why would dropping one be any harder? The existing database library I was using already had a convenient &ldquo;drop column&rdquo; method, so I simply called that and tried to run the migration. During the process, I ended up with a <code>ForeignKeyConstraintException</code>! I quickly scanned the schema to see what could have caused that, and didn&rsquo;t see anything obvious. The table I was trying to modify didn&rsquo;t have any foreign keys itself, and the column I was dropping was not a foreign key. Curious to understand what was happening, I started to dig into what this method call was doing.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2020/02/10/dropping-columns-like-its-hot/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -594,49 +639,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/08/03/using-espresso-for-easy-ui-testing/">Using Espresso for Easy UI Testing</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-08-03T22:16:49-04:00" pubdate data-updated="true">Aug 3<span>rd</span>, 2015</time>
-        
-         | <a href="/blog/2015/08/03/using-espresso-for-easy-ui-testing/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>One thing that I notice when I talk to Android developers is that a lot of them don&rsquo;t put an emphasis on testing. They say that it&rsquo;s too hard to write them or that they are too hard to integrate and set up, or give a bunch of other reasons why they don&rsquo;t. But it&rsquo;s actually pretty simple to write <a href="https://code.google.com/p/android-test-kit/wiki/Espresso">Espresso</a> tests, and they really aren&rsquo;t that hard to integrate with your code base.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2015/08/03/using-espresso-for-easy-ui-testing/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -652,6 +654,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2020/02/10/dropping-columns-like-its-hot/">Dropping Columns Like It&#8217;s Hot</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2019/09/21/stop-repeating-yourself-sharing-test-code-across-android-modules/">Stop Repeating Yourself: Sharing test code across Android Modules</a>
       </li>
     
@@ -665,10 +671,6 @@
     
       <li class="post">
         <a href="/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/">Using Build Types with the Google Services Gradle Plugin</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/03/09/changelog-for-n-support-libraries/">Changelog for N Support Libraries</a>
       </li>
     
   </ul>
@@ -722,7 +724,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2019 - Michael Evans -
+  Copyright &copy; 2020 - Michael Evans -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

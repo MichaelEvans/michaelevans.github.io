@@ -1,0 +1,399 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="msvalidate.01" content="275BF9CDA457668389C1F9916C380DD0" />
+  <title>Dropping Columns Like It's Hot - Michael Evans</title>
+  <meta name="author" content="Michael Evans">
+
+  
+  <meta name="description" content="Dropping Database Columns with SQLite">
+  <meta name="keywords" content="Android">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://michaelevans.org/blog/2020/02/10/dropping-columns-like-its-hot/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Michael Evans" type="application/atom+xml">
+  <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-28589266-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Michael Evans</a></h1>
+  
+    <h2>A bunch of technobabble.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:michaelevans.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Dropping Columns Like It's Hot</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2020-02-10T20:03:03-05:00" pubdate data-updated="true">Feb 10<span>th</span>, 2020</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Recently, I was doing some code cleanup and noticed that there were some data in the database that was no longer needed. I think most developers clean up their codebase of deprecated patterns and unused code, but I personally have not done a good job of ensuring that the same cleanup happens for unused columns in my databases.</p>
+
+<p>Dropping tables that are no longer used is pretty easy (especially if you can just use something like Room&rsquo;s <a href="https://developer.android.com/training/data-storage/room/migrating-db-versions">Migrations</a>) but when trying to remove unused columns, I ran into an unexpected problem. I thought to myself, it’s pretty easy to add or rename a column, why would dropping one be any harder? The existing database library I was using already had a convenient &ldquo;drop column&rdquo; method, so I simply called that and tried to run the migration. During the process, I ended up with a <code>ForeignKeyConstraintException</code>! I quickly scanned the schema to see what could have caused that, and didn&rsquo;t see anything obvious. The table I was trying to modify didn&rsquo;t have any foreign keys itself, and the column I was dropping was not a foreign key. Curious to understand what was happening, I started to dig into what this method call was doing.</p>
+
+<!-- more -->
+
+
+<p>I saw that although you can add a column with SQLite&rsquo;s <code>ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${columnType}</code> statements, there&rsquo;s <a href="https://www.sqlite.org/lang_altertable.html">no support for removing a column out of the box</a>. The library method I was using emulates dropping a column by doing the following:</p>
+
+<ol>
+<li>Rename the existing table into <code>$tablename_old</code></li>
+<li>Creating a new table with all the existing columns, minus the one we don’t want</li>
+<li>Copying all the data from <code>$tablename_old</code> to <code>$tablename</code></li>
+<li>Dropping <code>$tablename_old</code>, since we don’t need it anymore.</li>
+</ol>
+
+
+<p>This process seems to make a lot of sense &ndash; since we can’t remove the column on its own, let’s just make a new table with the structure we want and copy over the data that we want to keep. So why does this process not work?</p>
+
+<h3>The Gotcha!</h3>
+
+<p>If you read the SQlite documentation linked above closely, you might have noticed an important note:</p>
+
+<blockquote><p>Compatibility Note: The behavior of ALTER TABLE when renaming a table was enhanced in versions 3.25.0 (2018-09-15) and 3.26.0 (2018-12-01) in order to carry the rename operation forward into triggers and views that reference the renamed table. This is considered an improvement. Applications that depend on the older (and arguably buggy) behavior can use the PRAGMA legacy_alter_table=ON statement or the SQLITE_DBCONFIG_LEGACY_ALTER_TABLE configuration parameter on sqlite3_db_config() interface to make ALTER TABLE RENAME behave as it did prior to version 3.25.0.</p></blockquote>
+
+<p>What this means is that when we use <code>ALTER</code> to rename a table, any triggers/views/foreign keys that reference that table will now be updated to support it. As an example:</p>
+
+<p>Let&rsquo;s say we had a table <code>users</code> with a few columns: <code>id</code>, <code>first_name</code>, <code>last_name</code>, and <code>age</code>, and we had a table <code>orders</code> with the columns <code>id</code>, <code>order_number</code> and <code>user_id</code>, where <code>user_id</code> was a foreign key back to the <code>users</code> table. It might look a little like this:</p>
+
+<p><img class="center" src="/images/2020/02/10/before_step1.png" width="400" height="400"></p>
+
+<p>Following the steps above, let&rsquo;s try to drop the <code>age</code> column. First we&rsquo;ll rename the existing table into <code>users_old</code>, and create the new table:</p>
+
+<p><img class="center" src="/images/2020/02/10/before_step2.png" width="400" height="600"></p>
+
+<p>Then we copy the the data, and try to drop <code>users_old</code>, and this is where we run into the exception. The grey line in the diagram is our foreign key association, and that will no longer be valid because the <code>orders</code> table will be trying to reference <code>users_old</code> which we are trying to drop.</p>
+
+<p><img class="center" src="/images/2020/02/10/before_step3.png" width="400" height="600"></p>
+
+<p>Fortunately the documentation lists out a better sequence of steps to perform this operation:</p>
+
+<ol>
+<li>Create the new table</li>
+<li>Copy over the data we need</li>
+<li>Drop old table</li>
+<li>Rename the new table with the name of the old table</li>
+</ol>
+
+
+<p>Looking at it more visually &ndash; we&rsquo;ll start with the same tables and create a new table named <code>users_new</code> to hold the preserved data:</p>
+
+<p><img class="center" src="/images/2020/02/10/after_step1.png" width="400" height="600"></p>
+
+<p>Then we&rsquo;ll do the data copy, drop, the old table (but the foreign key relation will still reference the <code>users</code> table), and rename <code>users_new</code> to <code>users</code>.</p>
+
+<p><img class="center" src="/images/2020/02/10/after_step2.png" width="400" height="400"></p>
+
+<p>These steps will ensure that no existing links (views, triggers, etc) are modified. That way when we rename the table in the final step, the existing links will end up referencing the new table already.</p>
+
+<p><img class="center" src="/images/2020/02/10/after_step3.png" width="400" height="400"></p>
+
+<p>TLDR:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>override fun migrate(database: SupportSQLiteDatabase) {
+</span><span class='line'>    // Create the new table
+</span><span class='line'>    database.execSQL("CREATE TABLE users_new (id INTEGER, first_name TEXT, last_name TEXT, PRIMARY KEY(userid))")
+</span><span class='line'>    // Copy the data
+</span><span class='line'>    database.execSQL("INSERT INTO users_new (id, first_name, last_name) SELECT id, first_name, last_name FROM users")
+</span><span class='line'>    // Remove the old table
+</span><span class='line'>    database.execSQL("DROP TABLE users")
+</span><span class='line'>    // Change the table name to the correct one
+</span><span class='line'>    database.execSQL("ALTER TABLE users_new RENAME TO users")
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Hopefully this discovery helps you better clean up those unused columns in your databases!</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Michael Evans</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2020-02-10T20:03:03-05:00" pubdate data-updated="true">Feb 10<span>th</span>, 2020</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/android/'>Android</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://michaelevans.org/blog/2020/02/10/dropping-columns-like-its-hot/" data-via="m_evans10" data-counturl="http://michaelevans.org/blog/2020/02/10/dropping-columns-like-its-hot/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2019/09/21/stop-repeating-yourself-sharing-test-code-across-android-modules/" title="Previous Post: Stop Repeating Yourself: Sharing test code across Android Modules">&laquo; Stop Repeating Yourself: Sharing test code across Android Modules</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2020/02/10/dropping-columns-like-its-hot/">Dropping Columns Like It's Hot</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2019/09/21/stop-repeating-yourself-sharing-test-code-across-android-modules/">Stop Repeating Yourself: Sharing test code across Android Modules</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2019/02/07/hands-on-with-viewpager2/">Hands on with ViewPager2</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/08/23/enabling-night-mode-on-android-nougat/">Enabling Night Mode on Android Nougat</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/">Using Build Types with the Google Services Gradle Plugin</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/MichaelEvans">@MichaelEvans</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'MichaelEvans',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/114052868601022948953?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2020 - Michael Evans -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mevans';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://michaelevans.org/blog/2020/02/10/dropping-columns-like-its-hot/';
+        var disqus_url = 'http://michaelevans.org/blog/2020/02/10/dropping-columns-like-its-hot/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

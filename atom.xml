@@ -4,7 +4,7 @@
   <title><![CDATA[Michael Evans]]></title>
   <link href="http://michaelevans.org/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2019-09-21T21:39:41-04:00</updated>
+  <updated>2020-02-10T21:37:27-05:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -12,6 +12,100 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Dropping Columns Like It's Hot]]></title>
+    <link href="http://michaelevans.org/blog/2020/02/10/dropping-columns-like-its-hot/"/>
+    <updated>2020-02-10T20:03:03-05:00</updated>
+    <id>http://michaelevans.org/blog/2020/02/10/dropping-columns-like-its-hot</id>
+    <content type="html"><![CDATA[<p>Recently, I was doing some code cleanup and noticed that there were some data in the database that was no longer needed. I think most developers clean up their codebase of deprecated patterns and unused code, but I personally have not done a good job of ensuring that the same cleanup happens for unused columns in my databases.</p>
+
+<p>Dropping tables that are no longer used is pretty easy (especially if you can just use something like Room&rsquo;s <a href="https://developer.android.com/training/data-storage/room/migrating-db-versions">Migrations</a>) but when trying to remove unused columns, I ran into an unexpected problem. I thought to myself, it’s pretty easy to add or rename a column, why would dropping one be any harder? The existing database library I was using already had a convenient &ldquo;drop column&rdquo; method, so I simply called that and tried to run the migration. During the process, I ended up with a <code>ForeignKeyConstraintException</code>! I quickly scanned the schema to see what could have caused that, and didn&rsquo;t see anything obvious. The table I was trying to modify didn&rsquo;t have any foreign keys itself, and the column I was dropping was not a foreign key. Curious to understand what was happening, I started to dig into what this method call was doing.</p>
+
+<!-- more -->
+
+
+<p>I saw that although you can add a column with SQLite&rsquo;s <code>ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${columnType}</code> statements, there&rsquo;s <a href="https://www.sqlite.org/lang_altertable.html">no support for removing a column out of the box</a>. The library method I was using emulates dropping a column by doing the following:</p>
+
+<ol>
+<li>Rename the existing table into <code>$tablename_old</code></li>
+<li>Creating a new table with all the existing columns, minus the one we don’t want</li>
+<li>Copying all the data from <code>$tablename_old</code> to <code>$tablename</code></li>
+<li>Dropping <code>$tablename_old</code>, since we don’t need it anymore.</li>
+</ol>
+
+
+<p>This process seems to make a lot of sense &ndash; since we can’t remove the column on its own, let’s just make a new table with the structure we want and copy over the data that we want to keep. So why does this process not work?</p>
+
+<h3>The Gotcha!</h3>
+
+<p>If you read the SQlite documentation linked above closely, you might have noticed an important note:</p>
+
+<blockquote><p>Compatibility Note: The behavior of ALTER TABLE when renaming a table was enhanced in versions 3.25.0 (2018-09-15) and 3.26.0 (2018-12-01) in order to carry the rename operation forward into triggers and views that reference the renamed table. This is considered an improvement. Applications that depend on the older (and arguably buggy) behavior can use the PRAGMA legacy_alter_table=ON statement or the SQLITE_DBCONFIG_LEGACY_ALTER_TABLE configuration parameter on sqlite3_db_config() interface to make ALTER TABLE RENAME behave as it did prior to version 3.25.0.</p></blockquote>
+
+<p>What this means is that when we use <code>ALTER</code> to rename a table, any triggers/views/foreign keys that reference that table will now be updated to support it. As an example:</p>
+
+<p>Let&rsquo;s say we had a table <code>users</code> with a few columns: <code>id</code>, <code>first_name</code>, <code>last_name</code>, and <code>age</code>, and we had a table <code>orders</code> with the columns <code>id</code>, <code>order_number</code> and <code>user_id</code>, where <code>user_id</code> was a foreign key back to the <code>users</code> table. It might look a little like this:</p>
+
+<p><img class="center" src="http://michaelevans.org/images/2020/02/10/before_step1.png" width="400" height="400"></p>
+
+<p>Following the steps above, let&rsquo;s try to drop the <code>age</code> column. First we&rsquo;ll rename the existing table into <code>users_old</code>, and create the new table:</p>
+
+<p><img class="center" src="http://michaelevans.org/images/2020/02/10/before_step2.png" width="400" height="600"></p>
+
+<p>Then we copy the the data, and try to drop <code>users_old</code>, and this is where we run into the exception. The grey line in the diagram is our foreign key association, and that will no longer be valid because the <code>orders</code> table will be trying to reference <code>users_old</code> which we are trying to drop.</p>
+
+<p><img class="center" src="http://michaelevans.org/images/2020/02/10/before_step3.png" width="400" height="600"></p>
+
+<p>Fortunately the documentation lists out a better sequence of steps to perform this operation:</p>
+
+<ol>
+<li>Create the new table</li>
+<li>Copy over the data we need</li>
+<li>Drop old table</li>
+<li>Rename the new table with the name of the old table</li>
+</ol>
+
+
+<p>Looking at it more visually &ndash; we&rsquo;ll start with the same tables and create a new table named <code>users_new</code> to hold the preserved data:</p>
+
+<p><img class="center" src="http://michaelevans.org/images/2020/02/10/after_step1.png" width="400" height="600"></p>
+
+<p>Then we&rsquo;ll do the data copy, drop, the old table (but the foreign key relation will still reference the <code>users</code> table), and rename <code>users_new</code> to <code>users</code>.</p>
+
+<p><img class="center" src="http://michaelevans.org/images/2020/02/10/after_step2.png" width="400" height="400"></p>
+
+<p>These steps will ensure that no existing links (views, triggers, etc) are modified. That way when we rename the table in the final step, the existing links will end up referencing the new table already.</p>
+
+<p><img class="center" src="http://michaelevans.org/images/2020/02/10/after_step3.png" width="400" height="400"></p>
+
+<p>TLDR:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>override fun migrate(database: SupportSQLiteDatabase) {
+</span><span class='line'>    // Create the new table
+</span><span class='line'>    database.execSQL("CREATE TABLE users_new (id INTEGER, first_name TEXT, last_name TEXT, PRIMARY KEY(userid))")
+</span><span class='line'>    // Copy the data
+</span><span class='line'>    database.execSQL("INSERT INTO users_new (id, first_name, last_name) SELECT id, first_name, last_name FROM users")
+</span><span class='line'>    // Remove the old table
+</span><span class='line'>    database.execSQL("DROP TABLE users")
+</span><span class='line'>    // Change the table name to the correct one
+</span><span class='line'>    database.execSQL("ALTER TABLE users_new RENAME TO users")
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Hopefully this discovery helps you better clean up those unused columns in your databases!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Stop Repeating Yourself: Sharing test code across Android Modules]]></title>
@@ -1614,93 +1708,6 @@ Liquid::Template.register_tag('google_plus', Jekyll::GooglePlusEmbedTag)</code><
 <p>In addition to paricipating from your computer, Google has also launched an <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.helpouts">Android app</a> so that you can get help while you&rsquo;re mobile as well. Whether you&rsquo;re interested in giving Helpouts a shot, want to learn about writing apps for Android, or just want to see what the newest Google product looks like &ndash; feel free to checkout <a href="https://helpouts.google.com/114052868601022948953/ls/a65184ab017ae8b0">my listing!</a>.</p>
 
 <p><img class="center" src="http://michaelevans.org/images/2013/11/05/waiting.png" width="600" height="600" title="Waiting" ></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Using a ViewPager in a ScrollView]]></title>
-    <link href="http://michaelevans.org/blog/2013/10/13/using-a-viewpager-in-a-scrollview/"/>
-    <updated>2013-10-13T20:48:00-04:00</updated>
-    <id>http://michaelevans.org/blog/2013/10/13/using-a-viewpager-in-a-scrollview</id>
-    <content type="html"><![CDATA[<p>For a new app that I&rsquo;m working on, I wanted to use a ViewPager inside a ScrollView in order to make a simple image carousel. The only problem is, ScrollViews don&rsquo;t seem to play nicely with horizontally swiping Views. As soon as the user moves their finger even slightly up or down, the ViewPager page change is cancelled, and the page snaps back to the current item. This can lead to an extremely frustrating user experience, because it is difficult for the user to understand why the views won&rsquo;t swipe.</p>
-
-<!-- more -->
-
-
-<p>A popular solution that I&rsquo;ve seen online is to use the ViewPager&rsquo;s <code>getParent().requestDisallowInterceptTouchEvent(true);</code> method to prevent the ScrollView from scrolling while the ViewPager is being touched or scrolled. The solution that I&rsquo;ve been using is a bit like this, but it provides a little bit of a &ldquo;drag threshold&rdquo;, which is a bit forgiving in the event that the user is trying to drag the ScrollView, but happens to have their finger in the ViewPager. The code I used is as follows:</p>
-
-<figure class='code'><figcaption><span>PagerTouchListener.java</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">mPager</span><span class="o">.</span><span class="na">setOnTouchListener</span><span class="o">(</span><span class="k">new</span> <span class="n">View</span><span class="o">.</span><span class="na">OnTouchListener</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">dragthreshold</span> <span class="o">=</span> <span class="mi">30</span><span class="o">;</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">downX</span><span class="o">;</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">downY</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nd">@Override</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">onTouch</span><span class="o">(</span><span class="n">View</span> <span class="n">v</span><span class="o">,</span> <span class="n">MotionEvent</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="k">switch</span> <span class="o">(</span><span class="n">event</span><span class="o">.</span><span class="na">getAction</span><span class="o">())</span> <span class="o">{</span>
-</span><span class='line'>        <span class="k">case</span> <span class="n">MotionEvent</span><span class="o">.</span><span class="na">ACTION_DOWN</span><span class="o">:</span>
-</span><span class='line'>            <span class="n">downX</span> <span class="o">=</span> <span class="o">(</span><span class="kt">int</span><span class="o">)</span> <span class="n">event</span><span class="o">.</span><span class="na">getRawX</span><span class="o">();</span>
-</span><span class='line'>            <span class="n">downY</span> <span class="o">=</span> <span class="o">(</span><span class="kt">int</span><span class="o">)</span> <span class="n">event</span><span class="o">.</span><span class="na">getRawY</span><span class="o">();</span>
-</span><span class='line'>            <span class="k">break</span><span class="o">;</span>
-</span><span class='line'>        <span class="k">case</span> <span class="n">MotionEvent</span><span class="o">.</span><span class="na">ACTION_MOVE</span><span class="o">:</span>
-</span><span class='line'>            <span class="kt">int</span> <span class="n">distanceX</span> <span class="o">=</span> <span class="n">Math</span><span class="o">.</span><span class="na">abs</span><span class="o">((</span><span class="kt">int</span><span class="o">)</span> <span class="n">event</span><span class="o">.</span><span class="na">getRawX</span><span class="o">()</span> <span class="o">-</span> <span class="n">downX</span><span class="o">);</span>
-</span><span class='line'>            <span class="kt">int</span> <span class="n">distanceY</span> <span class="o">=</span> <span class="n">Math</span><span class="o">.</span><span class="na">abs</span><span class="o">((</span><span class="kt">int</span><span class="o">)</span> <span class="n">event</span><span class="o">.</span><span class="na">getRawY</span><span class="o">()</span> <span class="o">-</span> <span class="n">downY</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'>            <span class="k">if</span> <span class="o">(</span><span class="n">distanceY</span> <span class="o">&gt;</span> <span class="n">distanceX</span> <span class="o">&amp;&amp;</span> <span class="n">distanceY</span> <span class="o">&gt;</span> <span class="n">dragthreshold</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>                <span class="n">mPager</span><span class="o">.</span><span class="na">getParent</span><span class="o">().</span><span class="na">requestDisallowInterceptTouchEvent</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
-</span><span class='line'>                <span class="n">mScrollView</span><span class="o">.</span><span class="na">getParent</span><span class="o">().</span><span class="na">requestDisallowInterceptTouchEvent</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
-</span><span class='line'>            <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">distanceX</span> <span class="o">&gt;</span> <span class="n">distanceY</span> <span class="o">&amp;&amp;</span> <span class="n">distanceX</span> <span class="o">&gt;</span> <span class="n">dragthreshold</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>                <span class="n">mPager</span><span class="o">.</span><span class="na">getParent</span><span class="o">().</span><span class="na">requestDisallowInterceptTouchEvent</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
-</span><span class='line'>                <span class="n">mScrollView</span><span class="o">.</span><span class="na">getParent</span><span class="o">().</span><span class="na">requestDisallowInterceptTouchEvent</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
-</span><span class='line'>            <span class="o">}</span>
-</span><span class='line'>            <span class="k">break</span><span class="o">;</span>
-</span><span class='line'>        <span class="k">case</span> <span class="n">MotionEvent</span><span class="o">.</span><span class="na">ACTION_UP</span><span class="o">:</span>
-</span><span class='line'>            <span class="n">mScrollView</span><span class="o">.</span><span class="na">getParent</span><span class="o">().</span><span class="na">requestDisallowInterceptTouchEvent</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
-</span><span class='line'>            <span class="n">mPager</span><span class="o">.</span><span class="na">getParent</span><span class="o">().</span><span class="na">requestDisallowInterceptTouchEvent</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
-</span><span class='line'>            <span class="k">break</span><span class="o">;</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>        <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>I found this very useful solution on <a href="http://stackoverflow.com/questions/8381697/viewpager-inside-a-scrollview-does-not-scroll-correclty/16224484#16224484">StackOverflow</a>, among many other solutions that did work (although not as nicely as this one).</p>
 ]]></content>
   </entry>
   

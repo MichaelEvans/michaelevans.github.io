@@ -198,14 +198,18 @@
         <loc>
             http://michaelevans.org/blog/2019/09/21/stop-repeating-yourself-sharing-test-code-across-android-modules/
         </loc>
-        <lastmod>2019-09-21T21:38:55-04:00</lastmod>
+        <lastmod>2019-10-17T20:51:44-04:00</lastmod>
+    </url>
+    <url>
+        <loc>http://michaelevans.org/blog/2020/02/10/dropping-columns-like-its-hot/</loc>
+        <lastmod>2020-02-10T21:37:12-05:00</lastmod>
     </url>
     <url>
         <loc>http://michaelevans.org/blog/archives/</loc>
-        <lastmod>2019-09-21T21:38:55-04:00</lastmod>
+        <lastmod>2020-02-10T21:37:12-05:00</lastmod>
     </url>
     <url>
         <loc>http://michaelevans.org/</loc>
-        <lastmod>2019-09-21T21:38:55-04:00</lastmod>
+        <lastmod>2020-02-10T21:37:12-05:00</lastmod>
     </url>
 </urlset>
