@@ -1,0 +1,421 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="msvalidate.01" content="275BF9CDA457668389C1F9916C380DD0" />
+  <title>Improving App Debugging with Flipper - Michael Evans</title>
+  <meta name="author" content="Michael Evans">
+
+  
+  <meta name="description" content="Improving App Debugging with Flipper">
+  <meta name="keywords" content="Android">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://michaelevans.org/blog/2020/03/10/improving-app-debugging-with-flipper/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Michael Evans" type="application/atom+xml">
+  <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-28589266-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Michael Evans</a></h1>
+  
+    <h2>A bunch of technobabble.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:michaelevans.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Improving App Debugging With Flipper</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2020-03-10T20:10:22-04:00" pubdate data-updated="true">Mar 10<span>th</span>, 2020</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Some time last year, Facebook released a new mobile debugging tool, named <a href="https://fbflipper.com/">Flipper</a>. It&rsquo;s essentially the successor to the widely popular <a href="http://facebook.github.io/stetho/">Stetho</a>. Although after talking to many developers, it seems like this newer tool is relatively unknown.</p>
+
+<p>Like Stetho, Flipper has many built-in features &ndash; including a layout inspector, a database inspector and a network inspector. Unlike Stetho though, Flipper has a very extensible API which allows for tons of customization. Over the next few articles, we&rsquo;re going to take a look at Flipper and its plugins, the APIs it provides, and how we can leverage them to help us debug various parts of our app. This post will focus on getting set up with Flipper, as well as taking a look at two of its most useful default plugins.</p>
+
+<h2>Getting Started</h2>
+
+<p>Getting started with Flipper is really easy:</p>
+
+<ul>
+<li><a href="https://fbflipper.com/">Download the desktop client</a>,</li>
+<li>Add the dependencies in your build.gradle:</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>repositories {
+</span><span class='line'>  jcenter()
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>dependencies {
+</span><span class='line'>  debugImplementation 'com.facebook.flipper:flipper:0.33.1'
+</span><span class='line'>  debugImplementation 'com.facebook.soloader:soloader:0.8.2'
+</span><span class='line'>
+</span><span class='line'>  releaseImplementation 'com.facebook.flipper:flipper-noop:0.33.1'
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Initialize the Flipper client when your application starts:</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>class SampleApplication : Application() {
+</span><span class='line'>    override fun onCreate() {
+</span><span class='line'>        super.onCreate()
+</span><span class='line'>        SoLoader.init(this, false)
+</span><span class='line'>
+</span><span class='line'>        if (BuildConfig.DEBUG && FlipperUtils.shouldEnableFlipper(this)) {
+</span><span class='line'>            val client = AndroidFlipperClient.getInstance(this)
+</span><span class='line'>            client.addPlugin(InspectorFlipperPlugin(this, DescriptorMapping.withDefaults()))
+</span><span class='line'>            client.start()
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And that&rsquo;s it! Opening the desktop client should show you an overview of your app with the Inspector plugin configured.</p>
+
+<h2>Inspector Plugin</h2>
+
+<p>The Inspector Plugin is similar to the one found in <a href="https://developer.android.com/studio/debug/layout-inspector">Android Studio 4.0</a>, but has a few neat features. I like it because it operates in real-time, and doesn&rsquo;t require any attaching to process in Studio every time you want to inspect a layout.</p>
+
+<p>Another thing you can do in the Layout Inspector that&rsquo;s really cool is actually <em>edit</em> properties! Pretty mind blowing to make tweaks in the inspector and watch the views change in realtime. It&rsquo;s really handy for experimenting with changing padding, and text colors. It doesn&rsquo;t actually edit any of your xml files, but this allows you to iterate quickly to make sure everything looks right.</p>
+
+<p>Let&rsquo;s find a view we want to update (like our repository name):</p>
+
+<p><img class="center" src="/images/2020/03/10/inspecting.png" width="800" height="800"></p>
+
+<p><img class="center" src="/images/2020/03/10/selecting.png" width="800" height="800"></p>
+
+<p>We can click on the the color swatch to open a color picker:</p>
+
+<p><img class="center" src="/images/2020/03/10/editing.png" width="800" height="800"></p>
+
+<p>And now when we look over at our device:</p>
+
+<p><img class="center" src="/images/2020/03/10/previewing.png" width="800" height="800"></p>
+
+<p>Neat!</p>
+
+<h2>Database Browser / Plugin</h2>
+
+<p>Something I&rsquo;ve wanted for a long time was a way to view the contents of my database from Android Studio. Right now, if you want to visualize your data or try out some queries &ndash; the best solution is to pull the sqlite database file off your emulator/device and run sqlite locally. But with Flipper, there&rsquo;s a better way!</p>
+
+<p>All we need to do is configure the database plugin, and our tables should show up right away:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>client.addPlugin(DatabasesFlipperPlugin(context))</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img class="center" src="/images/2020/03/10/database_browser.png" width="800" height="800"></p>
+
+<p>Now we can easily inspect the contents of our tables, and even run queries on the live running application!</p>
+
+<p><img class="center" src="/images/2020/03/10/writing_queries.png" width="800" height="800"></p>
+
+<p>I&rsquo;ve <a href="https://github.com/MichaelEvans/architecture-components-samples/commit/274ea5702cb5f10ea13012ce6d9fc6b6896f471e">pushed a branch</a> of the Github Browser Architecture Component sample with these changes to GitHub if you&rsquo;d like to try it out. Next time we&rsquo;ll take advantage of Flipper&rsquo;s extensibility to create our own plugins to make debugging our app easier!</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Michael Evans</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2020-03-10T20:10:22-04:00" pubdate data-updated="true">Mar 10<span>th</span>, 2020</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/android/'>Android</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://michaelevans.org/blog/2020/03/10/improving-app-debugging-with-flipper/" data-via="m_evans10" data-counturl="http://michaelevans.org/blog/2020/03/10/improving-app-debugging-with-flipper/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2020/02/10/dropping-columns-like-its-hot/" title="Previous Post: Dropping Columns Like It's Hot">&laquo; Dropping Columns Like It's Hot</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2020/03/10/improving-app-debugging-with-flipper/">Improving App Debugging with Flipper</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2020/02/10/dropping-columns-like-its-hot/">Dropping Columns Like It's Hot</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2019/09/21/stop-repeating-yourself-sharing-test-code-across-android-modules/">Stop Repeating Yourself: Sharing test code across Android Modules</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2019/02/07/hands-on-with-viewpager2/">Hands on with ViewPager2</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/08/23/enabling-night-mode-on-android-nougat/">Enabling Night Mode on Android Nougat</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/MichaelEvans">@MichaelEvans</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'MichaelEvans',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/114052868601022948953?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2020 - Michael Evans -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mevans';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://michaelevans.org/blog/2020/03/10/improving-app-debugging-with-flipper/';
+        var disqus_url = 'http://michaelevans.org/blog/2020/03/10/improving-app-debugging-with-flipper/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

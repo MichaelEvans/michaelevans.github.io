@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Android | Michael Evans]]></title>
   <link href="http://michaelevans.org/blog/categories/android/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2020-02-10T21:37:27-05:00</updated>
+  <updated>2020-03-11T00:41:57-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -12,6 +12,99 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Improving App Debugging with Flipper]]></title>
+    <link href="http://michaelevans.org/blog/2020/03/10/improving-app-debugging-with-flipper/"/>
+    <updated>2020-03-10T20:10:22-04:00</updated>
+    <id>http://michaelevans.org/blog/2020/03/10/improving-app-debugging-with-flipper</id>
+    <content type="html"><![CDATA[<p>Some time last year, Facebook released a new mobile debugging tool, named <a href="https://fbflipper.com/">Flipper</a>. It&rsquo;s essentially the successor to the widely popular <a href="http://facebook.github.io/stetho/">Stetho</a>. Although after talking to many developers, it seems like this newer tool is relatively unknown.</p>
+
+<p>Like Stetho, Flipper has many built-in features &ndash; including a layout inspector, a database inspector and a network inspector. Unlike Stetho though, Flipper has a very extensible API which allows for tons of customization. Over the next few articles, we&rsquo;re going to take a look at Flipper and its plugins, the APIs it provides, and how we can leverage them to help us debug various parts of our app. This post will focus on getting set up with Flipper, as well as taking a look at two of its most useful default plugins.</p>
+
+<h2>Getting Started</h2>
+
+<p>Getting started with Flipper is really easy:</p>
+
+<ul>
+<li><a href="https://fbflipper.com/">Download the desktop client</a>,</li>
+<li>Add the dependencies in your build.gradle:
+```
+repositories {
+jcenter()
+}</li>
+</ul>
+
+
+<p>dependencies {
+  debugImplementation &lsquo;com.facebook.flipper:flipper:0.33.1&rsquo;
+  debugImplementation &lsquo;com.facebook.soloader:soloader:0.8.2&rsquo;</p>
+
+<p>  releaseImplementation &lsquo;com.facebook.flipper:flipper-noop:0.33.1&rsquo;
+}
+<code>
+- Initialize the Flipper client when your application starts:
+</code>
+class SampleApplication : Application() {</p>
+
+<pre><code>override fun onCreate() {
+    super.onCreate()
+    SoLoader.init(this, false)
+
+    if (BuildConfig.DEBUG &amp;&amp; FlipperUtils.shouldEnableFlipper(this)) {
+        val client = AndroidFlipperClient.getInstance(this)
+        client.addPlugin(InspectorFlipperPlugin(this, DescriptorMapping.withDefaults()))
+        client.start()
+    }
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<p>And that&rsquo;s it! Opening the desktop client should show you an overview of your app with the Inspector plugin configured.</p>
+
+<h2>Inspector Plugin</h2>
+
+<p>The Inspector Plugin is similar to the one found in <a href="https://developer.android.com/studio/debug/layout-inspector">Android Studio 4.0</a>, but has a few neat features. I like it because it operates in real-time, and doesn&rsquo;t require any attaching to process in Studio every time you want to inspect a layout.</p>
+
+<p>Another thing you can do in the Layout Inspector that&rsquo;s really cool is actually <em>edit</em> properties! Pretty mind blowing to make tweaks in the inspector and watch the views change in realtime. It&rsquo;s really handy for experimenting with changing padding, and text colors. It doesn&rsquo;t actually edit any of your xml files, but this allows you to iterate quickly to make sure everything looks right.</p>
+
+<p>Let&rsquo;s find a view we want to update (like our repository name):</p>
+
+<p><img class="center" src="/images/2020/03/10/inspecting.png" width="800" height="800"></p>
+
+<p><img class="center" src="/images/2020/03/10/selecting.png" width="800" height="800"></p>
+
+<p>We can click on the the color swatch to open a color picker:</p>
+
+<p><img class="center" src="/images/2020/03/10/editing.png" width="800" height="800"></p>
+
+<p>And now when we look over at our device:</p>
+
+<p><img class="center" src="/images/2020/03/10/previewing.png" width="800" height="800"></p>
+
+<p>Neat!</p>
+
+<h2>Database Browser / Plugin</h2>
+
+<p>Something I&rsquo;ve wanted for a long time was a way to view the contents of my database from Android Studio. Right now, if you want to visualize your data or try out some queries &ndash; the best solution is to pull the sqlite database file off your emulator/device and run sqlite locally. But with Flipper, there&rsquo;s a better way!</p>
+
+<p>All we need to do is configure the database plugin, and our tables should show up right away:</p>
+
+<p><code>
+client.addPlugin(DatabasesFlipperPlugin(context))
+</code></p>
+
+<p><img class="center" src="/images/2020/03/10/database_browser.png" width="800" height="800"></p>
+
+<p>Now we can easily inspect the contents of our tables, and even run queries on the live running application!</p>
+
+<p><img class="center" src="/images/2020/03/10/writing_queries.png" width="800" height="800"></p>
+
+<p>I&rsquo;ve <a href="https://github.com/MichaelEvans/architecture-components-samples/commit/274ea5702cb5f10ea13012ce6d9fc6b6896f471e">pushed a branch</a> of the Github Browser Architecture Component sample with these changes to GitHub if you&rsquo;d like to try it out. Next time we&rsquo;ll take advantage of Flipper&rsquo;s extensibility to create our own plugins to make debugging our app easier!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Dropping Columns Like It's Hot]]></title>
@@ -305,50 +398,6 @@ boolean showNightMode = getIntent().getBooleanExtra(</p>
 <p>Long story short, if you pass the right extras to this activity, and you&rsquo;ll get access to the Night Mode settings (as well as the infamous Quick Tile!).</p>
 
 <p>Fortunately for us, this is pretty trivial to accomplish with <code>adb</code> via <code>adb -d shell am start  --ez show_night_mode true com.android.systemui/.tuner.TunerActivity</code>, but not everyone who wants this feature is familiar with <code>adb</code>. So I published an app to the Play Store that does exactly that &ndash; click one button, and get access to those settings! You can find the app on the Play Store <a href="https://play.google.com/store/apps/details?id=org.michaelevans.nightmodeenabler">here</a>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Using Build Types with the Google Services Gradle Plugin]]></title>
-    <link href="http://michaelevans.org/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/"/>
-    <updated>2016-03-31T21:11:55-04:00</updated>
-    <id>http://michaelevans.org/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin</id>
-    <content type="html"><![CDATA[<p>If you want to integrate your Android app with most of Google Play Services nowadays, you&rsquo;ll find that you are instructed to set up the <a href="https://developers.google.com/android/guides/google-services-plugin">Google Services Gradle plugin</a> to handle configuring dependencies. The plugin allows you to drop a JSON file into your project, and then the plugin will do a bunch of the configuration for your project, such as handling the API keys.</p>
-
-<p>This is all well and good—unless you&rsquo;re like me (<a href="https://github.com/googlesamples/google-services/issues/54">and countless others</a>) and want to use a different configuration for your debug and release builds. This would be useful, as an example, if you use Google Play Services for GCM and would like to have development builds recieve pushes from non-production systems.</p>
-
-<p>It seems that the plugin is configured in such a way that it supports build flavors, but it does not yet support build types. However, with a little Gradle magic, we can hack that support in.</p>
-
-<!-- more -->
-
-
-<p><strong>Disclaimer: This approach worked for me—but as with any hack, it is subject to break.</strong></p>
-
-<p>So how can we go about doing this? We want to put the debug JSON file into the root of our app module during debug builds and use the release one for release builds. If you don&rsquo;t do that, or if you attempt to put it in <code>app/debug</code> and <code>app/release</code>, you&rsquo;ll get an error that says <code>File google-services.json is missing from module root folder. The Google Services Plugin cannot function without it</code>.</p>
-
-<p>This error is thrown by a task named <code>process{VariantName}GoogleServices</code>. What we could do to solve this is swap the file in before that task is run! Using a little Groovy magic, I came up with this:</p>
-
-<p>```groovy
-android.applicationVariants.all { variant &ndash;></p>
-
-<pre><code>def hackTask = task("hackGps${variant.name.capitalize()}") &lt;&lt; {
-    copy {
-        from rootProject.file("config/${variant.buildType.name}/google-services.json")
-        into "${projectDir}"
-    }
-}
-def googleTask = tasks.findByName("process${variant.name.capitalize()}GoogleServices")
-googleTask.dependsOn hackTask
-</code></pre>
-
-<p>}
-```</p>
-
-<p>For each one of your variants, this code will create a new task &ndash; <code>hackGps{VariantName}</code>, which copies a <code>google-services.json</code> file from a <code>config</code> directory into the root of your app module. Then it finds the corresponding Google Services task, and hooks itself in to run right before that! Now when you assemble your application, the right <code>google-services.json</code> file will be in the right place, ready to be picked up by the plugin.</p>
-
-<p><em>You might also want to .gitignore the <code>app/google-services.json</code> file, so that you don&rsquo;t keep committing the changed file to git</em></p>
-
-<p>Hopefully Google will fix this issue in an upcoming release of the Google Services plugin, but until then &ndash; this technique should work!</p>
 ]]></content>
   </entry>
   

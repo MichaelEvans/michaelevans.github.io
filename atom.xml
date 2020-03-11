@@ -4,7 +4,7 @@
   <title><![CDATA[Michael Evans]]></title>
   <link href="http://michaelevans.org/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2020-02-10T21:37:27-05:00</updated>
+  <updated>2020-03-11T00:41:57-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -12,6 +12,122 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Improving App Debugging with Flipper]]></title>
+    <link href="http://michaelevans.org/blog/2020/03/10/improving-app-debugging-with-flipper/"/>
+    <updated>2020-03-10T20:10:22-04:00</updated>
+    <id>http://michaelevans.org/blog/2020/03/10/improving-app-debugging-with-flipper</id>
+    <content type="html"><![CDATA[<p>Some time last year, Facebook released a new mobile debugging tool, named <a href="https://fbflipper.com/">Flipper</a>. It&rsquo;s essentially the successor to the widely popular <a href="http://facebook.github.io/stetho/">Stetho</a>. Although after talking to many developers, it seems like this newer tool is relatively unknown.</p>
+
+<p>Like Stetho, Flipper has many built-in features &ndash; including a layout inspector, a database inspector and a network inspector. Unlike Stetho though, Flipper has a very extensible API which allows for tons of customization. Over the next few articles, we&rsquo;re going to take a look at Flipper and its plugins, the APIs it provides, and how we can leverage them to help us debug various parts of our app. This post will focus on getting set up with Flipper, as well as taking a look at two of its most useful default plugins.</p>
+
+<h2>Getting Started</h2>
+
+<p>Getting started with Flipper is really easy:</p>
+
+<ul>
+<li><a href="https://fbflipper.com/">Download the desktop client</a>,</li>
+<li>Add the dependencies in your build.gradle:</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>repositories {
+</span><span class='line'>  jcenter()
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>dependencies {
+</span><span class='line'>  debugImplementation 'com.facebook.flipper:flipper:0.33.1'
+</span><span class='line'>  debugImplementation 'com.facebook.soloader:soloader:0.8.2'
+</span><span class='line'>
+</span><span class='line'>  releaseImplementation 'com.facebook.flipper:flipper-noop:0.33.1'
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Initialize the Flipper client when your application starts:</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>class SampleApplication : Application() {
+</span><span class='line'>    override fun onCreate() {
+</span><span class='line'>        super.onCreate()
+</span><span class='line'>        SoLoader.init(this, false)
+</span><span class='line'>
+</span><span class='line'>        if (BuildConfig.DEBUG && FlipperUtils.shouldEnableFlipper(this)) {
+</span><span class='line'>            val client = AndroidFlipperClient.getInstance(this)
+</span><span class='line'>            client.addPlugin(InspectorFlipperPlugin(this, DescriptorMapping.withDefaults()))
+</span><span class='line'>            client.start()
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And that&rsquo;s it! Opening the desktop client should show you an overview of your app with the Inspector plugin configured.</p>
+
+<h2>Inspector Plugin</h2>
+
+<p>The Inspector Plugin is similar to the one found in <a href="https://developer.android.com/studio/debug/layout-inspector">Android Studio 4.0</a>, but has a few neat features. I like it because it operates in real-time, and doesn&rsquo;t require any attaching to process in Studio every time you want to inspect a layout.</p>
+
+<p>Another thing you can do in the Layout Inspector that&rsquo;s really cool is actually <em>edit</em> properties! Pretty mind blowing to make tweaks in the inspector and watch the views change in realtime. It&rsquo;s really handy for experimenting with changing padding, and text colors. It doesn&rsquo;t actually edit any of your xml files, but this allows you to iterate quickly to make sure everything looks right.</p>
+
+<p>Let&rsquo;s find a view we want to update (like our repository name):</p>
+
+<p><img class="center" src="http://michaelevans.org/images/2020/03/10/inspecting.png" width="800" height="800"></p>
+
+<p><img class="center" src="http://michaelevans.org/images/2020/03/10/selecting.png" width="800" height="800"></p>
+
+<p>We can click on the the color swatch to open a color picker:</p>
+
+<p><img class="center" src="http://michaelevans.org/images/2020/03/10/editing.png" width="800" height="800"></p>
+
+<p>And now when we look over at our device:</p>
+
+<p><img class="center" src="http://michaelevans.org/images/2020/03/10/previewing.png" width="800" height="800"></p>
+
+<p>Neat!</p>
+
+<h2>Database Browser / Plugin</h2>
+
+<p>Something I&rsquo;ve wanted for a long time was a way to view the contents of my database from Android Studio. Right now, if you want to visualize your data or try out some queries &ndash; the best solution is to pull the sqlite database file off your emulator/device and run sqlite locally. But with Flipper, there&rsquo;s a better way!</p>
+
+<p>All we need to do is configure the database plugin, and our tables should show up right away:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>client.addPlugin(DatabasesFlipperPlugin(context))</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img class="center" src="http://michaelevans.org/images/2020/03/10/database_browser.png" width="800" height="800"></p>
+
+<p>Now we can easily inspect the contents of our tables, and even run queries on the live running application!</p>
+
+<p><img class="center" src="http://michaelevans.org/images/2020/03/10/writing_queries.png" width="800" height="800"></p>
+
+<p>I&rsquo;ve <a href="https://github.com/MichaelEvans/architecture-components-samples/commit/274ea5702cb5f10ea13012ce6d9fc6b6896f471e">pushed a branch</a> of the Github Browser Architecture Component sample with these changes to GitHub if you&rsquo;d like to try it out. Next time we&rsquo;ll take advantage of Flipper&rsquo;s extensibility to create our own plugins to make debugging our app easier!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Dropping Columns Like It's Hot]]></title>
@@ -1671,43 +1787,6 @@ Liquid::Template.register_tag('google_plus', Jekyll::GooglePlusEmbedTag)</code><
 <hr />
 
 <p>Are you using this library in your app? Please let me know so I can add a link to it on the <a href="https://github.com/MichaelEvans/ColorArt">GitHub project page</a>! Also, feel free to send pull requests!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Hands On with Google Helpouts]]></title>
-    <link href="http://michaelevans.org/blog/2013/11/05/hands-on-with-google-helpouts/"/>
-    <updated>2013-11-05T10:38:00-05:00</updated>
-    <id>http://michaelevans.org/blog/2013/11/05/hands-on-with-google-helpouts</id>
-    <content type="html"><![CDATA[<p>This morning Google launched a new product called <a href="https://helpouts.google.com">Helpouts</a>, a tool which will connect people with experts for help via a video conference. I was accepted as a Helpout provider a few weeks back, and have been using the product for a little while during the internal beta. I decided to do an Helpout to teach people to write code, which I cleverly named &ldquo;<a href="https://helpouts.google.com/114052868601022948953/ls/a65184ab017ae8b0">Coding 101: learn the basics of writing code and building apps</a>&rdquo;.</p>
-
-<iframe width="640" height="510" src="http://www.youtube.com/embed/K-VFC9AQM1k " frameborder="0" webkitAllowFullScreen mozallowfullscreen allowfullscreen></iframe>
-
-
-<p></p>
-
-<!-- more -->
-
-
-<h3>As a Provider</h3>
-
-<p>As a provider, you are to create a listing which people can sign up for. The process is pretty simple, all that&rsquo;s required is a bit of a description, fill out some pricing options (free, price per minute or per session), some info about yourself explaining your qualificaitons, and a picture for the listing. After that, you&rsquo;ll wait for your listing to be approved by Google.</p>
-
-<p><img class="left" src="http://michaelevans.org/images/2013/11/05/pricing_options.png" width="400" height="400" title="Pricing Options" ></p>
-
-<p>Part of the approval process includes doing a Helpout with a Google employee, in order to get a feel for the system and see how it works. They then also verify the information that you provided to make sure you are who you say you are.</p>
-
-<h3>As a User</h3>
-
-<p>On the consumer side, prospective users can select from any of the categories of Helpouts, which inlude art and music, computer and electronics, cooking, education, fashion and beauty, fitness and nutrition and home and garden. After you select a category, you choose the topic/listing that you&rsquo;re interested in, pick a time, and you&rsquo;ll get an email confirmation regarding your scheduled appointment.</p>
-
-<p><img class="right" src="http://michaelevans.org/images/2013/11/05/your_helpouts.png" width="400" height="500" title="Your Helpouts" ></p>
-
-<p>When its time for your helpout, you&rsquo;ll get a reminder email with a link you can use to quickly join. The interface looks almost identical to the Hangouts UI, except with a few extra widgets to indicate the Helpout title/price/if it&rsquo;s being recorded.</p>
-
-<p>In addition to paricipating from your computer, Google has also launched an <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.helpouts">Android app</a> so that you can get help while you&rsquo;re mobile as well. Whether you&rsquo;re interested in giving Helpouts a shot, want to learn about writing apps for Android, or just want to see what the newest Google product looks like &ndash; feel free to checkout <a href="https://helpouts.google.com/114052868601022948953/ls/a65184ab017ae8b0">my listing!</a>.</p>
-
-<p><img class="center" src="http://michaelevans.org/images/2013/11/05/waiting.png" width="600" height="600" title="Waiting" ></p>
 ]]></content>
   </entry>
   
