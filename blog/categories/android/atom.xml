@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Android | Michael Evans]]></title>
   <link href="http://michaelevans.org/blog/categories/android/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2020-03-11T00:41:57-04:00</updated>
+  <updated>2020-06-22T12:25:15-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -12,6 +12,56 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Android Developer Challenge]]></title>
+    <link href="http://michaelevans.org/blog/2020/06/21/android-developer-challenge/"/>
+    <updated>2020-06-21T23:41:17-04:00</updated>
+    <id>http://michaelevans.org/blog/2020/06/21/android-developer-challenge</id>
+    <content type="html"><![CDATA[<p>Late last year, Google announced the <a href="https://developer.android.com/dev-challenge">Android Developer Challenge</a>, a contest for Android developers to show off new experiences made possible by on-device Machine Learning. Since then, tons of developers have submitted their ideas and been hard at work developing their apps. Today, the <a href="https://android-developers.googleblog.com/2020/06/dev-challenge-winners.html">winners of the challenge have been announced</a>!</p>
+
+<!-- more -->
+
+
+<p>I was lucky to get access to a cool trial box that Google sent out, complete with little goodies to try out some of the apps from the winners! Here are some obligatory unboxing photos:</p>
+
+<p><img class="center" src="/images/2020/06/21/box_a.jpg" width="800" height="800"></p>
+
+<p><img class="center" src="/images/2020/06/21/box_b.jpg" width="800" height="800"></p>
+
+<p><img class="center" src="/images/2020/06/21/box_c.jpg" width="800" height="800"></p>
+
+<p>After checking out the cool loot, I downloaded the winning apps to check them out, and wanted to show off some of my favorites.</p>
+
+<h2>Trashly</h2>
+
+<p>The first app I tried was <a href="https://play.google.com/store/apps/details?id=com.epam.mobilelabs.trashly">Trashly</a>. The goal of this app is to make recycling easier by providing up-to-date information about where and how to recycle your items. You can type in any item that you&rsquo;re interested in recycling, but what&rsquo;s cooler (and relevant to the challenge) is that you can use the camera to detect an object and find out 1) if the item is recyclable, and 2) where you can go to recycle it. I tried this with a can of soda, which was instantly recognized:</p>
+
+<p><img class="center" src="/images/2020/06/21/trashly_capture.png" width="800" height="800"></p>
+
+<p><img class="center" src="/images/2020/06/21/trashly_info.png" width="800" height="800"></p>
+
+<p>And was given a map of nearby places that I could take my can to recycle. Very cool and useful!</p>
+
+<p><img class="center" src="/images/2020/06/21/trashly_map.png" width="800" height="800"></p>
+
+<h2>Leepi</h2>
+
+<p>The next app that I tried was <a href="https://play.google.com/store/apps/details?id=com.mangoai.leepi">Leepi</a>. It&rsquo;s a fun, educational app to help users learn American Sign Language. I personally had never learned Sign Language, so this was a really cool way to start! It uses the camera and on-device machine learning to interpret the user&rsquo;s hand positions to verify that they are doing the hand positions and gestures correctly.</p>
+
+<p><img class="center" src="/images/2020/06/21/leepi_a.png" width="800" height="800"></p>
+
+<p><img class="center" src="/images/2020/06/21/leepi_capture.png" width="800" height="800"></p>
+
+<h2>Path Finder</h2>
+
+<p>The last app I wanted to talk about was called <a href="https://play.google.com/store/apps/details?id=com.br.ml.brpathfinder">Path Finder</a>. The gist of this app is to use the camera and machine learning to build a heatmap of obstacles that might be problematic for visually impaired people in public environments. I tried the app out on the streets of New York City and have some screenshots of the results below. I am not sure how useful this would be in practice, but it certainly looks interesting. I would be curious to hear feedback from someone who is visually impaired to hear their thoughts on the presentation format.</p>
+
+<p><img class="center" src="/images/2020/06/21/pathfinder.png" width="800" height="800"></p>
+
+<p>If you&rsquo;re interested in seeing the very cool and interesting things you can do with on-device machine learning, I definitely encourage you to check out these and the rest of the winning apps. And if you&rsquo;re an author of one of these applications, congratulations on a job well done!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Improving App Debugging with Flipper]]></title>
@@ -369,35 +419,6 @@ viewPager.orientation = ViewPager2.ORIENTATION_VERTICAL
 <p>Based on the release notes there are a lot of issues left to fix before this moves to a final release &ndash; but this is a long awaited update for one of those oldest support library components.</p>
 
 <p>The sample code for this post can be found <a href="https://github.com/MichaelEvans/ViewPager2Sample">here</a>. Thanks to Chris Banes' <a href="https://github.com/chrisbanes/cheesesquare">CheeseSquare</a> for the sample data for this demo!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Enabling Night Mode on Android Nougat]]></title>
-    <link href="http://michaelevans.org/blog/2016/08/23/enabling-night-mode-on-android-nougat/"/>
-    <updated>2016-08-23T18:27:01-04:00</updated>
-    <id>http://michaelevans.org/blog/2016/08/23/enabling-night-mode-on-android-nougat</id>
-    <content type="html"><![CDATA[<p>If you&rsquo;re like me, you loved the <a href="http://www.androidpolice.com/2016/03/09/android-n-feature-spotlight-night-mode-is-back-with-expanded-features-including-red-filter-and-brightness/">Night Mode feature</a> that was added to the Nougat Developer Preview a few months ago. You might have been disappointed when you found out that it was missing in later preview builds, and was probably going to be removed <a href="https://www.reddit.com/r/androiddev/comments/4tm8i6/were_on_the_android_engineering_team_and_built/d5igc5t">because it wasn&rsquo;t ready</a>.</p>
-
-<p>When the source code for Nougat was released this morning, my friend <a href="https://twitter.com/vishnurajeevan">Vishnu</a> found this interesting snippet in the <a href="https://android.googlesource.com/platform/frameworks/base/+/android-7.0.0_r1/packages/SystemUI/src/com/android/systemui/tuner/TunerActivity.java#42">SystemUI source</a> (better known to end users as the System UI Tuner):</p>
-
-<p>```java
-boolean showNightMode = getIntent().getBooleanExtra(</p>
-
-<pre><code>NightModeFragment.EXTRA_SHOW_NIGHT_MODE, false);
-</code></pre>
-
-<p>final PreferenceFragment fragment = showNightMode ? new NightModeFragment()</p>
-
-<pre><code>: showDemoMode ? new DemoModeFragment()
-: new TunerFragment();
-</code></pre>
-
-<p>```</p>
-
-<p>Long story short, if you pass the right extras to this activity, and you&rsquo;ll get access to the Night Mode settings (as well as the infamous Quick Tile!).</p>
-
-<p>Fortunately for us, this is pretty trivial to accomplish with <code>adb</code> via <code>adb -d shell am start  --ez show_night_mode true com.android.systemui/.tuner.TunerActivity</code>, but not everyone who wants this feature is familiar with <code>adb</code>. So I published an app to the Play Store that does exactly that &ndash; click one button, and get access to those settings! You can find the app on the Play Store <a href="https://play.google.com/store/apps/details?id=org.michaelevans.nightmodeenabler">here</a>.</p>
 ]]></content>
   </entry>
   

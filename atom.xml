@@ -4,7 +4,7 @@
   <title><![CDATA[Michael Evans]]></title>
   <link href="http://michaelevans.org/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2020-03-11T00:41:57-04:00</updated>
+  <updated>2020-06-22T12:25:15-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -12,6 +12,56 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Android Developer Challenge]]></title>
+    <link href="http://michaelevans.org/blog/2020/06/21/android-developer-challenge/"/>
+    <updated>2020-06-21T23:41:17-04:00</updated>
+    <id>http://michaelevans.org/blog/2020/06/21/android-developer-challenge</id>
+    <content type="html"><![CDATA[<p>Late last year, Google announced the <a href="https://developer.android.com/dev-challenge">Android Developer Challenge</a>, a contest for Android developers to show off new experiences made possible by on-device Machine Learning. Since then, tons of developers have submitted their ideas and been hard at work developing their apps. Today, the <a href="https://android-developers.googleblog.com/2020/06/dev-challenge-winners.html">winners of the challenge have been announced</a>!</p>
+
+<!-- more -->
+
+
+<p>I was lucky to get access to a cool trial box that Google sent out, complete with little goodies to try out some of the apps from the winners! Here are some obligatory unboxing photos:</p>
+
+<p><img class="center" src="http://michaelevans.org/images/2020/06/21/box_a.jpg" width="800" height="800"></p>
+
+<p><img class="center" src="http://michaelevans.org/images/2020/06/21/box_b.jpg" width="800" height="800"></p>
+
+<p><img class="center" src="http://michaelevans.org/images/2020/06/21/box_c.jpg" width="800" height="800"></p>
+
+<p>After checking out the cool loot, I downloaded the winning apps to check them out, and wanted to show off some of my favorites.</p>
+
+<h2>Trashly</h2>
+
+<p>The first app I tried was <a href="https://play.google.com/store/apps/details?id=com.epam.mobilelabs.trashly">Trashly</a>. The goal of this app is to make recycling easier by providing up-to-date information about where and how to recycle your items. You can type in any item that you&rsquo;re interested in recycling, but what&rsquo;s cooler (and relevant to the challenge) is that you can use the camera to detect an object and find out 1) if the item is recyclable, and 2) where you can go to recycle it. I tried this with a can of soda, which was instantly recognized:</p>
+
+<p><img class="center" src="http://michaelevans.org/images/2020/06/21/trashly_capture.png" width="800" height="800"></p>
+
+<p><img class="center" src="http://michaelevans.org/images/2020/06/21/trashly_info.png" width="800" height="800"></p>
+
+<p>And was given a map of nearby places that I could take my can to recycle. Very cool and useful!</p>
+
+<p><img class="center" src="http://michaelevans.org/images/2020/06/21/trashly_map.png" width="800" height="800"></p>
+
+<h2>Leepi</h2>
+
+<p>The next app that I tried was <a href="https://play.google.com/store/apps/details?id=com.mangoai.leepi">Leepi</a>. It&rsquo;s a fun, educational app to help users learn American Sign Language. I personally had never learned Sign Language, so this was a really cool way to start! It uses the camera and on-device machine learning to interpret the user&rsquo;s hand positions to verify that they are doing the hand positions and gestures correctly.</p>
+
+<p><img class="center" src="http://michaelevans.org/images/2020/06/21/leepi_a.png" width="800" height="800"></p>
+
+<p><img class="center" src="http://michaelevans.org/images/2020/06/21/leepi_capture.png" width="800" height="800"></p>
+
+<h2>Path Finder</h2>
+
+<p>The last app I wanted to talk about was called <a href="https://play.google.com/store/apps/details?id=com.br.ml.brpathfinder">Path Finder</a>. The gist of this app is to use the camera and machine learning to build a heatmap of obstacles that might be problematic for visually impaired people in public environments. I tried the app out on the streets of New York City and have some screenshots of the results below. I am not sure how useful this would be in practice, but it certainly looks interesting. I would be curious to hear feedback from someone who is visually impaired to hear their thoughts on the presentation format.</p>
+
+<p><img class="center" src="http://michaelevans.org/images/2020/06/21/pathfinder.png" width="800" height="800"></p>
+
+<p>If you&rsquo;re interested in seeing the very cool and interesting things you can do with on-device machine learning, I definitely encourage you to check out these and the rest of the winning apps. And if you&rsquo;re an author of one of these applications, congratulations on a job well done!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Improving App Debugging with Flipper]]></title>
@@ -1638,8 +1688,8 @@ diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.Toolbar appc
 
   class GooglePlusEmbedTag &lt; Liquid::Tag
     @post = nil
-    @height = ''
-    @width = ''
+    @height = &#39;&#39;
+    @width = &#39;&#39;
 
     def initialize(tag_name, markup, tokens)
       if markup =~ /(https:\/\/plus.google.com\/\d+\/posts\/\w+)/i
@@ -1649,12 +1699,12 @@ diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.Toolbar appc
     end
 
     def render(context)
-      &quot;&lt;div align='center'&gt;&lt;div class='g-post' data-href='#{@url}'&gt;&lt;/div&gt;&lt;/div&gt;&quot;
+      &quot;&lt;div align=&#39;center&#39;&gt;&lt;div class=&#39;g-post&#39; data-href=&#39;#{@url}&#39;&gt;&lt;/div&gt;&lt;/div&gt;&quot;
     end
   end
 end
 
-Liquid::Template.register_tag('google_plus', Jekyll::GooglePlusEmbedTag)</code></pre></noscript></div>
+Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)</code></pre></noscript></div>
 
 
 
@@ -1717,76 +1767,6 @@ Liquid::Template.register_tag('google_plus', Jekyll::GooglePlusEmbedTag)</code><
 <p>For 2014, I&rsquo;d really like to contribute more to open source. Much of the work I do takes advantage of the work that others have open sourced, and I really find contributing back rewarding. I&rsquo;d also like to do more writing on this blog, with both personal posts, as well as more tips and tutorials.</p>
 
 <p>Overall, 2013 was a pretty eventful year. Here&rsquo;s to 2014 being even better. Happy New Year everyone!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[ColorArt: a library to do iTunes 11-style color matching for Android]]></title>
-    <link href="http://michaelevans.org/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android/"/>
-    <updated>2013-12-12T00:02:34-05:00</updated>
-    <id>http://michaelevans.org/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android</id>
-    <content type="html"><![CDATA[<p>Last week I open sourced an Android library called <a href="https://github.com/MichaelEvans/ColorArt">ColorArt</a>, which is a port of the popular OS X library written by the guys over at <a href="http://www.panic.com/blog/itunes-11-and-colors/">Panic</a>. It allows you to use a source image to create a themed image/text display, very similar to the effect which is done in iTunes 11.</p>
-
-<p><img class="center" src="http://michaelevans.org/images/2013/12/12/itunes-11.png" width="600" height="600" title="iTunes Example" ></p>
-
-<!-- more -->
-
-
-<h3>Using the Library</h3>
-
-<p>ColorArt is pretty easy to use, and can add a cool effect to any app. In order to add it to your project, add the dependency to your <code>build.gradle</code> file:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>compile 'org.michaelevans.colorart:library:0.0.1'﻿</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The next thing you need is to take a Bitmap that you want to use, and pass it to a ColorArt object:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.album);
-</span><span class='line'>ColorArt colorArt = new ColorArt(bitmap);</span></code></pre></td></tr></table></div></figure>
-
-
-<p>After that, it&rsquo;s as simple as calling some getter methods in order to get the colors that make up the image:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>colorArt.getBackgroundColor()
-</span><span class='line'>colorArt.getPrimaryColor()
-</span><span class='line'>colorArt.getSecondaryColor()
-</span><span class='line'>colorArt.getDetailColor()</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Voilà! Now you can make cool themed image/text display using Bitmaps as part of your application.</p>
-
-<p><img class="center" src="http://michaelevans.org/images/2013/12/12/sample.png" width="300" height="300" title="Sample" ></p>
-
-<h3>Bonus: FadingImageView</h3>
-
-<p>I also added a class that extends ImageView, which will allow you to add a subtle gradient from the image, to the background color, similar to what you see in the iTunes display. It&rsquo;s also extremely easy to use:</p>
-
-<ol>
-<li>Replace the ImageView that you are presently using with a <code>FadingImageView</code>.</li>
-<li>Call</li>
-</ol>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>mFadingImageView.setBackgroundColor(colorArt.getBackgroundColor(), FadingImageView.FadeSide.LEFT);</span></code></pre></td></tr></table></div></figure>
-
-
-<p>to set the background color to fade to, and which side gets the gradient.</p>
-
-<p>That&rsquo;s it!</p>
-
-<p>You can also toggle that gradient with a call to <code>mImageView.setFadeEnabled(true/false);</code>.</p>
-
-<hr />
-
-<p>Are you using this library in your app? Please let me know so I can add a link to it on the <a href="https://github.com/MichaelEvans/ColorArt">GitHub project page</a>! Also, feel free to send pull requests!</p>
 ]]></content>
   </entry>
   
