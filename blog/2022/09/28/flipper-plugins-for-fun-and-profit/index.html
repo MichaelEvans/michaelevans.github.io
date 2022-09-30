@@ -1,0 +1,586 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="msvalidate.01" content="275BF9CDA457668389C1F9916C380DD0" />
+  <title>Building Flipper Plugins for Fun and Profit - Michael Evans</title>
+  <meta name="author" content="Michael Evans">
+
+  
+  <meta name="description" content="Building Flipper Plugins for Fun and Profit">
+  <meta name="keywords" content="Android">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://michaelevans.org/blog/2022/09/28/flipper-plugins-for-fun-and-profit/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Michael Evans" type="application/atom+xml">
+  <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-28589266-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Michael Evans</a></h1>
+  
+    <h2>A bunch of technobabble.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:michaelevans.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Building Flipper Plugins for Fun and Profit</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2022-09-28T23:41:17-04:00" pubdate data-updated="true">Sep 28<span>th</span>, 2022</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>A long, long time ago, I wrote a <a href="http://michaelevans.org/blog/2020/03/10/improving-app-debugging-with-flipper/">blog post</a> about how I was using <a href="https://fbflipper.com/">Flipper</a> as one of my favorite development tools. Since then, Android Studio has come a long way adding tons of features like a new <a href="https://androidstudio.googleblog.com/2022/03/android-studio-dolphin-canary-6-now.html">Logcat</a> and <a href="https://developer.android.com/studio/debug/layout-inspector">Layout Inspector</a>.</p>
+
+<p>However, there are often times that you&rsquo;ll need a tool more specific to your own workflow that Android Studio doesn&rsquo;t provide, and that&rsquo;s exactly where Flipper&rsquo;s extensibility really shines. As an example, I&rsquo;d like to go through building a custom plugin for Flipper, similar to one that I&rsquo;ve used on my own projects, that demonstrates how easy it is to get started building these tools.</p>
+
+<!-- more -->
+
+
+<h2>The Problem</h2>
+
+<p>As most apps grow, there becomes a need to measure app usage and engagement to better understand user behavior. In order to measure that, we often turn to analytics libraries (like <a href="https://firebase.google.com/docs/analytics">Firebase Analytics</a>) to handle this in-app behavior reporting. However, when implementing these client events, it&rsquo;s often helpful to have a quick feedback loop to ensure that the event and associated payload are correct, without having to check an analytics dashboard (which can often take some time to refresh).</p>
+
+<p>Luckily, most analytics libraries (including Firebase) have different solutions for this problem. In the Firebase Analytics library, the recommended debugging method is <a href="https://firebase.google.com/docs/analytics/events?platform=android#view_events_in_the_android_studio_debug_log">to set a property with ADB</a> to log all the events to logcat. This does provide much faster feedback than checking a dashboard, but it&rsquo;s not the most user friendly &ndash; developers need to set the property at the command line, and need to be monitoring logcat for all of the events (and also doesn&rsquo;t offer much of a search/filter function).</p>
+
+<h2>The Solution</h2>
+
+<p>Rather than sticking to plain text in logcat, we can build a custom Flipper plugin that will display our analytics events in a filterable table. Most Flipper plugins are comprised of two parts &ndash; a client library that runs as part of your Android app, and a desktop plugin that runs inside Flipper for processing and displaying the data sent by the client.</p>
+
+<p>All of the code for this example can be found in this example <a href="https://github.com/MichaelEvans/FlipperPluginSample">Github Repository</a>.</p>
+
+<h3>Part 1: Client Side</h3>
+
+<p>On the Android side, you&rsquo;ll need to add the <a href="https://fbflipper.com/docs/getting-started/android-native/">Flipper SDK</a> if you haven&rsquo;t already. If you have Flipper set up already, you can skip to the next section. If not, here&rsquo;s a quick run-down:</p>
+
+<h4>Add Flipper</h4>
+
+<p>Add the Gradle dependencies:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>dependencies {
+</span><span class='line'>  debugImplementation 'com.facebook.flipper:flipper:0.164.0'
+</span><span class='line'>  debugImplementation 'com.facebook.soloader:soloader:0.10.4'
+</span><span class='line'>
+</span><span class='line'>  releaseImplementation 'com.facebook.flipper:flipper-noop:0.164.0'
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Configure your Application class:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>class MyApplication : Application {
+</span><span class='line'>  override fun onCreate() {
+</span><span class='line'>    super.onCreate()
+</span><span class='line'>    SoLoader.init(this, false)
+</span><span class='line'>
+</span><span class='line'>    if (BuildConfig.DEBUG && FlipperUtils.shouldEnableFlipper(this)) {
+</span><span class='line'>      val client = AndroidFlipperClient.getInstance(this)
+</span><span class='line'>      client.addPlugin(InspectorFlipperPlugin(this, DescriptorMapping.withDefaults()))
+</span><span class='line'>      client.start()
+</span><span class='line'>    }
+</span><span class='line'>  }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Building the Plugin</h4>
+
+<p>And now it&rsquo;s time to build the plugin! Create a class to hold your plugin logic (For this example, I will call mine <code>AnalyticsPlugin</code>). For the purposes of this sample, it&rsquo;ll be a singleton <code>object</code> for reasons that we&rsquo;ll see later.</p>
+
+<p>We&rsquo;ll subclass the <code>BufferingFlipperPlugin</code> class, rather than <code>FlipperPlugin</code>, because the bufffering version will keep our events in a buffer until the connection is made with the desktop client (so that we don&rsquo;t lose any events).</p>
+
+<p>We need to override <code>getId()</code>, which is how Flipper will correlate our client plugin with the matching desktop plugin, and <code>runInBackground()</code> in order to tell Flipper to keep communicating with the desktop client, even if our plugin isn&rsquo;t the currently in the foreground.</p>
+
+<p>Lastly, we&rsquo;re going to create a <code>reportEvent</code> method, which will send whatever data we want to the server. In this example, we&rsquo;ll send a unique identifier for the event, the event name, and the timestamp that the event occured at. <strong>Note: <code>FlipperObject</code> can even be constructed by using JSON text or a <code>JSONObject</code>!</strong></p>
+
+<p>Here&rsquo;s what our plugin might look like:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>object AnalyticsPlugin : BufferingFlipperPlugin() {
+</span><span class='line'>
+</span><span class='line'>    fun reportEvent(eventName: String) {
+</span><span class='line'>        val flipperObject = FlipperObject.Builder()
+</span><span class='line'>            .put("id", UUID.randomUUID())
+</span><span class='line'>            .put("event", eventName)
+</span><span class='line'>            .put("timestamp", Date().toLocaleString())
+</span><span class='line'>            .build()
+</span><span class='line'>        send("newRow", flipperObject)
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>    override fun getId(): String {
+</span><span class='line'>        return "org.michaelevans.flipper.analytics"
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>    override fun runInBackground(): Boolean {
+</span><span class='line'>        return true
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After we create our plugin, we&rsquo;ll need to go back to our Application class to install our plugin, just like we would with the pre-loaded ones:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>val flipperClient = AndroidFlipperClient.getInstance(this)
+</span><span class='line'>  // ...
+</span><span class='line'>flipperClient.addPlugin(AnalyticsPlugin)
+</span><span class='line'>flipperClient.start()</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The last thing we need to do is actually call our plugin somewhere. The implementation of this part will depend a lot on the particular implementation of your own app, but for this example we&rsquo;ll have an <code>Analytics</code> class that conditionally logs our events to Flipper in debug builds, and would do some normal production logic otherwise.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>class Analytics() {
+</span><span class='line'>
+</span><span class='line'>    private val plugin = AnalyticsPlugin
+</span><span class='line'>  
+</span><span class='line'>    fun reportEvent(eventName: String) {
+</span><span class='line'>        if (BuildConfig.DEBUG) {
+</span><span class='line'>            plugin.reportEvent(eventName)
+</span><span class='line'>        } else {
+</span><span class='line'>            // do normal analytics logic here
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once that&rsquo;s all done, the client work is complete!</p>
+
+<h3>Part 2: Desktop Side</h3>
+
+<h4>Setup</h4>
+
+<p>In order to build the desktop-side plugin, we&rsquo;ll need to set up our environment. We&rsquo;ll need something called <code>npx</code>, which is a tool to execute Javascript packages. <code>npx</code> can be installed from <a href="https://brew.sh/">Homebrew</a> with <code>brew install npx</code>.</p>
+
+<p>Once <code>npx</code> is installed, run the following command in the directory that you&rsquo;d like to create your plugin in:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>npx flipper-pkg init</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This command will kick off a little bit of a &ldquo;new plugin wizard&rdquo;, asking a few questions about the plugin we&rsquo;ll be creating:</p>
+
+<ol>
+<li>Whether the plugin is a &ldquo;client&rdquo; plugin or a &ldquo;device&rdquo; plugin &ndash; our plugin will require our app to communicate, we&rsquo;ll choose <code>client</code>. (Flipper also supports <code>device</code> plugins that don&rsquo;t need any particular app to be running. For example, Logcat provides logs for the <em>entire</em> device, rather than needing any individual app).</li>
+<li>An ID. This needs to be the same as the ID we specified in the client code, otherwise Flipper will have no way of matching up the two halves of our plugin.</li>
+<li>A title. This is the human readable name of the plugin that will show up in the sidebar.</li>
+</ol>
+
+
+<p>After that, you should be able to <code>cd</code> into the newly created module directory and run <code>yarn watch</code> to have the plugin continuously be compiled when you make changes.</p>
+
+<h4>Building the Plugin</h4>
+
+<p>If you&rsquo;re familiar with JavaScript and React (I&rsquo;m not especially), creating the desktop side of the plugin might be easy. However, if you&rsquo;re <em>not</em> experienced with these tools, Flipper includes some <a href="https://fbflipper.com/docs/extending/flipper-plugin/#createtableplugin">very convenient helpers</a> for building a simple table UI. In this example, that&rsquo;s exactly what we&rsquo;ll be doing &ndash; let&rsquo;s get started!</p>
+
+<p>The init command we ran earlier auto-generated some files, one of which is <code>index.tsx</code> inside the <code>src</code> directory. Majority of the changes we&rsquo;ll need to make will be in this file.</p>
+
+<p>For our table, the first thing we&rsquo;ll need to define is the fields that will be shown in each row:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>type Row = {
+</span><span class='line'>  id: string;
+</span><span class='line'>  event: string;
+</span><span class='line'>  timestamp: Date;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The next thing we need to do is create something called a <code>DataTableColumn</code>, which tells Flipper how to display our data. Each object defined in this section will map to the columns in our table &ndash; we can optionally provide a <code>title</code> to provide a more meaningful label at the top of the table and a <code>width</code> in either pixels, percent or nothing (which will distribute the space evenly).</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>const columns: DataTableColumn&lt;Row&gt;[] = [
+</span><span class='line'>  {
+</span><span class='line'>      title: 'Event Name',
+</span><span class='line'>    key: 'event'
+</span><span class='line'>  },
+</span><span class='line'>  {
+</span><span class='line'>    key: 'timestamp',
+</span><span class='line'>    width: 150
+</span><span class='line'>  }
+</span><span class='line'>];</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Lastly, we will use the Flipper <code>createTablePlugin</code> function to glue this all together:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>const {plugin, Component} = createTablePlugin&lt;Row&gt;({
+</span><span class='line'>  columns,
+</span><span class='line'>  method: 'newRow',
+</span><span class='line'>  key: 'id'
+</span><span class='line'>});
+</span><span class='line'>export {plugin, Component};</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If a simple table is not what you&rsquo;re looking for, there&rsquo;s <a href="https://fbflipper.com/docs/tutorial/js-custom/">an entire section in the documentation</a> about how to build a custom UI, and even how to write tests for the display logic.</p>
+
+<p>After you have finished with this part, you should be able to open Flipper and see your plugin listed in the &ldquo;Unavailable Plugins&rdquo; display of the Flipper desktop app. Our plugin is considered &ldquo;Unavailable&rdquo; because no currently running application is available to connect to it&hellip;yet.</p>
+
+<p><img class="center" src="/images/2022/09/28/unavailable.jpg" width="800"></p>
+
+<p>Build and launch your Android app and the plugin should now become &ldquo;Disabled&rdquo;.</p>
+
+<p><img class="center" src="/images/2022/09/28/disabled.jpg" width="800"></p>
+
+<p>We can now click &ldquo;+&rdquo; on the plugin row to &ldquo;enable&rdquo; it and start sending those analytics events &ndash; They should start showing up in the Flipper UI immediately!</p>
+
+<p><img class="center" src="/images/2022/09/28/working.jpg" width="800"></p>
+
+<p>Depending on your use-case, your events might not just be a simple string and timestamp. You&rsquo;ll likely have defined some attributes, maybe the ID of an item being viewed, or the level number completed in a game. It would be great if there was a simple way to see all the data that corresponds to an event, right? Conveniently, the Flipper sidebar to show us that information in an easy to read way. All you need to do is click on the row, and a side panel will appear that renders our event as as JSON tree (I added some additional fields as a demo here):</p>
+
+<p><img class="center" src="/images/2022/09/28/sidebar.jpg" width="800"></p>
+
+<h3>Wrap up</h3>
+
+<p>By using the table plugin on the desktop side, searching and filtering behavior all comes for free, which is amazing if your app sends a lot of analytics events!</p>
+
+<p>The code for both the Desktop Plugin and the Android sample app can be found on <a href="https://github.com/MichaelEvans/FlipperPluginSample">Github here</a>.</p>
+
+<p>As this post demonstrates &ndash; the Flipper SDK is pretty flexible and allows you to build all sorts of custom development tools to help ease everday tasks. Come up with an idea for a cool plugin? Send me a <a href="https://twitter.com/m_evans10">tweet</a>, I&rsquo;d love to hear about it!</p>
+
+<p>(Thanks to <a href="https://twitter.com/zarahjutz">Zarah</a> for the editing and feedback for this post!)</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Michael Evans</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2022-09-28T23:41:17-04:00" pubdate data-updated="true">Sep 28<span>th</span>, 2022</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/android/'>Android</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://michaelevans.org/blog/2022/09/28/flipper-plugins-for-fun-and-profit/" data-via="m_evans10" data-counturl="http://michaelevans.org/blog/2022/09/28/flipper-plugins-for-fun-and-profit/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2020/06/21/android-developer-challenge/" title="Previous Post: Android Developer Challenge">&laquo; Android Developer Challenge</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2022/09/28/flipper-plugins-for-fun-and-profit/">Building Flipper Plugins for Fun and Profit</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2020/06/21/android-developer-challenge/">Android Developer Challenge</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2020/03/10/improving-app-debugging-with-flipper/">Improving App Debugging with Flipper</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2020/02/10/dropping-columns-like-its-hot/">Dropping Columns Like It's Hot</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2019/09/21/stop-repeating-yourself-sharing-test-code-across-android-modules/">Stop Repeating Yourself: Sharing test code across Android Modules</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/MichaelEvans">@MichaelEvans</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'MichaelEvans',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/114052868601022948953?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2022 - Michael Evans -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mevans';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://michaelevans.org/blog/2022/09/28/flipper-plugins-for-fun-and-profit/';
+        var disqus_url = 'http://michaelevans.org/blog/2022/09/28/flipper-plugins-for-fun-and-profit/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

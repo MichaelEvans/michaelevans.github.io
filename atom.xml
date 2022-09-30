@@ -4,7 +4,7 @@
   <title><![CDATA[Michael Evans]]></title>
   <link href="http://michaelevans.org/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2020-06-22T12:25:15-04:00</updated>
+  <updated>2022-09-29T21:55:59-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -12,6 +12,287 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Building Flipper Plugins for Fun and Profit]]></title>
+    <link href="http://michaelevans.org/blog/2022/09/28/flipper-plugins-for-fun-and-profit/"/>
+    <updated>2022-09-28T23:41:17-04:00</updated>
+    <id>http://michaelevans.org/blog/2022/09/28/flipper-plugins-for-fun-and-profit</id>
+    <content type="html"><![CDATA[<p>A long, long time ago, I wrote a <a href="http://michaelevans.org/blog/2020/03/10/improving-app-debugging-with-flipper/">blog post</a> about how I was using <a href="https://fbflipper.com/">Flipper</a> as one of my favorite development tools. Since then, Android Studio has come a long way adding tons of features like a new <a href="https://androidstudio.googleblog.com/2022/03/android-studio-dolphin-canary-6-now.html">Logcat</a> and <a href="https://developer.android.com/studio/debug/layout-inspector">Layout Inspector</a>.</p>
+
+<p>However, there are often times that you&rsquo;ll need a tool more specific to your own workflow that Android Studio doesn&rsquo;t provide, and that&rsquo;s exactly where Flipper&rsquo;s extensibility really shines. As an example, I&rsquo;d like to go through building a custom plugin for Flipper, similar to one that I&rsquo;ve used on my own projects, that demonstrates how easy it is to get started building these tools.</p>
+
+<!-- more -->
+
+
+<h2>The Problem</h2>
+
+<p>As most apps grow, there becomes a need to measure app usage and engagement to better understand user behavior. In order to measure that, we often turn to analytics libraries (like <a href="https://firebase.google.com/docs/analytics">Firebase Analytics</a>) to handle this in-app behavior reporting. However, when implementing these client events, it&rsquo;s often helpful to have a quick feedback loop to ensure that the event and associated payload are correct, without having to check an analytics dashboard (which can often take some time to refresh).</p>
+
+<p>Luckily, most analytics libraries (including Firebase) have different solutions for this problem. In the Firebase Analytics library, the recommended debugging method is <a href="https://firebase.google.com/docs/analytics/events?platform=android#view_events_in_the_android_studio_debug_log">to set a property with ADB</a> to log all the events to logcat. This does provide much faster feedback than checking a dashboard, but it&rsquo;s not the most user friendly &ndash; developers need to set the property at the command line, and need to be monitoring logcat for all of the events (and also doesn&rsquo;t offer much of a search/filter function).</p>
+
+<h2>The Solution</h2>
+
+<p>Rather than sticking to plain text in logcat, we can build a custom Flipper plugin that will display our analytics events in a filterable table. Most Flipper plugins are comprised of two parts &ndash; a client library that runs as part of your Android app, and a desktop plugin that runs inside Flipper for processing and displaying the data sent by the client.</p>
+
+<p>All of the code for this example can be found in this example <a href="https://github.com/MichaelEvans/FlipperPluginSample">Github Repository</a>.</p>
+
+<h3>Part 1: Client Side</h3>
+
+<p>On the Android side, you&rsquo;ll need to add the <a href="https://fbflipper.com/docs/getting-started/android-native/">Flipper SDK</a> if you haven&rsquo;t already. If you have Flipper set up already, you can skip to the next section. If not, here&rsquo;s a quick run-down:</p>
+
+<h4>Add Flipper</h4>
+
+<p>Add the Gradle dependencies:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>dependencies {
+</span><span class='line'>  debugImplementation 'com.facebook.flipper:flipper:0.164.0'
+</span><span class='line'>  debugImplementation 'com.facebook.soloader:soloader:0.10.4'
+</span><span class='line'>
+</span><span class='line'>  releaseImplementation 'com.facebook.flipper:flipper-noop:0.164.0'
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Configure your Application class:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>class MyApplication : Application {
+</span><span class='line'>  override fun onCreate() {
+</span><span class='line'>    super.onCreate()
+</span><span class='line'>    SoLoader.init(this, false)
+</span><span class='line'>
+</span><span class='line'>    if (BuildConfig.DEBUG && FlipperUtils.shouldEnableFlipper(this)) {
+</span><span class='line'>      val client = AndroidFlipperClient.getInstance(this)
+</span><span class='line'>      client.addPlugin(InspectorFlipperPlugin(this, DescriptorMapping.withDefaults()))
+</span><span class='line'>      client.start()
+</span><span class='line'>    }
+</span><span class='line'>  }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Building the Plugin</h4>
+
+<p>And now it&rsquo;s time to build the plugin! Create a class to hold your plugin logic (For this example, I will call mine <code>AnalyticsPlugin</code>). For the purposes of this sample, it&rsquo;ll be a singleton <code>object</code> for reasons that we&rsquo;ll see later.</p>
+
+<p>We&rsquo;ll subclass the <code>BufferingFlipperPlugin</code> class, rather than <code>FlipperPlugin</code>, because the bufffering version will keep our events in a buffer until the connection is made with the desktop client (so that we don&rsquo;t lose any events).</p>
+
+<p>We need to override <code>getId()</code>, which is how Flipper will correlate our client plugin with the matching desktop plugin, and <code>runInBackground()</code> in order to tell Flipper to keep communicating with the desktop client, even if our plugin isn&rsquo;t the currently in the foreground.</p>
+
+<p>Lastly, we&rsquo;re going to create a <code>reportEvent</code> method, which will send whatever data we want to the server. In this example, we&rsquo;ll send a unique identifier for the event, the event name, and the timestamp that the event occured at. <strong>Note: <code>FlipperObject</code> can even be constructed by using JSON text or a <code>JSONObject</code>!</strong></p>
+
+<p>Here&rsquo;s what our plugin might look like:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>object AnalyticsPlugin : BufferingFlipperPlugin() {
+</span><span class='line'>
+</span><span class='line'>    fun reportEvent(eventName: String) {
+</span><span class='line'>        val flipperObject = FlipperObject.Builder()
+</span><span class='line'>            .put("id", UUID.randomUUID())
+</span><span class='line'>            .put("event", eventName)
+</span><span class='line'>            .put("timestamp", Date().toLocaleString())
+</span><span class='line'>            .build()
+</span><span class='line'>        send("newRow", flipperObject)
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>    override fun getId(): String {
+</span><span class='line'>        return "org.michaelevans.flipper.analytics"
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>    override fun runInBackground(): Boolean {
+</span><span class='line'>        return true
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After we create our plugin, we&rsquo;ll need to go back to our Application class to install our plugin, just like we would with the pre-loaded ones:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>val flipperClient = AndroidFlipperClient.getInstance(this)
+</span><span class='line'>  // ...
+</span><span class='line'>flipperClient.addPlugin(AnalyticsPlugin)
+</span><span class='line'>flipperClient.start()</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The last thing we need to do is actually call our plugin somewhere. The implementation of this part will depend a lot on the particular implementation of your own app, but for this example we&rsquo;ll have an <code>Analytics</code> class that conditionally logs our events to Flipper in debug builds, and would do some normal production logic otherwise.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>class Analytics() {
+</span><span class='line'>
+</span><span class='line'>    private val plugin = AnalyticsPlugin
+</span><span class='line'>  
+</span><span class='line'>    fun reportEvent(eventName: String) {
+</span><span class='line'>        if (BuildConfig.DEBUG) {
+</span><span class='line'>            plugin.reportEvent(eventName)
+</span><span class='line'>        } else {
+</span><span class='line'>            // do normal analytics logic here
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once that&rsquo;s all done, the client work is complete!</p>
+
+<h3>Part 2: Desktop Side</h3>
+
+<h4>Setup</h4>
+
+<p>In order to build the desktop-side plugin, we&rsquo;ll need to set up our environment. We&rsquo;ll need something called <code>npx</code>, which is a tool to execute Javascript packages. <code>npx</code> can be installed from <a href="https://brew.sh/">Homebrew</a> with <code>brew install npx</code>.</p>
+
+<p>Once <code>npx</code> is installed, run the following command in the directory that you&rsquo;d like to create your plugin in:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>npx flipper-pkg init</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This command will kick off a little bit of a &ldquo;new plugin wizard&rdquo;, asking a few questions about the plugin we&rsquo;ll be creating:</p>
+
+<ol>
+<li>Whether the plugin is a &ldquo;client&rdquo; plugin or a &ldquo;device&rdquo; plugin &ndash; our plugin will require our app to communicate, we&rsquo;ll choose <code>client</code>. (Flipper also supports <code>device</code> plugins that don&rsquo;t need any particular app to be running. For example, Logcat provides logs for the <em>entire</em> device, rather than needing any individual app).</li>
+<li>An ID. This needs to be the same as the ID we specified in the client code, otherwise Flipper will have no way of matching up the two halves of our plugin.</li>
+<li>A title. This is the human readable name of the plugin that will show up in the sidebar.</li>
+</ol>
+
+
+<p>After that, you should be able to <code>cd</code> into the newly created module directory and run <code>yarn watch</code> to have the plugin continuously be compiled when you make changes.</p>
+
+<h4>Building the Plugin</h4>
+
+<p>If you&rsquo;re familiar with JavaScript and React (I&rsquo;m not especially), creating the desktop side of the plugin might be easy. However, if you&rsquo;re <em>not</em> experienced with these tools, Flipper includes some <a href="https://fbflipper.com/docs/extending/flipper-plugin/#createtableplugin">very convenient helpers</a> for building a simple table UI. In this example, that&rsquo;s exactly what we&rsquo;ll be doing &ndash; let&rsquo;s get started!</p>
+
+<p>The init command we ran earlier auto-generated some files, one of which is <code>index.tsx</code> inside the <code>src</code> directory. Majority of the changes we&rsquo;ll need to make will be in this file.</p>
+
+<p>For our table, the first thing we&rsquo;ll need to define is the fields that will be shown in each row:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>type Row = {
+</span><span class='line'>  id: string;
+</span><span class='line'>  event: string;
+</span><span class='line'>  timestamp: Date;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The next thing we need to do is create something called a <code>DataTableColumn</code>, which tells Flipper how to display our data. Each object defined in this section will map to the columns in our table &ndash; we can optionally provide a <code>title</code> to provide a more meaningful label at the top of the table and a <code>width</code> in either pixels, percent or nothing (which will distribute the space evenly).</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>const columns: DataTableColumn&lt;Row&gt;[] = [
+</span><span class='line'>  {
+</span><span class='line'>      title: 'Event Name',
+</span><span class='line'>    key: 'event'
+</span><span class='line'>  },
+</span><span class='line'>  {
+</span><span class='line'>    key: 'timestamp',
+</span><span class='line'>    width: 150
+</span><span class='line'>  }
+</span><span class='line'>];</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Lastly, we will use the Flipper <code>createTablePlugin</code> function to glue this all together:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>const {plugin, Component} = createTablePlugin&lt;Row&gt;({
+</span><span class='line'>  columns,
+</span><span class='line'>  method: 'newRow',
+</span><span class='line'>  key: 'id'
+</span><span class='line'>});
+</span><span class='line'>export {plugin, Component};</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If a simple table is not what you&rsquo;re looking for, there&rsquo;s <a href="https://fbflipper.com/docs/tutorial/js-custom/">an entire section in the documentation</a> about how to build a custom UI, and even how to write tests for the display logic.</p>
+
+<p>After you have finished with this part, you should be able to open Flipper and see your plugin listed in the &ldquo;Unavailable Plugins&rdquo; display of the Flipper desktop app. Our plugin is considered &ldquo;Unavailable&rdquo; because no currently running application is available to connect to it&hellip;yet.</p>
+
+<p><img class="center" src="http://michaelevans.org/images/2022/09/28/unavailable.jpg" width="800"></p>
+
+<p>Build and launch your Android app and the plugin should now become &ldquo;Disabled&rdquo;.</p>
+
+<p><img class="center" src="http://michaelevans.org/images/2022/09/28/disabled.jpg" width="800"></p>
+
+<p>We can now click &ldquo;+&rdquo; on the plugin row to &ldquo;enable&rdquo; it and start sending those analytics events &ndash; They should start showing up in the Flipper UI immediately!</p>
+
+<p><img class="center" src="http://michaelevans.org/images/2022/09/28/working.jpg" width="800"></p>
+
+<p>Depending on your use-case, your events might not just be a simple string and timestamp. You&rsquo;ll likely have defined some attributes, maybe the ID of an item being viewed, or the level number completed in a game. It would be great if there was a simple way to see all the data that corresponds to an event, right? Conveniently, the Flipper sidebar to show us that information in an easy to read way. All you need to do is click on the row, and a side panel will appear that renders our event as as JSON tree (I added some additional fields as a demo here):</p>
+
+<p><img class="center" src="http://michaelevans.org/images/2022/09/28/sidebar.jpg" width="800"></p>
+
+<h3>Wrap up</h3>
+
+<p>By using the table plugin on the desktop side, searching and filtering behavior all comes for free, which is amazing if your app sends a lot of analytics events!</p>
+
+<p>The code for both the Desktop Plugin and the Android sample app can be found on <a href="https://github.com/MichaelEvans/FlipperPluginSample">Github here</a>.</p>
+
+<p>As this post demonstrates &ndash; the Flipper SDK is pretty flexible and allows you to build all sorts of custom development tools to help ease everday tasks. Come up with an idea for a cool plugin? Send me a <a href="https://twitter.com/m_evans10">tweet</a>, I&rsquo;d love to hear about it!</p>
+
+<p>(Thanks to <a href="https://twitter.com/zarahjutz">Zarah</a> for the editing and feedback for this post!)</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Android Developer Challenge]]></title>
@@ -1729,44 +2010,6 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
 
 
 <p>That&rsquo;s it! Enjoy your tether-free development.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[2013 in Review]]></title>
-    <link href="http://michaelevans.org/blog/2013/12/31/2013-in-review/"/>
-    <updated>2013-12-31T11:27:05-05:00</updated>
-    <id>http://michaelevans.org/blog/2013/12/31/2013-in-review</id>
-    <content type="html"><![CDATA[<p>Today is December 31st, and I decided to write up a blog post, reflecting on the year that I&rsquo;ve had. I&rsquo;ve learned a lot over the last twelve months, and done a lot of interesting things (okay, at least interesting to me). Here&rsquo;s a brief overview of what happened:</p>
-
-<div align='center'><div class='g-post' data-href='https://plus.google.com/114052868601022948953/posts/ZzXcKVs2fvH'></div></div>
-
-
-
-
-<!-- more -->
-
-
-<h2>Looking Back</h2>
-
-<ul>
-<li><p><strong>January 17th</strong>: Released the first version of my <a href="https://play.google.com/store/apps/details?id=com.evans.hackernews">Hacker News</a> app to the Play Store. It was one of my first Android releases in a long while, and my first using the &ldquo;Holo&rdquo; design language that came about in Android 4.0+. It was met with a surprising amount of positivity when I <a href="https://news.ycombinator.com/item?id=5072757">posted it on Hacker News</a>, and has a 4.1 rating as of this post. I am actually in the process of rewriting this app, using a lot of the techniques I learned in the past 12 months.</p></li>
-<li><p><strong>February</strong>: In February I was invited to take part in the <a href="http://www.michaelevans.org/blog/2013/02/20/googles-project-glass/">Glass Foundry</a>, a hackathon for Google Glass. I was one of the first non-Googlers to get my hands on it, and the team I was on won! Our prize was a Google Glass, free of charge. We built a recipes app for Glass, which would allow for hands-free cooking.</p></li>
-<li><p><strong>April</strong>: April was a pretty exciting month for me, I quit my job as a developer at The Washington Post, and started a new one as a developer at LivingSocial. I also traveled to New York City, in order to be one of the first people to pick up <a href="http://www.michaelevans.org/blog/2013/04/29/hands-on-with-google-glass/">Google Glass</a>.</p></li>
-<li><p><strong>May</strong>: In May, I was fortunate enough to attend my third Google I/O. If you know anything about Google I/O, you&rsquo;d know that statement alone is enough.</p></li>
-<li><p><strong>August</strong>: After returning from Defcon 21, I posted <a href="http://www.michaelevans.org/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse/">a pair</a> of <a href="http://www.michaelevans.org/blog/2013/08/20/parse-android-todo-app-tutorial-part-two-users/">Android development tutorials</a> on how to make a Todo application using Parse. These have been two of my most popular posts to date, and I&rsquo;ll definitely be working on more in the future. If you enjoyed those posts, feel free to let me know what other topics you&rsquo;d like to see covered!</p></li>
-<li><p><strong>September</strong>: After a bit of a hiatus from Android app development, I released an app called <a href="https://play.google.com/store/apps/details?id=org.michaelevans.bikefinder">Bike Finder</a>. This app is for locating bikes for use with Capital Bikeshare in Washington DC, with support for CityBikes and Divvy (among others) soon.</p></li>
-<li><p><strong>October</strong>: Another hackathon attempt, this time without success; Ed, Jon and I built an app for BattleHack called Tappd, which was designed to be a point-of-sale replacement, where users could tap-to-pay, as well as recieve push notifications for events such as their table being ready.</p></li>
-<li><p><strong>November</strong>: I signed up and was chosen to be one of the <a href="https://helpouts.google.com/114052868601022948953/ls/a65184ab017ae8b0">pioneer providers</a> for Google Helpouts, a program designed to help people in real time, using Google Hangouts. I set up a helpout to teach software development, and have had a few dozen <a href="http://blog.votanoticias.com/app-de-meneame-para-google-glass/">successful sessions</a> so far.</p></li>
-<li><p><strong>December</strong>: Most recently I released my first open source library for Android: <a href="https://github.com/MichaelEvans/ColorArt">ColorArt</a>. It ended up being very popular, making it onto <a href="http://androidweekly.net/issues/issue-81">Android Weekly</a>, and being the top Java repo for a week on GitHub. And even more exciting was the release of a project I had been working on for 3 months: a complete rewrite of the <a href="https://play.google.com/store/apps/details?id=com.livingsocial.www">LivingSocial app for Android</a>. It was a big update for us, and even got featured on one of my favorite Android news sites: <a href="http://www.androidpolice.com/2013/12/10/livingsocial-hits-v2-0-gets-a-complete-redesign-and-deal-searching/">Android Police</a>.</p></li>
-</ul>
-
-
-<h3>Going Forward</h3>
-
-<p>For 2014, I&rsquo;d really like to contribute more to open source. Much of the work I do takes advantage of the work that others have open sourced, and I really find contributing back rewarding. I&rsquo;d also like to do more writing on this blog, with both personal posts, as well as more tips and tutorials.</p>
-
-<p>Overall, 2013 was a pretty eventful year. Here&rsquo;s to 2014 being even better. Happy New Year everyone!</p>
 ]]></content>
   </entry>
   

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Android | Michael Evans]]></title>
   <link href="http://michaelevans.org/blog/categories/android/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2020-06-22T12:25:15-04:00</updated>
+  <updated>2022-09-29T21:55:59-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -12,6 +12,231 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Building Flipper Plugins for Fun and Profit]]></title>
+    <link href="http://michaelevans.org/blog/2022/09/28/flipper-plugins-for-fun-and-profit/"/>
+    <updated>2022-09-28T23:41:17-04:00</updated>
+    <id>http://michaelevans.org/blog/2022/09/28/flipper-plugins-for-fun-and-profit</id>
+    <content type="html"><![CDATA[<p>A long, long time ago, I wrote a <a href="http://michaelevans.org/blog/2020/03/10/improving-app-debugging-with-flipper/">blog post</a> about how I was using <a href="https://fbflipper.com/">Flipper</a> as one of my favorite development tools. Since then, Android Studio has come a long way adding tons of features like a new <a href="https://androidstudio.googleblog.com/2022/03/android-studio-dolphin-canary-6-now.html">Logcat</a> and <a href="https://developer.android.com/studio/debug/layout-inspector">Layout Inspector</a>.</p>
+
+<p>However, there are often times that you&rsquo;ll need a tool more specific to your own workflow that Android Studio doesn&rsquo;t provide, and that&rsquo;s exactly where Flipper&rsquo;s extensibility really shines. As an example, I&rsquo;d like to go through building a custom plugin for Flipper, similar to one that I&rsquo;ve used on my own projects, that demonstrates how easy it is to get started building these tools.</p>
+
+<!-- more -->
+
+
+<h2>The Problem</h2>
+
+<p>As most apps grow, there becomes a need to measure app usage and engagement to better understand user behavior. In order to measure that, we often turn to analytics libraries (like <a href="https://firebase.google.com/docs/analytics">Firebase Analytics</a>) to handle this in-app behavior reporting. However, when implementing these client events, it&rsquo;s often helpful to have a quick feedback loop to ensure that the event and associated payload are correct, without having to check an analytics dashboard (which can often take some time to refresh).</p>
+
+<p>Luckily, most analytics libraries (including Firebase) have different solutions for this problem. In the Firebase Analytics library, the recommended debugging method is <a href="https://firebase.google.com/docs/analytics/events?platform=android#view_events_in_the_android_studio_debug_log">to set a property with ADB</a> to log all the events to logcat. This does provide much faster feedback than checking a dashboard, but it&rsquo;s not the most user friendly &ndash; developers need to set the property at the command line, and need to be monitoring logcat for all of the events (and also doesn&rsquo;t offer much of a search/filter function).</p>
+
+<h2>The Solution</h2>
+
+<p>Rather than sticking to plain text in logcat, we can build a custom Flipper plugin that will display our analytics events in a filterable table. Most Flipper plugins are comprised of two parts &ndash; a client library that runs as part of your Android app, and a desktop plugin that runs inside Flipper for processing and displaying the data sent by the client.</p>
+
+<p>All of the code for this example can be found in this example <a href="https://github.com/MichaelEvans/FlipperPluginSample">Github Repository</a>.</p>
+
+<h3>Part 1: Client Side</h3>
+
+<p>On the Android side, you&rsquo;ll need to add the <a href="https://fbflipper.com/docs/getting-started/android-native/">Flipper SDK</a> if you haven&rsquo;t already. If you have Flipper set up already, you can skip to the next section. If not, here&rsquo;s a quick run-down:</p>
+
+<h4>Add Flipper</h4>
+
+<p>Add the Gradle dependencies:
+```
+dependencies {
+  debugImplementation &lsquo;com.facebook.flipper:flipper:0.164.0&rsquo;
+  debugImplementation &lsquo;com.facebook.soloader:soloader:0.10.4&rsquo;</p>
+
+<p>  releaseImplementation &lsquo;com.facebook.flipper:flipper-noop:0.164.0&rsquo;
+}
+```</p>
+
+<p>Configure your Application class:
+```
+class MyApplication : Application {
+  override fun onCreate() {</p>
+
+<pre><code>super.onCreate()
+SoLoader.init(this, false)
+
+if (BuildConfig.DEBUG &amp;&amp; FlipperUtils.shouldEnableFlipper(this)) {
+  val client = AndroidFlipperClient.getInstance(this)
+  client.addPlugin(InspectorFlipperPlugin(this, DescriptorMapping.withDefaults()))
+  client.start()
+}
+</code></pre>
+
+<p>  }
+}
+```</p>
+
+<h4>Building the Plugin</h4>
+
+<p>And now it&rsquo;s time to build the plugin! Create a class to hold your plugin logic (For this example, I will call mine <code>AnalyticsPlugin</code>). For the purposes of this sample, it&rsquo;ll be a singleton <code>object</code> for reasons that we&rsquo;ll see later.</p>
+
+<p>We&rsquo;ll subclass the <code>BufferingFlipperPlugin</code> class, rather than <code>FlipperPlugin</code>, because the bufffering version will keep our events in a buffer until the connection is made with the desktop client (so that we don&rsquo;t lose any events).</p>
+
+<p>We need to override <code>getId()</code>, which is how Flipper will correlate our client plugin with the matching desktop plugin, and <code>runInBackground()</code> in order to tell Flipper to keep communicating with the desktop client, even if our plugin isn&rsquo;t the currently in the foreground.</p>
+
+<p>Lastly, we&rsquo;re going to create a <code>reportEvent</code> method, which will send whatever data we want to the server. In this example, we&rsquo;ll send a unique identifier for the event, the event name, and the timestamp that the event occured at. <strong>Note: <code>FlipperObject</code> can even be constructed by using JSON text or a <code>JSONObject</code>!</strong></p>
+
+<p>Here&rsquo;s what our plugin might look like:</p>
+
+<p>```
+object AnalyticsPlugin : BufferingFlipperPlugin() {</p>
+
+<pre><code>fun reportEvent(eventName: String) {
+    val flipperObject = FlipperObject.Builder()
+        .put("id", UUID.randomUUID())
+        .put("event", eventName)
+        .put("timestamp", Date().toLocaleString())
+        .build()
+    send("newRow", flipperObject)
+}
+
+override fun getId(): String {
+    return "org.michaelevans.flipper.analytics"
+}
+
+override fun runInBackground(): Boolean {
+    return true
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<p>After we create our plugin, we&rsquo;ll need to go back to our Application class to install our plugin, just like we would with the pre-loaded ones:</p>
+
+<p><code>
+val flipperClient = AndroidFlipperClient.getInstance(this)
+  // ...
+flipperClient.addPlugin(AnalyticsPlugin)
+flipperClient.start()
+</code></p>
+
+<p>The last thing we need to do is actually call our plugin somewhere. The implementation of this part will depend a lot on the particular implementation of your own app, but for this example we&rsquo;ll have an <code>Analytics</code> class that conditionally logs our events to Flipper in debug builds, and would do some normal production logic otherwise.</p>
+
+<p>```
+class Analytics() {</p>
+
+<pre><code>private val plugin = AnalyticsPlugin
+
+fun reportEvent(eventName: String) {
+    if (BuildConfig.DEBUG) {
+        plugin.reportEvent(eventName)
+    } else {
+        // do normal analytics logic here
+    }
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Once that&rsquo;s all done, the client work is complete!</p>
+
+<h3>Part 2: Desktop Side</h3>
+
+<h4>Setup</h4>
+
+<p>In order to build the desktop-side plugin, we&rsquo;ll need to set up our environment. We&rsquo;ll need something called <code>npx</code>, which is a tool to execute Javascript packages. <code>npx</code> can be installed from <a href="https://brew.sh/">Homebrew</a> with <code>brew install npx</code>.</p>
+
+<p>Once <code>npx</code> is installed, run the following command in the directory that you&rsquo;d like to create your plugin in:
+<code>
+npx flipper-pkg init
+</code></p>
+
+<p>This command will kick off a little bit of a &ldquo;new plugin wizard&rdquo;, asking a few questions about the plugin we&rsquo;ll be creating:</p>
+
+<ol>
+<li>Whether the plugin is a &ldquo;client&rdquo; plugin or a &ldquo;device&rdquo; plugin &ndash; our plugin will require our app to communicate, we&rsquo;ll choose <code>client</code>. (Flipper also supports <code>device</code> plugins that don&rsquo;t need any particular app to be running. For example, Logcat provides logs for the <em>entire</em> device, rather than needing any individual app).</li>
+<li>An ID. This needs to be the same as the ID we specified in the client code, otherwise Flipper will have no way of matching up the two halves of our plugin.</li>
+<li>A title. This is the human readable name of the plugin that will show up in the sidebar.</li>
+</ol>
+
+
+<p>After that, you should be able to <code>cd</code> into the newly created module directory and run <code>yarn watch</code> to have the plugin continuously be compiled when you make changes.</p>
+
+<h4>Building the Plugin</h4>
+
+<p>If you&rsquo;re familiar with JavaScript and React (I&rsquo;m not especially), creating the desktop side of the plugin might be easy. However, if you&rsquo;re <em>not</em> experienced with these tools, Flipper includes some <a href="https://fbflipper.com/docs/extending/flipper-plugin/#createtableplugin">very convenient helpers</a> for building a simple table UI. In this example, that&rsquo;s exactly what we&rsquo;ll be doing &ndash; let&rsquo;s get started!</p>
+
+<p>The init command we ran earlier auto-generated some files, one of which is <code>index.tsx</code> inside the <code>src</code> directory. Majority of the changes we&rsquo;ll need to make will be in this file.</p>
+
+<p>For our table, the first thing we&rsquo;ll need to define is the fields that will be shown in each row:</p>
+
+<p><code>
+type Row = {
+  id: string;
+  event: string;
+  timestamp: Date;
+}
+</code></p>
+
+<p>The next thing we need to do is create something called a <code>DataTableColumn</code>, which tells Flipper how to display our data. Each object defined in this section will map to the columns in our table &ndash; we can optionally provide a <code>title</code> to provide a more meaningful label at the top of the table and a <code>width</code> in either pixels, percent or nothing (which will distribute the space evenly).</p>
+
+<p>```
+const columns: DataTableColumn<Row>[] = [
+  {</p>
+
+<pre><code>title: 'Event Name',
+key: 'event'
+</code></pre>
+
+<p>  },
+  {</p>
+
+<pre><code>key: 'timestamp',
+width: 150
+</code></pre>
+
+<p>  }
+];
+```</p>
+
+<p>Lastly, we will use the Flipper <code>createTablePlugin</code> function to glue this all together:</p>
+
+<p><code>
+const {plugin, Component} = createTablePlugin&lt;Row&gt;({
+  columns,
+  method: 'newRow',
+  key: 'id'
+});
+export {plugin, Component};
+</code></p>
+
+<p>If a simple table is not what you&rsquo;re looking for, there&rsquo;s <a href="https://fbflipper.com/docs/tutorial/js-custom/">an entire section in the documentation</a> about how to build a custom UI, and even how to write tests for the display logic.</p>
+
+<p>After you have finished with this part, you should be able to open Flipper and see your plugin listed in the &ldquo;Unavailable Plugins&rdquo; display of the Flipper desktop app. Our plugin is considered &ldquo;Unavailable&rdquo; because no currently running application is available to connect to it&hellip;yet.</p>
+
+<p><img class="center" src="/images/2022/09/28/unavailable.jpg" width="800"></p>
+
+<p>Build and launch your Android app and the plugin should now become &ldquo;Disabled&rdquo;.</p>
+
+<p><img class="center" src="/images/2022/09/28/disabled.jpg" width="800"></p>
+
+<p>We can now click &ldquo;+&rdquo; on the plugin row to &ldquo;enable&rdquo; it and start sending those analytics events &ndash; They should start showing up in the Flipper UI immediately!</p>
+
+<p><img class="center" src="/images/2022/09/28/working.jpg" width="800"></p>
+
+<p>Depending on your use-case, your events might not just be a simple string and timestamp. You&rsquo;ll likely have defined some attributes, maybe the ID of an item being viewed, or the level number completed in a game. It would be great if there was a simple way to see all the data that corresponds to an event, right? Conveniently, the Flipper sidebar to show us that information in an easy to read way. All you need to do is click on the row, and a side panel will appear that renders our event as as JSON tree (I added some additional fields as a demo here):</p>
+
+<p><img class="center" src="/images/2022/09/28/sidebar.jpg" width="800"></p>
+
+<h3>Wrap up</h3>
+
+<p>By using the table plugin on the desktop side, searching and filtering behavior all comes for free, which is amazing if your app sends a lot of analytics events!</p>
+
+<p>The code for both the Desktop Plugin and the Android sample app can be found on <a href="https://github.com/MichaelEvans/FlipperPluginSample">Github here</a>.</p>
+
+<p>As this post demonstrates &ndash; the Flipper SDK is pretty flexible and allows you to build all sorts of custom development tools to help ease everday tasks. Come up with an idea for a cool plugin? Send me a <a href="https://twitter.com/m_evans10">tweet</a>, I&rsquo;d love to hear about it!</p>
+
+<p>(Thanks to <a href="https://twitter.com/zarahjutz">Zarah</a> for the editing and feedback for this post!)</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Android Developer Challenge]]></title>
@@ -343,82 +568,6 @@ dependencies {</p>
 <h2>Important Caveat</h2>
 
 <p>It&rsquo;s important to note that this feature is currently only available with the <code>java-library</code> plugin, and has limited functionality in Kotlin modules, and not yet available for Android modules. There are currently feature requests on <a href="https://youtrack.jetbrains.com/issue/KT-33877">YouTrack</a> and the <a href="https://issuetracker.google.com/issues/139438142">Android Issue Tracker</a> to take advantage of this new functionality.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Hands on with ViewPager2]]></title>
-    <link href="http://michaelevans.org/blog/2019/02/07/hands-on-with-viewpager2/"/>
-    <updated>2019-02-07T21:38:07-05:00</updated>
-    <id>http://michaelevans.org/blog/2019/02/07/hands-on-with-viewpager2</id>
-    <content type="html"><![CDATA[<p>Today Google released their alpha of <a href="https://developer.android.com/jetpack/androidx/releases/viewpager2#1.0.0-alpha01">ViewPager2</a>, a signal of the nail in the coffin for the original ViewPager, originally <a href="https://android-developers.googleblog.com/2011/08/horizontal-view-swiping-with-viewpager.html">released in 2011</a>!</p>
-
-<p>Since then, I think it&rsquo;s safe to say that most developers have needed to make a ViewPager. Despite how prolific it is, it certainly isn&rsquo;t the most straightforward widget to include. I think we all have at least once wondered whether we should use a <code>FragmentPagerAdapter</code> or a <code>FragmentStatePagerAdapter</code>. Or wondered if we can use a <a href="https://www.bignerdranch.com/blog/viewpager-without-fragments/">ViewPager <em>without</em> Fragments</a>.</p>
-
-<p>And API confusion aside, we&rsquo;ve still had long standing, feature requests. <a href="https://issuetracker.google.com/issues/36973591">RTL support</a>? <a href="https://issuetracker.google.com/issues/36952939">Vertical orientation</a>? There are numerous <a href="https://github.com/duolingo/rtl-viewpager">open source</a> <a href="https://github.com/kaelaela/VerticalViewPager">solutions</a> for these, but nothing official from the support library (now AndroidX)&hellip;until now!</p>
-
-<p>Let&rsquo;s dive in and try to set up ViewPager2! You&rsquo;ll need your project configured with AndroidX already, as well as supporting minSdkVersion 14 or higher.</p>
-
-<!-- more -->
-
-
-<p>The first thing we&rsquo;ll need to do is add the library to our build.gradle dependencies.</p>
-
-<p><code>
-implementation 'androidx.viewpager2:viewpager2:1.0.0-alpha01'
-</code></p>
-
-<p>If you&rsquo;re familiar with RecyclerView, setting up ViewPager2 will be very familiar. We start off by creating an adapter:</p>
-
-<p>```
-class CheesePagerAdapter(private val cheeseStrings: Array<String>) : RecyclerView.Adapter<CheeseViewHolder>() {</p>
-
-<pre><code>override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CheeseViewHolder {
-    return CheeseViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.cheese_list_item, parent, false))
-}
-
-override fun onBindViewHolder(holder: CheeseViewHolder, position: Int) {
-    holder.cheeseName.text = cheeseStrings[position]
-}
-
-override fun getItemCount() = cheeseStrings.size
-</code></pre>
-
-<p>}
-```</p>
-
-<p>and pair it with a RecyclerView.ViewHolder.</p>
-
-<p>```
-class CheeseViewHolder(view: View) : RecyclerView.ViewHolder(view) {</p>
-
-<pre><code>val cheeseName: TextView = view.findViewById(R.id.cheese_name)
-</code></pre>
-
-<p>}
-```</p>
-
-<p>Finally, just like RecyclerView, we set the adapter of our ViewPager2 to be an instance of the RecyclerView adapter. However, you&rsquo;ll note that there&rsquo;s no need for a LayoutManager.</p>
-
-<p><code>
-viewPager.adapter = CheesePagerAdapter(Cheeses.CheeseStrings)
-</code></p>
-
-<p>And with that, we have a working ViewPager2!</p>
-
-<p><img class="center" src="/images/2019/02/07/Horizontal.gif" width="600" height="600" title="Horizontal ViewPager2" ></p>
-
-<p>We can even set the orientation to scroll vertically with just one line:</p>
-
-<p><code>
-viewPager.orientation = ViewPager2.ORIENTATION_VERTICAL
-</code></p>
-
-<p><img class="center" src="/images/2019/02/07/Vertical.gif" width="600" height="600" title="Vertical ViewPager2" ></p>
-
-<p>Based on the release notes there are a lot of issues left to fix before this moves to a final release &ndash; but this is a long awaited update for one of those oldest support library components.</p>
-
-<p>The sample code for this post can be found <a href="https://github.com/MichaelEvans/ViewPager2Sample">here</a>. Thanks to Chris Banes' <a href="https://github.com/chrisbanes/cheesesquare">CheeseSquare</a> for the sample data for this demo!</p>
 ]]></content>
   </entry>
   
