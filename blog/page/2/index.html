@@ -10,7 +10,7 @@
   <meta name="author" content="Michael Evans">
 
   
-  <meta name="description" content="I recently attended Google&rsquo;s Android Dev Summit where the Tools team presented a talk entitled Android Studio For Experts. The room was packed &hellip;">
+  <meta name="description" content="It seems like nowadays, the best advice is to modularize your Android app. It&rsquo;s a great suggestion for many reasons, including but not limited &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -79,6 +79,388 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2019/09/21/stop-repeating-yourself-sharing-test-code-across-android-modules/">Stop Repeating Yourself: Sharing Test Code Across Android Modules</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2019-09-21T21:34:52-04:00" pubdate data-updated="true">Sep 21<span>st</span>, 2019</time>
+        
+         | <a href="/blog/2019/09/21/stop-repeating-yourself-sharing-test-code-across-android-modules/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>It seems like nowadays, the <a href="https://jeroenmols.com/blog/2019/03/06/modularizationwhy/">best advice</a> <a href="https://robinhood.engineering/breaking-up-the-app-module-monolith-the-story-of-robinhoods-android-app-707fb993a50c">is to modularize</a> <a href="https://www.youtube.com/watch?v=PZBg5DIzNww">your Android app</a>. It&rsquo;s a great suggestion for many reasons, including but not limited to:</p>
+
+<pre><code>- improved build performance
+- enables on-demand delivery
+- pushes you to build reusable, discrete components
+</code></pre>
+
+<p>Sounds great, right? Are there any downsides? There is one in particular which has been a a pain point for many.</p>
+
+<p>Often times when you&rsquo;re writing tests, you&rsquo;ll want to use some <a href="https://testing.googleblog.com/2013/07/testing-on-toilet-know-your-test-doubles.html">test doubles</a> like fakes or fixtures in order to help simulate the system under test. Maybe you have a <code>FakeUser</code> instance that you use in your tests to avoid having to mock a <code>User</code> every time your test calls for one. Generally these classes live alongside tests in <code>src/test</code> directories and are used to test out your code within a module.</p>
+
+<p>For example, maybe you have a model object like:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>public class User {
+</span><span class='line'>    private final String firstName;
+</span><span class='line'>    private final String lastName;
+</span><span class='line'>
+</span><span class='line'>    public User(String firstName, String lastName) {
+</span><span class='line'>        this.firstName = firstName;
+</span><span class='line'>        this.lastName = lastName;
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>    public String getFirstName() {
+</span><span class='line'>        return firstName;
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>    public String getLastName() {
+</span><span class='line'>        return lastName;
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You might have some code in <code>src/test</code> that creates a bunch of fake users for your tests like:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>class TheOfficeFixtures {
+</span><span class='line'>        public static User manager = new User("Michael", "Scott");
+</span><span class='line'>        public static User assistantToTheRegionalManager = new User("Dwight", "Schrute");
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This works great if you&rsquo;re testing code <em>within</em> a module, but as soon as you&rsquo;d like to use these fake users in other modules, you&rsquo;ll note that these classes aren&rsquo;t shared!</p>
+
+<p>This code can&rsquo;t be shared between modules because Gradle doesn&rsquo;t expose the output of your test source set as a build artifact. There are all kinds of solutions for this problem out there, including <a href="https://treatwell.engineering/mock-factory-for-android-testing-in-multi-module-system-7654f45808be">creating a special module for all your fixtures</a>, and using <a href="https://stackoverflow.com/questions/5644011/multi-project-test-dependencies-with-gradle">gradle dependency hacks</a> to wire up source sets.</p>
+
+<p>However, that&rsquo;s not necessary anymore! As of version 5.6, Gradle now ships a new &lsquo;test-fixtures&rsquo; plugin! This plugin creates a new <code>testFixtures</code> source set, and configures that source set so that:</p>
+
+<pre><code>- classes in this set can see the main source set classes
+- test sources can see the test fixtures classes
+</code></pre>
+
+<h3>Using the Plugin</h3>
+
+<p>You can apply the <code>java-test-fixtures</code> plugin in your build.gradle script:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>plugins {
+</span><span class='line'>    id 'java-test-fixtures'
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This plugin will define the necessary source set, and handle all the wiring up of test artifacts. We can now  move those test fixtures from <code>src/test/java</code> to <code>src/testFixtures/java</code>, and that&rsquo;s it! These classes will be ready to be consumed by other modules.</p>
+
+<h3>Wiring it all together</h3>
+
+<p>Finally, we need to use a special keyword to pull these new fixtures in as a dependency for our tests. In our  gradle configuration, we add a test dependency (either API or Implementation) like so:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>dependencies {
+</span><span class='line'>    testImplementation(testFixtures(project(":lib")))
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And that&rsquo;s it! Our other module can now consume these test fixtures without any sort of intermediate modules or workarounds.</p>
+
+<p>If you&rsquo;d like to check out the complete configuration with examples sharing fixtures between both Kotlin and Java modules to a shared &ldquo;app&rdquo; module, I&rsquo;ve uploaded a sample project demonstrating how to use this new configuration <a href="https://github.com/MichaelEvans/TestFixturesExample">here</a>.</p>
+
+<h2>Important Caveat</h2>
+
+<p>It&rsquo;s important to note that this feature is currently only available with the <code>java-library</code> plugin, and has limited functionality in Kotlin modules, and not yet available for Android modules. There are currently feature requests on <a href="https://youtrack.jetbrains.com/issue/KT-33877">YouTrack</a> and the <a href="https://issuetracker.google.com/issues/139438142">Android Issue Tracker</a> to take advantage of this new functionality.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2019/02/07/hands-on-with-viewpager2/">Hands on With ViewPager2</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2019-02-07T21:38:07-05:00" pubdate data-updated="true">Feb 7<span>th</span>, 2019</time>
+        
+         | <a href="/blog/2019/02/07/hands-on-with-viewpager2/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Today Google released their alpha of <a href="https://developer.android.com/jetpack/androidx/releases/viewpager2#1.0.0-alpha01">ViewPager2</a>, a signal of the nail in the coffin for the original ViewPager, originally <a href="https://android-developers.googleblog.com/2011/08/horizontal-view-swiping-with-viewpager.html">released in 2011</a>!</p>
+
+<p>Since then, I think it&rsquo;s safe to say that most developers have needed to make a ViewPager. Despite how prolific it is, it certainly isn&rsquo;t the most straightforward widget to include. I think we all have at least once wondered whether we should use a <code>FragmentPagerAdapter</code> or a <code>FragmentStatePagerAdapter</code>. Or wondered if we can use a <a href="https://www.bignerdranch.com/blog/viewpager-without-fragments/">ViewPager <em>without</em> Fragments</a>.</p>
+
+<p>And API confusion aside, we&rsquo;ve still had long standing, feature requests. <a href="https://issuetracker.google.com/issues/36973591">RTL support</a>? <a href="https://issuetracker.google.com/issues/36952939">Vertical orientation</a>? There are numerous <a href="https://github.com/duolingo/rtl-viewpager">open source</a> <a href="https://github.com/kaelaela/VerticalViewPager">solutions</a> for these, but nothing official from the support library (now AndroidX)&hellip;until now!</p>
+
+<p>Let&rsquo;s dive in and try to set up ViewPager2! You&rsquo;ll need your project configured with AndroidX already, as well as supporting minSdkVersion 14 or higher.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2019/02/07/hands-on-with-viewpager2/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/08/23/enabling-night-mode-on-android-nougat/">Enabling Night Mode on Android Nougat</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-08-23T18:27:01-04:00" pubdate data-updated="true">Aug 23<span>rd</span>, 2016</time>
+        
+         | <a href="/blog/2016/08/23/enabling-night-mode-on-android-nougat/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>If you&rsquo;re like me, you loved the <a href="http://www.androidpolice.com/2016/03/09/android-n-feature-spotlight-night-mode-is-back-with-expanded-features-including-red-filter-and-brightness/">Night Mode feature</a> that was added to the Nougat Developer Preview a few months ago. You might have been disappointed when you found out that it was missing in later preview builds, and was probably going to be removed <a href="https://www.reddit.com/r/androiddev/comments/4tm8i6/were_on_the_android_engineering_team_and_built/d5igc5t">because it wasn&rsquo;t ready</a>.</p>
+
+<p>When the source code for Nougat was released this morning, my friend <a href="https://twitter.com/vishnurajeevan">Vishnu</a> found this interesting snippet in the <a href="https://android.googlesource.com/platform/frameworks/base/+/android-7.0.0_r1/packages/SystemUI/src/com/android/systemui/tuner/TunerActivity.java#42">SystemUI source</a> (better known to end users as the System UI Tuner):</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kt">boolean</span> <span class="n">showNightMode</span> <span class="o">=</span> <span class="n">getIntent</span><span class="o">().</span><span class="na">getBooleanExtra</span><span class="o">(</span>
+</span><span class='line'>    <span class="n">NightModeFragment</span><span class="o">.</span><span class="na">EXTRA_SHOW_NIGHT_MODE</span><span class="o">,</span> <span class="kc">false</span><span class="o">);</span>
+</span><span class='line'><span class="kd">final</span> <span class="n">PreferenceFragment</span> <span class="n">fragment</span> <span class="o">=</span> <span class="n">showNightMode</span> <span class="o">?</span> <span class="k">new</span> <span class="n">NightModeFragment</span><span class="o">()</span>
+</span><span class='line'>    <span class="o">:</span> <span class="n">showDemoMode</span> <span class="o">?</span> <span class="k">new</span> <span class="n">DemoModeFragment</span><span class="o">()</span>
+</span><span class='line'>    <span class="o">:</span> <span class="k">new</span> <span class="n">TunerFragment</span><span class="o">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Long story short, if you pass the right extras to this activity, and you&rsquo;ll get access to the Night Mode settings (as well as the infamous Quick Tile!).</p>
+
+<p>Fortunately for us, this is pretty trivial to accomplish with <code>adb</code> via <code>adb -d shell am start  --ez show_night_mode true com.android.systemui/.tuner.TunerActivity</code>, but not everyone who wants this feature is familiar with <code>adb</code>. So I published an app to the Play Store that does exactly that &ndash; click one button, and get access to those settings! You can find the app on the Play Store <a href="https://play.google.com/store/apps/details?id=org.michaelevans.nightmodeenabler">here</a>.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/">Using Build Types With the Google Services Gradle Plugin</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-03-31T21:11:55-04:00" pubdate data-updated="true">Mar 31<span>st</span>, 2016</time>
+        
+         | <a href="/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>If you want to integrate your Android app with most of Google Play Services nowadays, you&rsquo;ll find that you are instructed to set up the <a href="https://developers.google.com/android/guides/google-services-plugin">Google Services Gradle plugin</a> to handle configuring dependencies. The plugin allows you to drop a JSON file into your project, and then the plugin will do a bunch of the configuration for your project, such as handling the API keys.</p>
+
+<p>This is all well and good—unless you&rsquo;re like me (<a href="https://github.com/googlesamples/google-services/issues/54">and countless others</a>) and want to use a different configuration for your debug and release builds. This would be useful, as an example, if you use Google Play Services for GCM and would like to have development builds recieve pushes from non-production systems.</p>
+
+<p>It seems that the plugin is configured in such a way that it supports build flavors, but it does not yet support build types. However, with a little Gradle magic, we can hack that support in.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/03/09/changelog-for-n-support-libraries/">Changelog for N Support Libraries</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-03-09T19:38:46-05:00" pubdate data-updated="true">Mar 9<span>th</span>, 2016</time>
+        
+         | <a href="/blog/2016/03/09/changelog-for-n-support-libraries/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Pssst! If you&rsquo;re an Android developer, you might not have heard yet&hellip;the <a href="http://android-developers.blogspot.com/2016/03/first-preview-of-android-n-developer.html">N Preview started today</a>! As part of the festivities, a new alpha version of the support libraries was released. There was no changelog that I could find, so I decided to make one. Here&rsquo;s what has changed (so far) in the public API of a few of these libraries:</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2016/03/09/changelog-for-n-support-libraries/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/02/17/using-dagger-1-and-kotlin/">Using Dagger 1 and Kotlin</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-02-17T13:43:25-05:00" pubdate data-updated="true">Feb 17<span>th</span>, 2016</time>
+        
+         | <a href="/blog/2016/02/17/using-dagger-1-and-kotlin/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Unless you&rsquo;ve been hiding from all the news about Android development, you&rsquo;ve <a href="https://medium.com/@CodingDoug/kotlin-android-a-brass-tacks-experiment-part-1-3e5028491bcc#.15w4ypfer">likely</a> <a href="http://antonioleiva.com/kotlin-awesome-tricks-for-android/">heard</a> <a href="http://vishnurajeevan.com/2016/02/13/Using-Kotlin-Extensions-for-Rx-ifying/">about</a> <a href="https://realm.io/news/oredev-jake-wharton-kotlin-advancing-android-dev/">Kotlin</a> (<a href="https://blog.jetbrains.com/kotlin/2016/02/kotlin-1-0-released-pragmatic-language-for-jvm-and-android/">which hit version 1.0 on Monday</a>!). I&rsquo;ve been toying around with it lately (the <a href="https://kotlinlang.org/docs/tutorials/koans.html">Kotlin Koans</a> are a great place to start for a beginner) and wanted to try building an app with it &ndash; that is, until I hit a few road blocks.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2016/02/17/using-dagger-1-and-kotlin/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -255,391 +637,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/07/14/improving-your-code-with-android-support-annotations/">Improving Your Code With Android Support Annotations</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-07-14T22:46:56-04:00" pubdate data-updated="true">Jul 14<span>th</span>, 2015</time>
-        
-         | <a href="/blog/2015/07/14/improving-your-code-with-android-support-annotations/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>If you haven&rsquo;t heard of the Android Support Annotations library yet, you&rsquo;re missing out on a neat new package that will help you catch bugs in your apps. Included in the library is a number of Java annotations, that will help Android Studio check your code for possible errors and report them to you. There are quite a few of them, so I only plan to go over a few of them here, but you should definitely <a href="http://tools.android.com/tech-docs/support-annotations">check out the docs</a> for more info about the rest.</p>
-
-<h2>@NonNull / @Nullable</h2>
-
-<p><code>@NonNull</code> and <code>@Nullable</code> are probably the most basic of the support annotations, but also some of the most helpful! Annotate a parameter or method with either of these to denote if the parameter or method&rsquo;s return value can be null or not, and voila, now Android Studio can give us a nice warning that we&rsquo;re doing something unsafe.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2015/07/14/improving-your-code-with-android-support-annotations/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/05/07/android-ripples-with-rounded-corners/">Android Ripples With Rounded Corners</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-05-07T22:55:36-04:00" pubdate data-updated="true">May 7<span>th</span>, 2015</time>
-        
-         | <a href="/blog/2015/05/07/android-ripples-with-rounded-corners/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>So recently I was trying to add a ripple to a view that had rounded corners. Simple enough right? Let&rsquo;s just say I have a FrameLayout with the background similar to this one:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;?xml version="1.0" encoding="utf-8"?&gt;
-</span><span class='line'>&lt;shape xmlns:android="http://schemas.android.com/apk/res/android"
-</span><span class='line'>    android:shape="rectangle"&gt;
-</span><span class='line'>    &lt;solid android:color="@android:color/transparent"/&gt;
-</span><span class='line'>    &lt;corners android:radius="15dp" /&gt;
-</span><span class='line'>    &lt;stroke
-</span><span class='line'>        android:width="1px"
-</span><span class='line'>        android:color="#000000" /&gt;
-</span><span class='line'>&lt;/shape&gt;</span></code></pre></td></tr></table></div></figure>
-
-
-<p>It&rsquo;s not quite as simple as setting the foreground to <code>?attr/selectableItemBackground</code>, or else you&rsquo;ll see the ripple surpasses the corners (which doesn&rsquo;t look <em>so</em> bad when your border radius is small, but this would look terrible with a circlular view):</p>
-
-<p><img class="center" src="/images/2015/05/07/before.gif" width="600" height="600" title="Rounded Corner Fail!" ></p>
-
-<p>The solution for this lies in the special mask layer of the <a href="https://developer.android.com/reference/android/graphics/drawable/RippleDrawable.html">RippleDrawable</a>. You specify the mask layer via the <code>android:id</code> value set to <code>@android:id/mask</code>. For the example above, you can set the mask to the same size/shape as the view you&rsquo;re masking, and then the ripple will only show for that area. For something like our example above, you&rsquo;d use something like this:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;?xml version="1.0" encoding="utf-8"?&gt;
-</span><span class='line'>&lt;ripple xmlns:android="http://schemas.android.com/apk/res/android"
-</span><span class='line'>    android:color="?android:attr/colorControlHighlight"&gt;
-</span><span class='line'>    &lt;item android:id="@android:id/mask"&gt;
-</span><span class='line'>        &lt;shape android:shape="rectangle"&gt;
-</span><span class='line'>            &lt;solid android:color="#000000" /&gt;
-</span><span class='line'>            &lt;corners android:radius="15dp" /&gt;
-</span><span class='line'>        &lt;/shape&gt;
-</span><span class='line'>    &lt;/item&gt;
-</span><span class='line'>    &lt;item android:drawable="@drawable/rounded_corners" /&gt;
-</span><span class='line'>&lt;/ripple&gt;</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now when you tap on the view, you&rsquo;ll see something like this:</p>
-
-<p><img class="center" src="/images/2015/05/07/after.gif" width="600" height="600" title="Rounded Corners!" ></p>
-
-<p><em>Huzzah!</em></p>
-
-<p>Another tip: if you don&rsquo;t set a click listener for a FrameLayout (like we used in this example), the pressed state will never be used!</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/07/09/blurred-background-effect-for-android/">Blurred Background Effect for Android</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-07-09T23:04:46-04:00" pubdate data-updated="true">Jul 9<span>th</span>, 2014</time>
-        
-         | <a href="/blog/2014/07/09/blurred-background-effect-for-android/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>A few months ago, the Android design team reviewed apps that they thought were good-looking, and were referred to as the &ldquo;<a href="https://play.google.com/store/apps/collection/promotion_3000235_beautiful_apps?hl=en">Beautiful Design Collection</a>&rdquo;, as part of their <a href="https://www.youtube.com/playlist?list=PLWz5rJ2EKKc8j2B95zGMb8muZvrIy-wcF">Android Design in Action</a> series.</p>
-
-<p>One of these apps was <a href="https://play.google.com/store/apps/details?id=com.etsy.android&amp;hl=en">Etsy</a>, which had a very cool fading blur background effect, which you can see here:</p>
-
-<p><img class="center" src="/images/2014/07/09/2014-07-09-23_25_40.gif" width="600" height="600" title="Etsy Example" ></p>
-
-<p>As a learning experiment, I set off to replicate this behavior. I had seen a library by Manuel Peinado called <a href="https://github.com/ManuelPeinado/GlassActionBar">GlassActionBar</a> which demonstrated a similar glass-like blur effect on the ActionBar, so I decided to use that code for blurring my background.</p>
-
-<p>The code itself is pretty interesting, specifically the bit for versions on Jelly Bean or higher. If you&rsquo;re using API version 16 and up, you can use <a href="http://android-developers.blogspot.com/2013/08/renderscript-intrinsics.html">Renderscript Intrinsics</a>, which are a set of built-in functions that require very little code to use, but are optimized for high-performance.</p>
-
-<p>In my sample tests, using Renderscript to blur the image took on average about ~175ms, vs ~2 seconds doing the blur using Java code. (The required code is also only a tiny fraction of the length of the Renderscript one).</p>
-
-<p>Renderscript is extremely easy to add to your project, just throw</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>    renderscriptTargetApi 19
-</span><span class='line'>    renderscriptSupportMode true</span></code></pre></td></tr></table></div></figure>
-
-
-<p>in your <code>build.gradle</code> and you should be ready to roll.</p>
-
-<p>Once you have the blurring, the rest of the process is fairly straight forward. When you plan to leave an activity, create a bitmap of the current view and write it to disk. When you start your new activity (which should have a transparent background), you override the transition (otherwise you&rsquo;ll get the default zoom), and set the background to the blurred image you saved earlier. Add a fade in for the alpha and you get a nice little effect!</p>
-
-<p><img class="center" src="/images/2014/07/09/2014-07-09-23_34_05.gif" width="600" height="600" title="My Example" ></p>
-
-<p>If you&rsquo;d like to see how this looks in a sample project, you can find it on Github <a href="https://github.com/MichaelEvans/EtsyBlurExample">here</a>.</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/06/07/building-obs-studio-for-os-x/">Building OBS Studio for OS X</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-06-07T22:59:38-04:00" pubdate data-updated="true">Jun 7<span>th</span>, 2014</time>
-        
-         | <a href="/blog/2014/06/07/building-obs-studio-for-os-x/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Recently I&rsquo;ve been watching a bunch of streams on <a href="http://www.twitch.tv/">Twitch</a>, and was investigating the best options to stream from OS X. Sadly most of the ones I found were very expensive, until I saw that <a href="http://obsproject.com/">Open Broadcaster Software</a>, which was previously only for Windows, was <a href="https://github.com/jp9000/obs-studio">being rewritten</a> to work with OS X and Linux. However, it&rsquo;s still highly beta/under development and as a result, there&rsquo;s not a lot of documentation on how to build it.</p>
-
-<p>Here&rsquo;s how I did it:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>brew install ffmpeg glew cmake qt5
-</span><span class='line'>git clone https://github.com/jp9000/obs-studio.git
-</span><span class='line'>cd obs-studio
-</span><span class='line'>mkdir cmbuild && cd cmbuild
-</span><span class='line'>export CMAKE_PREFIX_PATH=/usr/local/Cellar/qt5/5.2.1/lib/cmake
-</span><span class='line'>cmake .. && make
-</span><span class='line'>cpack</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This will leave you with a disk image named <code>obs-studio-x64-&lt;sha1-hash&gt;.dmg</code>, which you can mount and install, just like any other OS X application.</p>
-
-<p>Happy Streaming!</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/04/13/embedding-google-plus-posts-in-octopress/">Embedding Google+ Posts in Octopress</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-04-13T13:46:25-04:00" pubdate data-updated="true">Apr 13<span>th</span>, 2014</time>
-        
-         | <a href="/blog/2014/04/13/embedding-google-plus-posts-in-octopress/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>A few months back I wrote a blog post about my <a href="http://www.michaelevans.org/blog/2013/12/31/2013-in-review/">2013 in Review</a>. One thing I wanted to add to the post was a link to the #AutoAwesomed video, which was generated from photos and videos I took during the year, which were backed up to Google+.</p>
-
-<p>Fortunately for me, Google allows you to embed posts into your pages using a technique which is documented <a href="https://developers.google.com/+/web/embedded-post/">here</a>. The problem with this method, for me at least, is that my blog is created using <a href="http://octopress.org/">Octopress</a>, and posts are written in Markdown and then rendered to HTML. Octopress does, however, allow you to write plugins which can help us with this issue.</p>
-
-<p>Here&rsquo;s the <a href="https://gist.github.com/MichaelEvans/10590514">plugin</a> in all it&rsquo;s glory:</p>
-
-<div><script src='https://gist.github.com/10590514.js?file=google_plus.rb'></script>
-<noscript><pre><code>module Jekyll
-
-  class GooglePlusEmbedTag &lt; Liquid::Tag
-    @post = nil
-    @height = &#39;&#39;
-    @width = &#39;&#39;
-
-    def initialize(tag_name, markup, tokens)
-      if markup =~ /(https:\/\/plus.google.com\/\d+\/posts\/\w+)/i
-        @url  = $1
-      end
-      super
-    end
-
-    def render(context)
-      &quot;&lt;div align=&#39;center&#39;&gt;&lt;div class=&#39;g-post&#39; data-href=&#39;#{@url}&#39;&gt;&lt;/div&gt;&lt;/div&gt;&quot;
-    end
-  end
-end
-
-Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)</code></pre></noscript></div>
-
-
-
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/03/03/adb-over-wifi/">ADB Over WiFi</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-03-03T22:30:38-05:00" pubdate data-updated="true">Mar 3<span>rd</span>, 2014</time>
-        
-         | <a href="/blog/2014/03/03/adb-over-wifi/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I haven&rsquo;t updated my blog in a while, but this is a tip/trick that&rsquo;s so good that I had to share. It&rsquo;s not a very widely known feature, but once you try it, you&rsquo;ll wonder how you lived with out it: using ADB over WiFi! That&rsquo;s right, no more plugging in all your devices to your computer to debug/etc. Best of all, no root required.</p>
-
-<p>It&rsquo;s also ingeniusly simple. First, connect the device you want to use via a USB cable.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>adb tcpip 5555
-</span><span class='line'>(Feel free to unplug it now)
-</span><span class='line'>adb connect &lt;IP address of your device&gt;</span></code></pre></td></tr></table></div></figure>
-
-
-<p>That&rsquo;s it! Enjoy your tether-free development.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -657,23 +654,23 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2022/09/28/flipper-plugins-for-fun-and-profit/">Building Flipper Plugins for Fun and Profit</a>
+        <a href="/blog/2024/12/14/ui-testing-made-easy-the-robot-test-pattern-on-android/">UI Testing Made Easy: The Robot Test Pattern on Android</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2020/06/21/android-developer-challenge/">Android Developer Challenge</a>
+        <a href="/blog/2024/10/10/modernizing-your-android-apps-data-storage-sharedpreferences-to-datastore/">Modernizing Your Android App&#8217;s Data Storage: SharedPreferences to DataStore</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2020/03/10/improving-app-debugging-with-flipper/">Improving App Debugging with Flipper</a>
+        <a href="/blog/2024/09/07/mastering-ktlint-a-guide-to-crafting-your-own-rules/">Mastering ktlint: A Guide to Crafting Your Own Rules</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2020/02/10/dropping-columns-like-its-hot/">Dropping Columns Like It&#8217;s Hot</a>
+        <a href="/blog/2024/07/29/stop-repeating-yourself-2-using-test-fixtures-with-agp/">Stop Repeating Yourself 2: Using Test Fixtures with AGP</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2019/09/21/stop-repeating-yourself-sharing-test-code-across-android-modules/">Stop Repeating Yourself: Sharing test code across Android Modules</a>
+        <a href="/blog/2024/06/27/understanding-referrals-using-google-play/">Understanding Referrals using Google Play</a>
       </li>
     
   </ul>
@@ -727,7 +724,7 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2022 - Michael Evans -
+  Copyright &copy; 2024 - Michael Evans -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Play Store | Michael Evans]]></title>
+  <link href="http://michaelevans.org/blog/categories/play-store/atom.xml" rel="self"/>
+  <link href="http://michaelevans.org/"/>
+  <updated>2024-12-29T00:15:11-05:00</updated>
+  <id>http://michaelevans.org/</id>
+  <author>
+    <name><![CDATA[Michael Evans]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Understanding Referrals using Google Play]]></title>
+    <link href="http://michaelevans.org/blog/2024/06/27/understanding-referrals-using-google-play/"/>
+    <updated>2024-06-27T19:41:33-04:00</updated>
+    <id>http://michaelevans.org/blog/2024/06/27/understanding-referrals-using-google-play</id>
+    <content type="html"><![CDATA[<p>Tracking how users install your app can be tricky, especially when you want to measure the effectiveness of your campaigns or ads. That’s where the <a href="https://developer.android.com/google/play/installreferrer">Google Play Install Referrer API</a> comes in handy—it gives you reliable data about how users found your app.</p>
+
+<p>If you’re developing an Android application, this guide will walk you through how to set up and use the InstallReferrerClient with Kotlin&rsquo;s callbackFlow to make integration simpler and more maintainable.</p>
+
+<h3>What is the Install Referrer?</h3>
+
+<p>The install referrer contains information about the source of the app installation. For example, if a user clicks an ad campaign link that leads to your app’s Play Store page, the referrer might include details about the campaign source, medium, or other specifics.</p>
+
+<p>Here’s how this data can help:</p>
+
+<ul>
+<li>Attribution: Identify which campaigns drive installs.</li>
+<li>Measure Success: Evaluate your marketing efforts' impact.</li>
+<li>Prevent Fraud: Verify referrer data to avoid fraudulent installs.</li>
+</ul>
+
+
+<h3>Setting Up and Using the InstallReferrerClient</h3>
+
+<p>Step 1: Add the Dependency</p>
+
+<p>First, include the Install Referrer library in your build.gradle file:</p>
+
+<p><code>
+implementation 'com.android.installreferrer:installreferrer:2.2'
+</code></p>
+
+<p>Step 2: Use <code>callbackFlow</code> for our implementation</p>
+
+<p>The InstallReferrerClient is callback-based, but Kotlin’s <code>callbackFlow</code> lets you handle this more elegantly. Here’s an example:</p>
+
+<p>```
+import com.android.installreferrer.api.InstallReferrerClient
+import com.android.installreferrer.api.InstallReferrerStateListener
+import com.android.installreferrer.api.ReferrerDetails
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow</p>
+
+<p>fun fetchInstallReferrer(context: Context) = callbackFlow {</p>
+
+<pre><code>val referrerClient = InstallReferrerClient.newBuilder(context).build()
+
+val listener = object : InstallReferrerStateListener {
+    override fun onInstallReferrerSetupFinished(responseCode: Int) {
+        when (responseCode) {
+            InstallReferrerClient.InstallReferrerResponse.OK -&gt; {
+                try {
+                    val response: ReferrerDetails = referrerClient.installReferrer
+                    trySend(Result.success(response))
+                } catch (e: Exception) {
+                    trySend(Result.failure(e))
+                } finally {
+                    referrerClient.endConnection()
+                }
+            }
+            InstallReferrerClient.InstallReferrerResponse.FEATURE_NOT_SUPPORTED -&gt; {
+                trySend(Result.failure(UnsupportedOperationException("Feature not supported")))
+            }
+            InstallReferrerClient.InstallReferrerResponse.SERVICE_UNAVAILABLE -&gt; {
+                trySend(Result.failure(IllegalStateException("Service unavailable")))
+            }
+        }
+    }
+
+    override fun onInstallReferrerServiceDisconnected() {
+        // Handle service disconnection if needed
+    }
+}
+
+referrerClient.startConnection(listener)
+
+awaitClose {
+    referrerClient.endConnection()
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Step 3: Consuming the Flow</p>
+
+<p>Collect the flow to retrieve and process the install referrer details:</p>
+
+<p>```
+fetchInstallReferrer(context).collect { result &ndash;></p>
+
+<pre><code>    result.onSuccess { referrerDetails -&gt;
+        val referrerUrl = referrerDetails.installReferrer
+        val clickTimestamp = referrerDetails.referrerClickTimestampSeconds
+        val installTimestamp = referrerDetails.installBeginTimestampSeconds
+
+        println("Referrer URL: $referrerUrl")
+        println("Click Time: $clickTimestamp")
+        println("Install Time: $installTimestamp")
+    }
+
+    result.onFailure { exception -&gt;
+        println("Error: ${exception.message}")
+    }
+}
+</code></pre>
+
+<p>```</p>
+
+<h3>Wrapping Up</h3>
+
+<p>With this data, you&rsquo;ll gain valuable insights into your app’s install sources, helping you make data-driven marketing decisions. Happy coding!</p>
+]]></content>
+  </entry>
+  
+</feed>

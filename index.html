@@ -10,7 +10,7 @@
   <meta name="author" content="Michael Evans">
 
   
-  <meta name="description" content="A long, long time ago, I wrote a blog post about how I was using Flipper as one of my favorite development tools. Since then, Android Studio has come &hellip;">
+  <meta name="description" content="As Android applications grow in complexity, maintaining a robust testing strategy becomes increasingly challenging. The &ldquo;Robot Testing Pattern& &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -79,6 +79,1501 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2024/12/14/ui-testing-made-easy-the-robot-test-pattern-on-android/">UI Testing Made Easy: The Robot Test Pattern on Android</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2024-12-14T10:52:24-05:00" pubdate data-updated="true">Dec 14<span>th</span>, 2024</time>
+        
+         | <a href="/blog/2024/12/14/ui-testing-made-easy-the-robot-test-pattern-on-android/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>As Android applications grow in complexity, maintaining a robust testing strategy becomes increasingly challenging. The &ldquo;Robot Testing Pattern&rdquo; offers a structured approach to UI testing that can significantly improve your test suite&rsquo;s maintainability and reliability. This guide is designed for Android developers who have basic experience with testing and want to enhance their testing methodology.</p>
+
+<h2>Understanding the Robot Pattern</h2>
+
+<p>The Robot Testing Pattern, also known as the Robot Framework or Robot Pattern, is a testing methodology that creates an abstraction layer between your test code and UI interactions. Think of robots as specialized assistants that handle all the UI interactions on behalf of your tests.</p>
+
+<h3>Key Benefits</h3>
+
+<p>The Robot Pattern provides several advantages that make it particularly valuable for Android testing:</p>
+
+<ol>
+<li><p>Improved Test Readability: Tests become high-level descriptions of user behavior rather than low-level UI interactions, making them easier to understand and maintain.</p></li>
+<li><p>Enhanced Maintainability: When UI changes occur, updates are needed only in the robot implementation rather than across multiple test files.</p></li>
+<li><p>Code Reusability: Common interactions can be shared across multiple test cases, reducing duplication and ensuring consistency.</p></li>
+<li><p>Better Test Organization: The pattern enforces a clear separation between test logic and UI interaction code.</p></li>
+<li><p>Simplified Parallel Testing: Isolated UI interaction logic enables efficient parallel test execution and better test stability.</p></li>
+</ol>
+
+
+<h2>Implementation Guide</h2>
+
+<p>Let&rsquo;s explore how to implement the Robot Pattern in both Jetpack Compose and traditional View-based applications.</p>
+
+<h3>Jetpack Compose Implementation</h3>
+
+<p>Here&rsquo;s a basic implementation for a login screen using Compose:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>class LoginRobot {
+</span><span class='line'>    private val composeTestRule = createComposeRule()
+</span><span class='line'>    
+</span><span class='line'>    fun enterUsername(username: String) = apply {
+</span><span class='line'>        composeTestRule.onNodeWithContentDescription("UsernameTextField")
+</span><span class='line'>            .performTextInput(username)
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    fun enterPassword(password: String) = apply {
+</span><span class='line'>        composeTestRule.onNodeWithContentDescription("PasswordTextField")
+</span><span class='line'>            .performTextInput(password)
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    fun clickLoginButton() = apply {
+</span><span class='line'>        composeTestRule.onNodeWithContentDescription("LoginButton")
+</span><span class='line'>            .performClick()
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    // Add verification methods
+</span><span class='line'>    fun verifyErrorMessage(message: String) = apply {
+</span><span class='line'>        composeTestRule.onNodeWithText(message)
+</span><span class='line'>            .assertIsDisplayed()
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>View-Based Implementation</h3>
+
+<p>For applications using traditional Views, the robot implementation looks slightly different:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>class LoginRobot {
+</span><span class='line'>    fun enterUsername(username: String) = apply {
+</span><span class='line'>        onView(withId(R.id.editTextUsername))
+</span><span class='line'>            .perform(typeText(username))
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    fun enterPassword(password: String) = apply {
+</span><span class='line'>        onView(withId(R.id.editTextPassword))
+</span><span class='line'>            .perform(typeText(password))
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    fun clickLoginButton() = apply {
+</span><span class='line'>        onView(withId(R.id.buttonLogin))
+</span><span class='line'>            .perform(click())
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    // Add verification methods
+</span><span class='line'>    fun verifyErrorMessage(message: String) = apply {
+</span><span class='line'>        onView(withId(R.id.textViewError))
+</span><span class='line'>            .check(matches(withText(message)))
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Writing Tests with Robots</h3>
+
+<p>With these robot implementations, your tests become much more readable and maintainable:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>@Test
+</span><span class='line'>fun loginWithValidCredentials() {
+</span><span class='line'>    val loginRobot = LoginRobot()
+</span><span class='line'>    
+</span><span class='line'>    composeTestRule.setContent {
+</span><span class='line'>        LoginScreen()
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    loginRobot
+</span><span class='line'>        .enterUsername("user@example.com")
+</span><span class='line'>        .enterPassword("password123")
+</span><span class='line'>        .clickLoginButton()
+</span><span class='line'>        .verifyLoginSuccess()
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>@Test
+</span><span class='line'>fun loginWithInvalidCredentials() {
+</span><span class='line'>    val loginRobot = LoginRobot()
+</span><span class='line'>    
+</span><span class='line'>    composeTestRule.setContent {
+</span><span class='line'>        LoginScreen()
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    loginRobot
+</span><span class='line'>        .enterUsername("invalid@example.com")
+</span><span class='line'>        .enterPassword("wrongpassword")
+</span><span class='line'>        .clickLoginButton()
+</span><span class='line'>        .verifyErrorMessage("Invalid credentials")
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Creating a Base Robot</h3>
+
+<p>To promote code reuse and establish common testing patterns, create a base robot class:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>abstract class BaseRobot {
+</span><span class='line'>    protected val composeTestRule = createComposeRule()
+</span><span class='line'>    
+</span><span class='line'>    protected fun waitForElement(
+</span><span class='line'>        matcher: SemanticsMatcher,
+</span><span class='line'>        timeoutMs: Long = 5000
+</span><span class='line'>    ) {
+</span><span class='line'>        composeTestRule.waitUntil(timeoutMs) {
+</span><span class='line'>            composeTestRule
+</span><span class='line'>                .onAllNodes(matcher)
+</span><span class='line'>                .fetchSemanticsNodes().isNotEmpty()
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    protected fun assertIsDisplayed(matcher: SemanticsMatcher) {
+</span><span class='line'>        composeTestRule.onNode(matcher).assertIsDisplayed()
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    protected fun assertTextEquals(matcher: SemanticsMatcher, text: String) {
+</span><span class='line'>        composeTestRule.onNode(matcher)
+</span><span class='line'>            .assertTextEquals(text)
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Best Practices</h2>
+
+<ol>
+<li><p><strong>Keep Robots Focused</strong>: Each robot should represent a specific screen or component. Avoid creating &ldquo;super robots&rdquo; that handle multiple screens.</p></li>
+<li><p><strong>Include Verification Methods</strong>: Add methods to verify the state of the UI after actions are performed.</p></li>
+<li><p><strong>Use Method Chaining</strong>: Return the robot instance from each method to enable fluent method chaining.</p></li>
+<li><p><strong>Handle Async Operations</strong>: Include proper wait mechanisms for loading states and animations.</p></li>
+<li><p><strong>Document Robot Methods</strong>: Provide clear documentation for each robot method to explain its purpose and expected behavior.</p></li>
+</ol>
+
+
+<p>The Robot Testing Pattern significantly improves the maintainability and reliability of Android UI tests. By separating UI interaction logic into dedicated robot classes, you create more organized, readable, and maintainable tests. When UI changes occur, updates are localized to the robot implementations rather than scattered across test files. Happy coding!</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2024/10/10/modernizing-your-android-apps-data-storage-sharedpreferences-to-datastore/">Modernizing Your Android App&#8217;s Data Storage: SharedPreferences to DataStore</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2024-10-10T11:53:57-04:00" pubdate data-updated="true">Oct 10<span>th</span>, 2024</time>
+        
+         | <a href="/blog/2024/10/10/modernizing-your-android-apps-data-storage-sharedpreferences-to-datastore/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="https://developer.android.com/reference/android/content/SharedPreferences">SharedPreferences</a> has long been a staple for storing small pieces of data and user preferences in Android apps. However, it has notable limitations, such as a lack of type safety, no support for safe schema evolution, and potential performance issues on the main thread. Google introduced <a href="https://developer.android.com/topic/libraries/architecture/datastore">Proto DataStore</a> as a modern and robust alternative, offering:</p>
+
+<ul>
+<li>Strong typing with Protocol Buffers</li>
+<li>Safe schema evolution</li>
+<li>Built-in migration support</li>
+<li>Flow API for reactive programming</li>
+<li>Coroutines support for main-thread safety</li>
+</ul>
+
+
+<p>In this post, we&rsquo;ll walk through the process of migrating your existing SharedPreferences data to Proto DataStore without data loss, including best practices and common pitfalls to avoid.</p>
+
+<h2>Step 1: Add Dependencies</h2>
+
+<p>First, add the necessary dependencies to your app&rsquo;s <code>build.gradle</code> file:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>dependencies {
+</span><span class='line'>    def datastore_version = "1.0.0"
+</span><span class='line'>    
+</span><span class='line'>    // Proto DataStore
+</span><span class='line'>    implementation "androidx.datastore:datastore:$datastore_version"
+</span><span class='line'>    
+</span><span class='line'>    // Protocol Buffers
+</span><span class='line'>    implementation "com.google.protobuf:protobuf-javalite:3.18.0"
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Step 2: Define Your Proto DataStore Schema</h2>
+
+<p>Create a new <code>.proto</code> file in <code>app/src/main/proto/my_data.proto</code> to define your data schema:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>syntax = "proto3";
+</span><span class='line'>
+</span><span class='line'>option java_package = "com.example.app";
+</span><span class='line'>option java_multiple_files = true;
+</span><span class='line'>
+</span><span class='line'>message UserPreferences {
+</span><span class='line'>    // Define your fields with unique numbers
+</span><span class='line'>    string user_name = 1;
+</span><span class='line'>    bool notifications_enabled = 2;
+</span><span class='line'>    string theme = 3;
+</span><span class='line'>    
+</span><span class='line'>    // Optional: Add a version field for future schema evolution
+</span><span class='line'>    int32 schema_version = 999;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Note the <code>schema_version</code> field &ndash; this helps manage schema evolution as your app grows.</p>
+
+<h2>Step 3: Create a Proto DataStore Serializer</h2>
+
+<p>The serializer handles reading and writing your protocol buffer messages:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>object UserPreferencesSerializer : Serializer&lt;UserPreferences&gt; {
+</span><span class='line'>    override val defaultValue: UserPreferences = UserPreferences.getDefaultInstance()
+</span><span class='line'>    
+</span><span class='line'>    override suspend fun readFrom(input: InputStream): UserPreferences {
+</span><span class='line'>        try {
+</span><span class='line'>            return UserPreferences.parseFrom(input)
+</span><span class='line'>        } catch (exception: InvalidProtocolBufferException) {
+</span><span class='line'>            throw CorruptionException("Cannot read proto.", exception)
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    override suspend fun writeTo(t: UserPreferences, output: OutputStream) {
+</span><span class='line'>        t.writeTo(output)
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Step 4: Create a Repository Class</h2>
+
+<p>Following best practices, wrap the DataStore in a repository:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>class UserPreferencesRepository(private val context: Context) {
+</span><span class='line'>    private val dataStore: DataStore&lt;UserPreferences&gt; = context.createDataStore(
+</span><span class='line'>        fileName = "user_prefs.pb",
+</span><span class='line'>        serializer = UserPreferencesSerializer
+</span><span class='line'>    )
+</span><span class='line'>    
+</span><span class='line'>    val userPreferencesFlow: Flow&lt;UserPreferences&gt; = dataStore.data
+</span><span class='line'>        .catch { exception -&gt;
+</span><span class='line'>            if (exception is IOException) {
+</span><span class='line'>                emit(UserPreferences.getDefaultInstance())
+</span><span class='line'>            } else {
+</span><span class='line'>                throw exception
+</span><span class='line'>            }
+</span><span class='line'>        }
+</span><span class='line'>    
+</span><span class='line'>    suspend fun migrateFromSharedPreferences() = withContext(Dispatchers.IO) {
+</span><span class='line'>        try {
+</span><span class='line'>            val sharedPrefs = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+</span><span class='line'>            
+</span><span class='line'>            // Read existing preferences
+</span><span class='line'>            val userName = sharedPrefs.getString("user_name", "") ?: ""
+</span><span class='line'>            val notificationsEnabled = sharedPrefs.getBoolean("notifications_enabled", true)
+</span><span class='line'>            val theme = sharedPrefs.getString("theme", "system") ?: "system"
+</span><span class='line'>            
+</span><span class='line'>            // Migrate to DataStore
+</span><span class='line'>            dataStore.updateData { preferences -&gt;
+</span><span class='line'>                preferences.toBuilder()
+</span><span class='line'>                    .setUserName(userName)
+</span><span class='line'>                    .setNotificationsEnabled(notificationsEnabled)
+</span><span class='line'>                    .setTheme(theme)
+</span><span class='line'>                    .setSchemaVersion(1)
+</span><span class='line'>                    .build()
+</span><span class='line'>            }
+</span><span class='line'>            
+</span><span class='line'>            // Verify migration
+</span><span class='line'>            val migratedData = dataStore.data.first()
+</span><span class='line'>            if (migratedData.userName == userName &&
+</span><span class='line'>                migratedData.notificationsEnabled == notificationsEnabled &&
+</span><span class='line'>                migratedData.theme == theme) {
+</span><span class='line'>                // Clear SharedPreferences after successful migration
+</span><span class='line'>                sharedPrefs.edit().clear().apply()
+</span><span class='line'>                Result.success(Unit)
+</span><span class='line'>            } else {
+</span><span class='line'>                Result.failure(Exception("Migration verification failed"))
+</span><span class='line'>            }
+</span><span class='line'>        } catch (e: Exception) {
+</span><span class='line'>            Result.failure(e)
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    suspend fun updateUserName(name: String) {
+</span><span class='line'>        dataStore.updateData { preferences -&gt;
+</span><span class='line'>            preferences.toBuilder()
+</span><span class='line'>                .setUserName(name)
+</span><span class='line'>                .build()
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    suspend fun updateNotificationsEnabled(enabled: Boolean) {
+</span><span class='line'>        dataStore.updateData { preferences -&gt;
+</span><span class='line'>            preferences.toBuilder()
+</span><span class='line'>                .setNotificationsEnabled(enabled)
+</span><span class='line'>                .build()
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    suspend fun updateTheme(theme: String) {
+</span><span class='line'>        dataStore.updateData { preferences -&gt;
+</span><span class='line'>            preferences.toBuilder()
+</span><span class='line'>                .setTheme(theme)
+</span><span class='line'>                .build()
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Step 5: Use in Your App</h2>
+
+<p>Here&rsquo;s how to use the repository in your app:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>class MainActivity : AppCompatActivity() {
+</span><span class='line'>    private lateinit var repository: UserPreferencesRepository
+</span><span class='line'>    
+</span><span class='line'>    override fun onCreate(savedInstanceState: Bundle?) {
+</span><span class='line'>        super.onCreate(savedInstanceState)
+</span><span class='line'>        
+</span><span class='line'>        repository = UserPreferencesRepository(applicationContext)
+</span><span class='line'>        
+</span><span class='line'>        // Migrate data on app first launch
+</span><span class='line'>        lifecycleScope.launch {
+</span><span class='line'>            repository.migrateFromSharedPreferences()
+</span><span class='line'>        }
+</span><span class='line'>        
+</span><span class='line'>        // Observe preferences changes
+</span><span class='line'>        lifecycleScope.launch {
+</span><span class='line'>            repository.userPreferencesFlow.collect { preferences -&gt;
+</span><span class='line'>                // Update UI based on preferences
+</span><span class='line'>                updateUI(preferences)
+</span><span class='line'>            }
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    private fun updateUI(preferences: UserPreferences) {
+</span><span class='line'>        // Update your UI components based on preferences
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Testing Your Migration</h2>
+
+<p>Here&rsquo;s an example of how to test your migration:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>@Test
+</span><span class='line'>fun testMigrationFromSharedPreferences() = runTest {
+</span><span class='line'>    val context = ApplicationProvider.getApplicationContext&lt;Context&gt;()
+</span><span class='line'>    
+</span><span class='line'>    // Set up test SharedPreferences
+</span><span class='line'>    val sharedPrefs = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+</span><span class='line'>    sharedPrefs.edit()
+</span><span class='line'>        .putString("user_name", "Test User")
+</span><span class='line'>        .putBoolean("notifications_enabled", true)
+</span><span class='line'>        .putString("theme", "dark")
+</span><span class='line'>        .apply()
+</span><span class='line'>    
+</span><span class='line'>    // Perform migration
+</span><span class='line'>    val repository = UserPreferencesRepository(context)
+</span><span class='line'>    val result = repository.migrateFromSharedPreferences()
+</span><span class='line'>    
+</span><span class='line'>    // Verify migration
+</span><span class='line'>    assert(result.isSuccess)
+</span><span class='line'>    
+</span><span class='line'>    val migratedData = repository.userPreferencesFlow.first()
+</span><span class='line'>    assertEquals("Test User", migratedData.userName)
+</span><span class='line'>    assertTrue(migratedData.notificationsEnabled)
+</span><span class='line'>    assertEquals("dark", migratedData.theme)
+</span><span class='line'>    
+</span><span class='line'>    // Verify SharedPreferences was cleared
+</span><span class='line'>    assertTrue(sharedPrefs.all.isEmpty())
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Best Practices and Common Pitfalls</h2>
+
+<ol>
+<li><p><strong>Schema Evolution</strong>: When adding new fields to your proto schema, always:</p>
+
+<ul>
+<li>Use new field numbers</li>
+<li>Provide default values</li>
+<li>Increment the schema version</li>
+</ul>
+</li>
+<li><p><strong>Error Handling</strong>: Always handle potential exceptions when reading/writing data:</p>
+
+<ul>
+<li><code>IOException</code> for file system issues</li>
+<li><code>CorruptionException</code> for invalid data</li>
+<li><code>InvalidProtocolBufferException</code> for proto parsing errors</li>
+</ul>
+</li>
+<li><p><strong>Performance</strong>:</p>
+
+<ul>
+<li>Perform migrations in the background using Coroutines</li>
+<li>Use Flow&rsquo;s <code>collectLatest</code> when frequent updates aren&rsquo;t necessary</li>
+<li>Consider caching frequently accessed values</li>
+</ul>
+</li>
+<li><p><strong>Testing</strong>:</p>
+
+<ul>
+<li>Write unit tests for your repository</li>
+<li>Test migration with various SharedPreferences states</li>
+<li>Include error cases in your tests</li>
+<li>Test schema evolution scenarios</li>
+</ul>
+</li>
+</ol>
+
+
+<h2>Conclusion</h2>
+
+<p>Migrating from SharedPreferences to Proto DataStore requires some initial setup, but the benefits of type safety, schema evolution, and reactive programming make it worthwhile. The resulting code will be more maintainable, type-safe, and resistant to runtime errors. Happy coding!</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2024/09/07/mastering-ktlint-a-guide-to-crafting-your-own-rules/">Mastering Ktlint: A Guide to Crafting Your Own Rules</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2024-09-07T11:49:37-04:00" pubdate data-updated="true">Sep 7<span>th</span>, 2024</time>
+        
+         | <a href="/blog/2024/09/07/mastering-ktlint-a-guide-to-crafting-your-own-rules/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="https://github.com/pinterest/ktlint">Ktlint</a> is a powerful linting tool for Kotlin code that helps maintain code quality and consistency. While it comes with a set of built-in rules, there may be cases where you want to create custom rules tailored to your project&rsquo;s specific requirements. In this tutorial, we&rsquo;ll walk you through the process of writing a custom ktlint rule that detects and removes Android Log statements from your Kotlin code.</p>
+
+<hr />
+
+<h2>Prerequisites</h2>
+
+<p>Before we dive into writing custom ktlint rules, ensure you have ktlint installed in your project. The tasks ktlintApplyToIdea and addKtlintCheckTask are provided by the ktlint Gradle plugin. If you haven&rsquo;t already, include the plugin in your project by adding the following to your <code>build.gradle.kts</code> file:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>plugins {
+</span><span class='line'>    id("org.jlleitschuh.gradle.ktlint") version "&lt;latest-version&gt;"
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once the plugin is applied, run the following command to set up ktlint in your project:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>./gradlew ktlintApplyToIdea addKtlintCheckTask</span></code></pre></td></tr></table></div></figure>
+
+
+<hr />
+
+<h2>Writing a Custom ktlint Rule</h2>
+
+<h3>1. Create a New Module</h3>
+
+<p>To write a custom ktlint rule, start by creating a new module in your Kotlin project.</p>
+
+<h3>2. Set Up Your Project</h3>
+
+<p>In your new module, make sure you have ktlint as a dependency. Add it to your <code>build.gradle.kts</code> or <code>build.gradle</code> file:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>dependencies {
+</span><span class='line'>    ktlint("io.gitlab.arturbosch.detekt:detekt-formatting:&lt;ktlint-version&gt;")
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>3. Define the ktlint Rule</h3>
+
+<p>Now, let&rsquo;s define our custom rule. Create a Kotlin class that extends the <code>Rule</code> class and override the <code>visit</code> method to define the logic for your rule. In this example, we want to detect Android Log statements.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>import io.gitlab.arturbosch.detekt.api.Rule
+</span><span class='line'>import org.jetbrains.kotlin.psi.KtCallExpression
+</span><span class='line'>
+</span><span class='line'>class LogStatementRule : Rule() {
+</span><span class='line'>    override fun visitCallExpression(expression: KtCallExpression) {
+</span><span class='line'>        if (expression.calleeExpression?.text == "Log" &&
+</span><span class='line'>            expression.valueArguments.size == 1
+</span><span class='line'>        ) {
+</span><span class='line'>            // Report a finding
+</span><span class='line'>            report(
+</span><span class='line'>                finding = "Found Android Log statement",
+</span><span class='line'>                documentable = expression
+</span><span class='line'>            )
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>4. Create a Test</h3>
+
+<p>As with any code we write, it&rsquo;s great practice to write tests for your custom rule to ensure it behaves as expected. Use the ktlint testing library to create a test case that demonstrates the rule&rsquo;s functionality.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>import io.gitlab.arturbosch.detekt.test.lint
+</span><span class='line'>import org.spekframework.spek2.Spek
+</span><span class='line'>import org.spekframework.spek2.style.specification.describe
+</span><span class='line'>
+</span><span class='line'>object LogStatementRuleSpec : Spek({
+</span><span class='line'>    describe("a LogStatementRule") {
+</span><span class='line'>        val subject = LogStatementRule()
+</span><span class='line'>
+</span><span class='line'>        it("should report Android Log statements") {
+</span><span class='line'>            val code = """
+</span><span class='line'>                import android.util.Log
+</span><span class='line'>                fun example() {
+</span><span class='line'>                    Log.d("Tag", "Message")
+</span><span class='line'>                }
+</span><span class='line'>            """.trimIndent()
+</span><span class='line'>
+</span><span class='line'>            subject.lint(code)
+</span><span class='line'>                .shouldContainOnly(subject.findings.single())
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>        it("should not report other function calls") {
+</span><span class='line'>            val code = """
+</span><span class='line'>                fun example() {
+</span><span class='line'>                    someFunction()
+</span><span class='line'>                }
+</span><span class='line'>            """.trimIndent()
+</span><span class='line'>
+</span><span class='line'>            subject.lint(code)
+</span><span class='line'>                .shouldBeEmpty()
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>})</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>5. Add the Rule to ktlint Configuration</h3>
+
+<p>To make your custom rule part of your ktlint configuration, add it to the <code>.editorconfig</code> file in your project:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># .editorconfig
+</span><span class='line'># Custom ktlint rules
+</span><span class='line'>ktlint.ruleset = LogStatementRule</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>6. Run ktlint</h3>
+
+<p>Run ktlint in your project to check for Android Log statements and automatically remove them using the <code>--apply-to-idea</code> flag:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>./gradlew ktlintApplyToIdea</span></code></pre></td></tr></table></div></figure>
+
+
+<hr />
+
+<h2>Conclusion</h2>
+
+<p>In this tutorial, we&rsquo;ve shown you how to write a custom ktlint rule to detect and remove Android Log statements from your Kotlin code. Custom ktlint rules can help you maintain code quality and consistency by enforcing project-specific coding standards. This is obviously a simple example, but this is a good example to adapt for other custom rules that fit your project&rsquo;s needs.</p>
+
+<p>Ktlint is a powerful tool that, when combined with custom rules, can significantly improve your Kotlin codebase&rsquo;s quality and readability. Happy coding!</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2024/07/29/stop-repeating-yourself-2-using-test-fixtures-with-agp/">Stop Repeating Yourself 2: Using Test Fixtures With AGP</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2024-07-29T19:43:27-04:00" pubdate data-updated="true">Jul 29<span>th</span>, 2024</time>
+        
+         | <a href="/blog/2024/07/29/stop-repeating-yourself-2-using-test-fixtures-with-agp/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Modern Android development often involves modularization to enhance build performance and maintainability. As you break down your app into multiple modules, sharing test utilities such as fixtures, mocks, or fakes between modules can become challenging. A <a href="https://michaelevans.org/blog/2019/09/21/stop-repeating-yourself-sharing-test-code-across-android-modules/">few years ago</a> I wrote about the concept of test fixtures, but at the time they <a href="https://issuetracker.google.com/issues/139438142">weren&rsquo;t supported</a> for Android modules. Thankfully, with Android Gradle Plugin (AGP) 8.5.0, Google introduced native support for test fixtures, streamlining this process significantly.</p>
+
+<h3>What Are Test Fixtures?</h3>
+
+<p>Test fixtures are reusable components such as test data, helper classes, or mocks that you can use to support your tests. Prior to AGP 8.5.0, sharing these utilities across modules often required workarounds like creating dedicated &ldquo;test&rdquo; modules or manually wiring dependencies. With AGP 8.5.0, the <code>testFixture</code>s feature makes it easier to declare and consume test fixtures directly from your modules.</p>
+
+<h3>Setting Up Test Fixtures</h3>
+
+<p>To enable test fixtures for a module, you need to include the <code>testFixtures</code> feature in your module&rsquo;s <code>build.gradle.kts</code> file. Here’s how you can set it up:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>android {
+</span><span class='line'>    // Enable test fixtures for the module
+</span><span class='line'>    testFixtures.enable = true
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>dependencies {
+</span><span class='line'>    // Declare dependencies for your test fixtures
+</span><span class='line'>    testFixturesImplementation("com.example:some-library:1.0.0")
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The testFixtures source set is automatically created under the src directory:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>module-name/
+</span><span class='line'>  src/
+</span><span class='line'>    main/
+</span><span class='line'>      java/
+</span><span class='line'>    testFixtures/
+</span><span class='line'>      java/
+</span><span class='line'>      kotlin/
+</span><span class='line'>    test/
+</span><span class='line'>      java/</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can now place reusable test utilities, such as mock data generators or fake implementations, inside the <code>testFixtures</code> directory.</p>
+
+<h3>Consuming Test Fixtures</h3>
+
+<p>Modules can consume test fixtures by declaring a dependency on the <code>testFixtures</code> configuration of another module. For example, if <code>module-b</code> needs to use the test fixtures from <code>module-a</code>, add the following dependency:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>dependencies {
+</span><span class='line'>    testImplementation(testFixtures(project(":module-a")))
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once this dependency is added, the test code in module-b can seamlessly access the fixtures provided by <code>module-a</code>.</p>
+
+<h3>Example: Sharing a Fake API Client</h3>
+
+<p>Suppose you have a fake API client used in multiple test cases. You can define it in the <code>testFixtures</code> source set of <code>module-a</code>:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>// module-a/src/testFixtures/kotlin/com/example/api/FakeApiClient.kt
+</span><span class='line'>package com.example.api
+</span><span class='line'>
+</span><span class='line'>class FakeApiClient {
+</span><span class='line'>    fun getFakeData(): String = "Fake Data"
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then, in <code>module-b</code>, you can consume and use this fake client:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>// module-b/src/test/kotlin/com/example/test/ApiClientTest.kt
+</span><span class='line'>package com.example.test
+</span><span class='line'>
+</span><span class='line'>import com.example.api.FakeApiClient
+</span><span class='line'>import org.junit.Test
+</span><span class='line'>
+</span><span class='line'>class ApiClientTest {
+</span><span class='line'>
+</span><span class='line'>    @Test
+</span><span class='line'>    fun testFakeData() {
+</span><span class='line'>        val fakeApiClient = FakeApiClient()
+</span><span class='line'>        assert(fakeApiClient.getFakeData() == "Fake Data")
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Conclusion</h3>
+
+<p>The testFixtures feature in AGP 8.5.0 is a game-changer for modularized Android projects. It eliminates the friction of sharing test utilities, allowing you to write cleaner, more maintainable test setups. If you’re working on a modularized project and haven’t tried testFixtures yet, now is the perfect time to incorporate it into your testing strategy.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2024/06/27/understanding-referrals-using-google-play/">Understanding Referrals Using Google Play</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2024-06-27T19:41:33-04:00" pubdate data-updated="true">Jun 27<span>th</span>, 2024</time>
+        
+         | <a href="/blog/2024/06/27/understanding-referrals-using-google-play/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Tracking how users install your app can be tricky, especially when you want to measure the effectiveness of your campaigns or ads. That’s where the <a href="https://developer.android.com/google/play/installreferrer">Google Play Install Referrer API</a> comes in handy—it gives you reliable data about how users found your app.</p>
+
+<p>If you’re developing an Android application, this guide will walk you through how to set up and use the InstallReferrerClient with Kotlin&rsquo;s callbackFlow to make integration simpler and more maintainable.</p>
+
+<h3>What is the Install Referrer?</h3>
+
+<p>The install referrer contains information about the source of the app installation. For example, if a user clicks an ad campaign link that leads to your app’s Play Store page, the referrer might include details about the campaign source, medium, or other specifics.</p>
+
+<p>Here’s how this data can help:</p>
+
+<ul>
+<li>Attribution: Identify which campaigns drive installs.</li>
+<li>Measure Success: Evaluate your marketing efforts&#8217; impact.</li>
+<li>Prevent Fraud: Verify referrer data to avoid fraudulent installs.</li>
+</ul>
+
+
+<h3>Setting Up and Using the InstallReferrerClient</h3>
+
+<p>Step 1: Add the Dependency</p>
+
+<p>First, include the Install Referrer library in your build.gradle file:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>implementation 'com.android.installreferrer:installreferrer:2.2'</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Step 2: Use <code>callbackFlow</code> for our implementation</p>
+
+<p>The InstallReferrerClient is callback-based, but Kotlin’s <code>callbackFlow</code> lets you handle this more elegantly. Here’s an example:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>import com.android.installreferrer.api.InstallReferrerClient
+</span><span class='line'>import com.android.installreferrer.api.InstallReferrerStateListener
+</span><span class='line'>import com.android.installreferrer.api.ReferrerDetails
+</span><span class='line'>import kotlinx.coroutines.channels.awaitClose
+</span><span class='line'>import kotlinx.coroutines.flow.callbackFlow
+</span><span class='line'>
+</span><span class='line'>fun fetchInstallReferrer(context: Context) = callbackFlow {
+</span><span class='line'>    val referrerClient = InstallReferrerClient.newBuilder(context).build()
+</span><span class='line'>
+</span><span class='line'>    val listener = object : InstallReferrerStateListener {
+</span><span class='line'>        override fun onInstallReferrerSetupFinished(responseCode: Int) {
+</span><span class='line'>            when (responseCode) {
+</span><span class='line'>                InstallReferrerClient.InstallReferrerResponse.OK -&gt; {
+</span><span class='line'>                    try {
+</span><span class='line'>                        val response: ReferrerDetails = referrerClient.installReferrer
+</span><span class='line'>                        trySend(Result.success(response))
+</span><span class='line'>                    } catch (e: Exception) {
+</span><span class='line'>                        trySend(Result.failure(e))
+</span><span class='line'>                    } finally {
+</span><span class='line'>                        referrerClient.endConnection()
+</span><span class='line'>                    }
+</span><span class='line'>                }
+</span><span class='line'>                InstallReferrerClient.InstallReferrerResponse.FEATURE_NOT_SUPPORTED -&gt; {
+</span><span class='line'>                    trySend(Result.failure(UnsupportedOperationException("Feature not supported")))
+</span><span class='line'>                }
+</span><span class='line'>                InstallReferrerClient.InstallReferrerResponse.SERVICE_UNAVAILABLE -&gt; {
+</span><span class='line'>                    trySend(Result.failure(IllegalStateException("Service unavailable")))
+</span><span class='line'>                }
+</span><span class='line'>            }
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>        override fun onInstallReferrerServiceDisconnected() {
+</span><span class='line'>            // Handle service disconnection if needed
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>    referrerClient.startConnection(listener)
+</span><span class='line'>
+</span><span class='line'>    awaitClose {
+</span><span class='line'>        referrerClient.endConnection()
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Step 3: Consuming the Flow</p>
+
+<p>Collect the flow to retrieve and process the install referrer details:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>fetchInstallReferrer(context).collect { result -&gt;
+</span><span class='line'>        result.onSuccess { referrerDetails -&gt;
+</span><span class='line'>            val referrerUrl = referrerDetails.installReferrer
+</span><span class='line'>            val clickTimestamp = referrerDetails.referrerClickTimestampSeconds
+</span><span class='line'>            val installTimestamp = referrerDetails.installBeginTimestampSeconds
+</span><span class='line'>
+</span><span class='line'>            println("Referrer URL: $referrerUrl")
+</span><span class='line'>            println("Click Time: $clickTimestamp")
+</span><span class='line'>            println("Install Time: $installTimestamp")
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>        result.onFailure { exception -&gt;
+</span><span class='line'>            println("Error: ${exception.message}")
+</span><span class='line'>        }
+</span><span class='line'>    }</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Wrapping Up</h3>
+
+<p>With this data, you&rsquo;ll gain valuable insights into your app’s install sources, helping you make data-driven marketing decisions. Happy coding!</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2024/04/17/accessing-test-resources-using-kotlin-multiplatform/">Accessing Test Resources Using Kotlin Multiplatform</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2024-04-17T20:11:01-04:00" pubdate data-updated="true">Apr 17<span>th</span>, 2024</time>
+        
+         | <a href="/blog/2024/04/17/accessing-test-resources-using-kotlin-multiplatform/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Kotlin Multiplatform (KMP) offers a powerful way to share code across platforms like Android, iOS, and the JVM. However, when it comes to testing, you might encounter a common challenge: how to handle test resources such as JSON files, configurations, or other data needed for tests. In this post, we’ll dive into strategies for accessing test resources in KMP projects.</p>
+
+<h3>Why Test Resources Matter</h3>
+
+<p>Test resources are essential for validating your code against real-world scenarios. For example, if you’re writing a library to parse JSON, you’d want to test it against diverse JSON samples representing different edge cases. While resource access is straightforward in single-platform projects, KMP’s multi-target nature requires some additional setup.</p>
+
+<h3>The Challenge in Kotlin Multiplatform</h3>
+
+<p>In KMP, test code resides in the <code>commonTest</code> source set, but resources aren’t directly bundled with it. Each platform manages file paths and resource access differently, so you need platform-specific setups for your resources and shared logic to load them efficiently.</p>
+
+<h3>Organizing Test Resources</h3>
+
+<p>Start by structuring your resources in a way that aligns with your project layout:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>project-root/
+</span><span class='line'>  src/
+</span><span class='line'>    commonTest/
+</span><span class='line'>      kotlin/
+</span><span class='line'>        ...
+</span><span class='line'>    androidTest/
+</span><span class='line'>      resources/
+</span><span class='line'>        test-data.json
+</span><span class='line'>    jvmTest/
+</span><span class='line'>      resources/
+</span><span class='line'>        test-data.json
+</span><span class='line'>    iosTest/
+</span><span class='line'>      resources/
+</span><span class='line'>        test-data.json</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This setup ensures that each target platform can access its respective resources while keeping them logically grouped.</p>
+
+<h3>Loading Resources by Platform</h3>
+
+<p>For Android, place your test resources in the <code>androidTest/resources</code> directory. Use the <code>javaClass.classLoader</code> to load them:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>fun loadTestResource(resourceName: String): String {
+</span><span class='line'>    val inputStream = javaClass.classLoader?.getResourceAsStream(resourceName)
+</span><span class='line'>    return inputStream?.bufferedReader()?.use { it.readText() }
+</span><span class='line'>        ?: throw IllegalArgumentException("Resource not found: $resourceName")
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>For iOS, add your resources to the test target in Xcode. Use platform-specific code to load them:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>import platform.Foundation.*
+</span><span class='line'>
+</span><span class='line'>fun loadTestResource(resourceName: String): String {
+</span><span class='line'>    val bundle = NSBundle.bundleForClass(MyTestClass::class)
+</span><span class='line'>    val path = bundle.pathForResource(resourceName, ofType = null)
+</span><span class='line'>        ?: throw IllegalArgumentException("Resource not found: $resourceName")
+</span><span class='line'>    return NSString.stringWithContentsOfFile(path, encoding = NSUTF8StringEncoding, error = null) as String
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Sharing the Resource Loader</h3>
+
+<p>To avoid duplication, define a common function in <code>commonTest</code> and use the <code>expect/actual</code> pattern for platform-specific implementations:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>// commonTest
+</span><span class='line'>expect fun loadTestResource(resourceName: String): String
+</span><span class='line'>
+</span><span class='line'>// androidTest
+</span><span class='line'>actual fun loadTestResource(resourceName: String): String {
+</span><span class='line'>    val inputStream = javaClass.classLoader?.getResourceAsStream(resourceName)
+</span><span class='line'>    return inputStream?.bufferedReader()?.use { it.readText() }
+</span><span class='line'>        ?: throw IllegalArgumentException("Resource not found: $resourceName")
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>// iosTest
+</span><span class='line'>actual fun loadTestResource(resourceName: String): String {
+</span><span class='line'>    val bundle = NSBundle.bundleForClass(MyTestClass::class)
+</span><span class='line'>    val path = bundle.pathForResource(resourceName, ofType = null)
+</span><span class='line'>        ?: throw IllegalArgumentException("Resource not found: $resourceName")
+</span><span class='line'>    return NSString.stringWithContentsOfFile(path, encoding = NSUTF8StringEncoding, error = null) as String
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Putting It All Together</p>
+
+<p>With this setup, your <code>commonTest</code> code can seamlessly access resources across platforms. For example:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>@Test
+</span><span class='line'>fun testJsonParsing() {
+</span><span class='line'>    val jsonData = loadTestResource("test-data.json")
+</span><span class='line'>    val parsedData = parseJson(jsonData)
+</span><span class='line'>    assertEquals(expectedData, parsedData)
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Accessing test resources in Kotlin Multiplatform involves a bit of extra setup, but the payoff is a unified testing strategy across platforms. By leveraging the expect/actual pattern, you can create platform-specific resource loaders while keeping your test logic shared and consistent. Dive into KMP’s capabilities, and streamline your tests for every target platform!</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -358,388 +1853,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2019/09/21/stop-repeating-yourself-sharing-test-code-across-android-modules/">Stop Repeating Yourself: Sharing Test Code Across Android Modules</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2019-09-21T21:34:52-04:00" pubdate data-updated="true">Sep 21<span>st</span>, 2019</time>
-        
-         | <a href="/blog/2019/09/21/stop-repeating-yourself-sharing-test-code-across-android-modules/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>It seems like nowadays, the <a href="https://jeroenmols.com/blog/2019/03/06/modularizationwhy/">best advice</a> <a href="https://robinhood.engineering/breaking-up-the-app-module-monolith-the-story-of-robinhoods-android-app-707fb993a50c">is to modularize</a> <a href="https://www.youtube.com/watch?v=PZBg5DIzNww">your Android app</a>. It&rsquo;s a great suggestion for many reasons, including but not limited to:</p>
-
-<pre><code>- improved build performance
-- enables on-demand delivery
-- pushes you to build reusable, discrete components
-</code></pre>
-
-<p>Sounds great, right? Are there any downsides? There is one in particular which has been a a pain point for many.</p>
-
-<p>Often times when you&rsquo;re writing tests, you&rsquo;ll want to use some <a href="https://testing.googleblog.com/2013/07/testing-on-toilet-know-your-test-doubles.html">test doubles</a> like fakes or fixtures in order to help simulate the system under test. Maybe you have a <code>FakeUser</code> instance that you use in your tests to avoid having to mock a <code>User</code> every time your test calls for one. Generally these classes live alongside tests in <code>src/test</code> directories and are used to test out your code within a module.</p>
-
-<p>For example, maybe you have a model object like:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>public class User {
-</span><span class='line'>    private final String firstName;
-</span><span class='line'>    private final String lastName;
-</span><span class='line'>
-</span><span class='line'>    public User(String firstName, String lastName) {
-</span><span class='line'>        this.firstName = firstName;
-</span><span class='line'>        this.lastName = lastName;
-</span><span class='line'>    }
-</span><span class='line'>
-</span><span class='line'>    public String getFirstName() {
-</span><span class='line'>        return firstName;
-</span><span class='line'>    }
-</span><span class='line'>
-</span><span class='line'>    public String getLastName() {
-</span><span class='line'>        return lastName;
-</span><span class='line'>    }
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>You might have some code in <code>src/test</code> that creates a bunch of fake users for your tests like:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>class TheOfficeFixtures {
-</span><span class='line'>        public static User manager = new User("Michael", "Scott");
-</span><span class='line'>        public static User assistantToTheRegionalManager = new User("Dwight", "Schrute");
-</span><span class='line'>    }
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This works great if you&rsquo;re testing code <em>within</em> a module, but as soon as you&rsquo;d like to use these fake users in other modules, you&rsquo;ll note that these classes aren&rsquo;t shared!</p>
-
-<p>This code can&rsquo;t be shared between modules because Gradle doesn&rsquo;t expose the output of your test source set as a build artifact. There are all kinds of solutions for this problem out there, including <a href="https://treatwell.engineering/mock-factory-for-android-testing-in-multi-module-system-7654f45808be">creating a special module for all your fixtures</a>, and using <a href="https://stackoverflow.com/questions/5644011/multi-project-test-dependencies-with-gradle">gradle dependency hacks</a> to wire up source sets.</p>
-
-<p>However, that&rsquo;s not necessary anymore! As of version 5.6, Gradle now ships a new &lsquo;test-fixtures&rsquo; plugin! This plugin creates a new <code>testFixtures</code> source set, and configures that source set so that:</p>
-
-<pre><code>- classes in this set can see the main source set classes
-- test sources can see the test fixtures classes
-</code></pre>
-
-<h3>Using the Plugin</h3>
-
-<p>You can apply the <code>java-test-fixtures</code> plugin in your build.gradle script:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>plugins {
-</span><span class='line'>    id 'java-test-fixtures'
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This plugin will define the necessary source set, and handle all the wiring up of test artifacts. We can now  move those test fixtures from <code>src/test/java</code> to <code>src/testFixtures/java</code>, and that&rsquo;s it! These classes will be ready to be consumed by other modules.</p>
-
-<h3>Wiring it all together</h3>
-
-<p>Finally, we need to use a special keyword to pull these new fixtures in as a dependency for our tests. In our  gradle configuration, we add a test dependency (either API or Implementation) like so:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>dependencies {
-</span><span class='line'>    testImplementation(testFixtures(project(":lib")))
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>And that&rsquo;s it! Our other module can now consume these test fixtures without any sort of intermediate modules or workarounds.</p>
-
-<p>If you&rsquo;d like to check out the complete configuration with examples sharing fixtures between both Kotlin and Java modules to a shared &ldquo;app&rdquo; module, I&rsquo;ve uploaded a sample project demonstrating how to use this new configuration <a href="https://github.com/MichaelEvans/TestFixturesExample">here</a>.</p>
-
-<h2>Important Caveat</h2>
-
-<p>It&rsquo;s important to note that this feature is currently only available with the <code>java-library</code> plugin, and has limited functionality in Kotlin modules, and not yet available for Android modules. There are currently feature requests on <a href="https://youtrack.jetbrains.com/issue/KT-33877">YouTrack</a> and the <a href="https://issuetracker.google.com/issues/139438142">Android Issue Tracker</a> to take advantage of this new functionality.</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2019/02/07/hands-on-with-viewpager2/">Hands on With ViewPager2</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2019-02-07T21:38:07-05:00" pubdate data-updated="true">Feb 7<span>th</span>, 2019</time>
-        
-         | <a href="/blog/2019/02/07/hands-on-with-viewpager2/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Today Google released their alpha of <a href="https://developer.android.com/jetpack/androidx/releases/viewpager2#1.0.0-alpha01">ViewPager2</a>, a signal of the nail in the coffin for the original ViewPager, originally <a href="https://android-developers.googleblog.com/2011/08/horizontal-view-swiping-with-viewpager.html">released in 2011</a>!</p>
-
-<p>Since then, I think it&rsquo;s safe to say that most developers have needed to make a ViewPager. Despite how prolific it is, it certainly isn&rsquo;t the most straightforward widget to include. I think we all have at least once wondered whether we should use a <code>FragmentPagerAdapter</code> or a <code>FragmentStatePagerAdapter</code>. Or wondered if we can use a <a href="https://www.bignerdranch.com/blog/viewpager-without-fragments/">ViewPager <em>without</em> Fragments</a>.</p>
-
-<p>And API confusion aside, we&rsquo;ve still had long standing, feature requests. <a href="https://issuetracker.google.com/issues/36973591">RTL support</a>? <a href="https://issuetracker.google.com/issues/36952939">Vertical orientation</a>? There are numerous <a href="https://github.com/duolingo/rtl-viewpager">open source</a> <a href="https://github.com/kaelaela/VerticalViewPager">solutions</a> for these, but nothing official from the support library (now AndroidX)&hellip;until now!</p>
-
-<p>Let&rsquo;s dive in and try to set up ViewPager2! You&rsquo;ll need your project configured with AndroidX already, as well as supporting minSdkVersion 14 or higher.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2019/02/07/hands-on-with-viewpager2/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/08/23/enabling-night-mode-on-android-nougat/">Enabling Night Mode on Android Nougat</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2016-08-23T18:27:01-04:00" pubdate data-updated="true">Aug 23<span>rd</span>, 2016</time>
-        
-         | <a href="/blog/2016/08/23/enabling-night-mode-on-android-nougat/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>If you&rsquo;re like me, you loved the <a href="http://www.androidpolice.com/2016/03/09/android-n-feature-spotlight-night-mode-is-back-with-expanded-features-including-red-filter-and-brightness/">Night Mode feature</a> that was added to the Nougat Developer Preview a few months ago. You might have been disappointed when you found out that it was missing in later preview builds, and was probably going to be removed <a href="https://www.reddit.com/r/androiddev/comments/4tm8i6/were_on_the_android_engineering_team_and_built/d5igc5t">because it wasn&rsquo;t ready</a>.</p>
-
-<p>When the source code for Nougat was released this morning, my friend <a href="https://twitter.com/vishnurajeevan">Vishnu</a> found this interesting snippet in the <a href="https://android.googlesource.com/platform/frameworks/base/+/android-7.0.0_r1/packages/SystemUI/src/com/android/systemui/tuner/TunerActivity.java#42">SystemUI source</a> (better known to end users as the System UI Tuner):</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kt">boolean</span> <span class="n">showNightMode</span> <span class="o">=</span> <span class="n">getIntent</span><span class="o">().</span><span class="na">getBooleanExtra</span><span class="o">(</span>
-</span><span class='line'>    <span class="n">NightModeFragment</span><span class="o">.</span><span class="na">EXTRA_SHOW_NIGHT_MODE</span><span class="o">,</span> <span class="kc">false</span><span class="o">);</span>
-</span><span class='line'><span class="kd">final</span> <span class="n">PreferenceFragment</span> <span class="n">fragment</span> <span class="o">=</span> <span class="n">showNightMode</span> <span class="o">?</span> <span class="k">new</span> <span class="n">NightModeFragment</span><span class="o">()</span>
-</span><span class='line'>    <span class="o">:</span> <span class="n">showDemoMode</span> <span class="o">?</span> <span class="k">new</span> <span class="n">DemoModeFragment</span><span class="o">()</span>
-</span><span class='line'>    <span class="o">:</span> <span class="k">new</span> <span class="n">TunerFragment</span><span class="o">();</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Long story short, if you pass the right extras to this activity, and you&rsquo;ll get access to the Night Mode settings (as well as the infamous Quick Tile!).</p>
-
-<p>Fortunately for us, this is pretty trivial to accomplish with <code>adb</code> via <code>adb -d shell am start  --ez show_night_mode true com.android.systemui/.tuner.TunerActivity</code>, but not everyone who wants this feature is familiar with <code>adb</code>. So I published an app to the Play Store that does exactly that &ndash; click one button, and get access to those settings! You can find the app on the Play Store <a href="https://play.google.com/store/apps/details?id=org.michaelevans.nightmodeenabler">here</a>.</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/">Using Build Types With the Google Services Gradle Plugin</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2016-03-31T21:11:55-04:00" pubdate data-updated="true">Mar 31<span>st</span>, 2016</time>
-        
-         | <a href="/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>If you want to integrate your Android app with most of Google Play Services nowadays, you&rsquo;ll find that you are instructed to set up the <a href="https://developers.google.com/android/guides/google-services-plugin">Google Services Gradle plugin</a> to handle configuring dependencies. The plugin allows you to drop a JSON file into your project, and then the plugin will do a bunch of the configuration for your project, such as handling the API keys.</p>
-
-<p>This is all well and good—unless you&rsquo;re like me (<a href="https://github.com/googlesamples/google-services/issues/54">and countless others</a>) and want to use a different configuration for your debug and release builds. This would be useful, as an example, if you use Google Play Services for GCM and would like to have development builds recieve pushes from non-production systems.</p>
-
-<p>It seems that the plugin is configured in such a way that it supports build flavors, but it does not yet support build types. However, with a little Gradle magic, we can hack that support in.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/03/09/changelog-for-n-support-libraries/">Changelog for N Support Libraries</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2016-03-09T19:38:46-05:00" pubdate data-updated="true">Mar 9<span>th</span>, 2016</time>
-        
-         | <a href="/blog/2016/03/09/changelog-for-n-support-libraries/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Pssst! If you&rsquo;re an Android developer, you might not have heard yet&hellip;the <a href="http://android-developers.blogspot.com/2016/03/first-preview-of-android-n-developer.html">N Preview started today</a>! As part of the festivities, a new alpha version of the support libraries was released. There was no changelog that I could find, so I decided to make one. Here&rsquo;s what has changed (so far) in the public API of a few of these libraries:</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2016/03/09/changelog-for-n-support-libraries/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/02/17/using-dagger-1-and-kotlin/">Using Dagger 1 and Kotlin</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2016-02-17T13:43:25-05:00" pubdate data-updated="true">Feb 17<span>th</span>, 2016</time>
-        
-         | <a href="/blog/2016/02/17/using-dagger-1-and-kotlin/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Unless you&rsquo;ve been hiding from all the news about Android development, you&rsquo;ve <a href="https://medium.com/@CodingDoug/kotlin-android-a-brass-tacks-experiment-part-1-3e5028491bcc#.15w4ypfer">likely</a> <a href="http://antonioleiva.com/kotlin-awesome-tricks-for-android/">heard</a> <a href="http://vishnurajeevan.com/2016/02/13/Using-Kotlin-Extensions-for-Rx-ifying/">about</a> <a href="https://realm.io/news/oredev-jake-wharton-kotlin-advancing-android-dev/">Kotlin</a> (<a href="https://blog.jetbrains.com/kotlin/2016/02/kotlin-1-0-released-pragmatic-language-for-jvm-and-android/">which hit version 1.0 on Monday</a>!). I&rsquo;ve been toying around with it lately (the <a href="https://kotlinlang.org/docs/tutorials/koans.html">Kotlin Koans</a> are a great place to start for a beginner) and wanted to try building an app with it &ndash; that is, until I hit a few road blocks.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2016/02/17/using-dagger-1-and-kotlin/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -755,23 +1868,23 @@
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2022/09/28/flipper-plugins-for-fun-and-profit/">Building Flipper Plugins for Fun and Profit</a>
+        <a href="/blog/2024/12/14/ui-testing-made-easy-the-robot-test-pattern-on-android/">UI Testing Made Easy: The Robot Test Pattern on Android</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2020/06/21/android-developer-challenge/">Android Developer Challenge</a>
+        <a href="/blog/2024/10/10/modernizing-your-android-apps-data-storage-sharedpreferences-to-datastore/">Modernizing Your Android App&#8217;s Data Storage: SharedPreferences to DataStore</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2020/03/10/improving-app-debugging-with-flipper/">Improving App Debugging with Flipper</a>
+        <a href="/blog/2024/09/07/mastering-ktlint-a-guide-to-crafting-your-own-rules/">Mastering ktlint: A Guide to Crafting Your Own Rules</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2020/02/10/dropping-columns-like-its-hot/">Dropping Columns Like It&#8217;s Hot</a>
+        <a href="/blog/2024/07/29/stop-repeating-yourself-2-using-test-fixtures-with-agp/">Stop Repeating Yourself 2: Using Test Fixtures with AGP</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2019/09/21/stop-repeating-yourself-sharing-test-code-across-android-modules/">Stop Repeating Yourself: Sharing test code across Android Modules</a>
+        <a href="/blog/2024/06/27/understanding-referrals-using-google-play/">Understanding Referrals using Google Play</a>
       </li>
     
   </ul>
@@ -825,7 +1938,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2022 - Michael Evans -
+  Copyright &copy; 2024 - Michael Evans -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

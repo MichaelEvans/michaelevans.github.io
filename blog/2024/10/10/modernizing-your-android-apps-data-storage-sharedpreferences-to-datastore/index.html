@@ -1,0 +1,732 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="msvalidate.01" content="275BF9CDA457668389C1F9916C380DD0" />
+  <title>Modernizing Your Android App's Data Storage: SharedPreferences to DataStore - Michael Evans</title>
+  <meta name="author" content="Michael Evans">
+
+  
+  <meta name="description" content="SharedPreferences has long been a staple for storing small pieces of data and user preferences in Android apps. However, it has notable limitations, &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://michaelevans.org/blog/2024/10/10/modernizing-your-android-apps-data-storage-sharedpreferences-to-datastore/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Michael Evans" type="application/atom+xml">
+  <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-28589266-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Michael Evans</a></h1>
+  
+    <h2>A bunch of technobabble.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:michaelevans.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Modernizing Your Android App's Data Storage: SharedPreferences to DataStore</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2024-10-10T11:53:57-04:00" pubdate data-updated="true">Oct 10<span>th</span>, 2024</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><a href="https://developer.android.com/reference/android/content/SharedPreferences">SharedPreferences</a> has long been a staple for storing small pieces of data and user preferences in Android apps. However, it has notable limitations, such as a lack of type safety, no support for safe schema evolution, and potential performance issues on the main thread. Google introduced <a href="https://developer.android.com/topic/libraries/architecture/datastore">Proto DataStore</a> as a modern and robust alternative, offering:</p>
+
+<ul>
+<li>Strong typing with Protocol Buffers</li>
+<li>Safe schema evolution</li>
+<li>Built-in migration support</li>
+<li>Flow API for reactive programming</li>
+<li>Coroutines support for main-thread safety</li>
+</ul>
+
+
+<p>In this post, we&rsquo;ll walk through the process of migrating your existing SharedPreferences data to Proto DataStore without data loss, including best practices and common pitfalls to avoid.</p>
+
+<h2>Step 1: Add Dependencies</h2>
+
+<p>First, add the necessary dependencies to your app&rsquo;s <code>build.gradle</code> file:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>dependencies {
+</span><span class='line'>    def datastore_version = "1.0.0"
+</span><span class='line'>    
+</span><span class='line'>    // Proto DataStore
+</span><span class='line'>    implementation "androidx.datastore:datastore:$datastore_version"
+</span><span class='line'>    
+</span><span class='line'>    // Protocol Buffers
+</span><span class='line'>    implementation "com.google.protobuf:protobuf-javalite:3.18.0"
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Step 2: Define Your Proto DataStore Schema</h2>
+
+<p>Create a new <code>.proto</code> file in <code>app/src/main/proto/my_data.proto</code> to define your data schema:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>syntax = "proto3";
+</span><span class='line'>
+</span><span class='line'>option java_package = "com.example.app";
+</span><span class='line'>option java_multiple_files = true;
+</span><span class='line'>
+</span><span class='line'>message UserPreferences {
+</span><span class='line'>    // Define your fields with unique numbers
+</span><span class='line'>    string user_name = 1;
+</span><span class='line'>    bool notifications_enabled = 2;
+</span><span class='line'>    string theme = 3;
+</span><span class='line'>    
+</span><span class='line'>    // Optional: Add a version field for future schema evolution
+</span><span class='line'>    int32 schema_version = 999;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Note the <code>schema_version</code> field &ndash; this helps manage schema evolution as your app grows.</p>
+
+<h2>Step 3: Create a Proto DataStore Serializer</h2>
+
+<p>The serializer handles reading and writing your protocol buffer messages:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>object UserPreferencesSerializer : Serializer&lt;UserPreferences&gt; {
+</span><span class='line'>    override val defaultValue: UserPreferences = UserPreferences.getDefaultInstance()
+</span><span class='line'>    
+</span><span class='line'>    override suspend fun readFrom(input: InputStream): UserPreferences {
+</span><span class='line'>        try {
+</span><span class='line'>            return UserPreferences.parseFrom(input)
+</span><span class='line'>        } catch (exception: InvalidProtocolBufferException) {
+</span><span class='line'>            throw CorruptionException("Cannot read proto.", exception)
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    override suspend fun writeTo(t: UserPreferences, output: OutputStream) {
+</span><span class='line'>        t.writeTo(output)
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Step 4: Create a Repository Class</h2>
+
+<p>Following best practices, wrap the DataStore in a repository:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>class UserPreferencesRepository(private val context: Context) {
+</span><span class='line'>    private val dataStore: DataStore&lt;UserPreferences&gt; = context.createDataStore(
+</span><span class='line'>        fileName = "user_prefs.pb",
+</span><span class='line'>        serializer = UserPreferencesSerializer
+</span><span class='line'>    )
+</span><span class='line'>    
+</span><span class='line'>    val userPreferencesFlow: Flow&lt;UserPreferences&gt; = dataStore.data
+</span><span class='line'>        .catch { exception -&gt;
+</span><span class='line'>            if (exception is IOException) {
+</span><span class='line'>                emit(UserPreferences.getDefaultInstance())
+</span><span class='line'>            } else {
+</span><span class='line'>                throw exception
+</span><span class='line'>            }
+</span><span class='line'>        }
+</span><span class='line'>    
+</span><span class='line'>    suspend fun migrateFromSharedPreferences() = withContext(Dispatchers.IO) {
+</span><span class='line'>        try {
+</span><span class='line'>            val sharedPrefs = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+</span><span class='line'>            
+</span><span class='line'>            // Read existing preferences
+</span><span class='line'>            val userName = sharedPrefs.getString("user_name", "") ?: ""
+</span><span class='line'>            val notificationsEnabled = sharedPrefs.getBoolean("notifications_enabled", true)
+</span><span class='line'>            val theme = sharedPrefs.getString("theme", "system") ?: "system"
+</span><span class='line'>            
+</span><span class='line'>            // Migrate to DataStore
+</span><span class='line'>            dataStore.updateData { preferences -&gt;
+</span><span class='line'>                preferences.toBuilder()
+</span><span class='line'>                    .setUserName(userName)
+</span><span class='line'>                    .setNotificationsEnabled(notificationsEnabled)
+</span><span class='line'>                    .setTheme(theme)
+</span><span class='line'>                    .setSchemaVersion(1)
+</span><span class='line'>                    .build()
+</span><span class='line'>            }
+</span><span class='line'>            
+</span><span class='line'>            // Verify migration
+</span><span class='line'>            val migratedData = dataStore.data.first()
+</span><span class='line'>            if (migratedData.userName == userName &&
+</span><span class='line'>                migratedData.notificationsEnabled == notificationsEnabled &&
+</span><span class='line'>                migratedData.theme == theme) {
+</span><span class='line'>                // Clear SharedPreferences after successful migration
+</span><span class='line'>                sharedPrefs.edit().clear().apply()
+</span><span class='line'>                Result.success(Unit)
+</span><span class='line'>            } else {
+</span><span class='line'>                Result.failure(Exception("Migration verification failed"))
+</span><span class='line'>            }
+</span><span class='line'>        } catch (e: Exception) {
+</span><span class='line'>            Result.failure(e)
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    suspend fun updateUserName(name: String) {
+</span><span class='line'>        dataStore.updateData { preferences -&gt;
+</span><span class='line'>            preferences.toBuilder()
+</span><span class='line'>                .setUserName(name)
+</span><span class='line'>                .build()
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    suspend fun updateNotificationsEnabled(enabled: Boolean) {
+</span><span class='line'>        dataStore.updateData { preferences -&gt;
+</span><span class='line'>            preferences.toBuilder()
+</span><span class='line'>                .setNotificationsEnabled(enabled)
+</span><span class='line'>                .build()
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    suspend fun updateTheme(theme: String) {
+</span><span class='line'>        dataStore.updateData { preferences -&gt;
+</span><span class='line'>            preferences.toBuilder()
+</span><span class='line'>                .setTheme(theme)
+</span><span class='line'>                .build()
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Step 5: Use in Your App</h2>
+
+<p>Here&rsquo;s how to use the repository in your app:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>class MainActivity : AppCompatActivity() {
+</span><span class='line'>    private lateinit var repository: UserPreferencesRepository
+</span><span class='line'>    
+</span><span class='line'>    override fun onCreate(savedInstanceState: Bundle?) {
+</span><span class='line'>        super.onCreate(savedInstanceState)
+</span><span class='line'>        
+</span><span class='line'>        repository = UserPreferencesRepository(applicationContext)
+</span><span class='line'>        
+</span><span class='line'>        // Migrate data on app first launch
+</span><span class='line'>        lifecycleScope.launch {
+</span><span class='line'>            repository.migrateFromSharedPreferences()
+</span><span class='line'>        }
+</span><span class='line'>        
+</span><span class='line'>        // Observe preferences changes
+</span><span class='line'>        lifecycleScope.launch {
+</span><span class='line'>            repository.userPreferencesFlow.collect { preferences -&gt;
+</span><span class='line'>                // Update UI based on preferences
+</span><span class='line'>                updateUI(preferences)
+</span><span class='line'>            }
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    private fun updateUI(preferences: UserPreferences) {
+</span><span class='line'>        // Update your UI components based on preferences
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Testing Your Migration</h2>
+
+<p>Here&rsquo;s an example of how to test your migration:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>@Test
+</span><span class='line'>fun testMigrationFromSharedPreferences() = runTest {
+</span><span class='line'>    val context = ApplicationProvider.getApplicationContext&lt;Context&gt;()
+</span><span class='line'>    
+</span><span class='line'>    // Set up test SharedPreferences
+</span><span class='line'>    val sharedPrefs = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+</span><span class='line'>    sharedPrefs.edit()
+</span><span class='line'>        .putString("user_name", "Test User")
+</span><span class='line'>        .putBoolean("notifications_enabled", true)
+</span><span class='line'>        .putString("theme", "dark")
+</span><span class='line'>        .apply()
+</span><span class='line'>    
+</span><span class='line'>    // Perform migration
+</span><span class='line'>    val repository = UserPreferencesRepository(context)
+</span><span class='line'>    val result = repository.migrateFromSharedPreferences()
+</span><span class='line'>    
+</span><span class='line'>    // Verify migration
+</span><span class='line'>    assert(result.isSuccess)
+</span><span class='line'>    
+</span><span class='line'>    val migratedData = repository.userPreferencesFlow.first()
+</span><span class='line'>    assertEquals("Test User", migratedData.userName)
+</span><span class='line'>    assertTrue(migratedData.notificationsEnabled)
+</span><span class='line'>    assertEquals("dark", migratedData.theme)
+</span><span class='line'>    
+</span><span class='line'>    // Verify SharedPreferences was cleared
+</span><span class='line'>    assertTrue(sharedPrefs.all.isEmpty())
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Best Practices and Common Pitfalls</h2>
+
+<ol>
+<li><p><strong>Schema Evolution</strong>: When adding new fields to your proto schema, always:</p>
+
+<ul>
+<li>Use new field numbers</li>
+<li>Provide default values</li>
+<li>Increment the schema version</li>
+</ul>
+</li>
+<li><p><strong>Error Handling</strong>: Always handle potential exceptions when reading/writing data:</p>
+
+<ul>
+<li><code>IOException</code> for file system issues</li>
+<li><code>CorruptionException</code> for invalid data</li>
+<li><code>InvalidProtocolBufferException</code> for proto parsing errors</li>
+</ul>
+</li>
+<li><p><strong>Performance</strong>:</p>
+
+<ul>
+<li>Perform migrations in the background using Coroutines</li>
+<li>Use Flow&rsquo;s <code>collectLatest</code> when frequent updates aren&rsquo;t necessary</li>
+<li>Consider caching frequently accessed values</li>
+</ul>
+</li>
+<li><p><strong>Testing</strong>:</p>
+
+<ul>
+<li>Write unit tests for your repository</li>
+<li>Test migration with various SharedPreferences states</li>
+<li>Include error cases in your tests</li>
+<li>Test schema evolution scenarios</li>
+</ul>
+</li>
+</ol>
+
+
+<h2>Conclusion</h2>
+
+<p>Migrating from SharedPreferences to Proto DataStore requires some initial setup, but the benefits of type safety, schema evolution, and reactive programming make it worthwhile. The resulting code will be more maintainable, type-safe, and resistant to runtime errors. Happy coding!</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Michael Evans</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2024-10-10T11:53:57-04:00" pubdate data-updated="true">Oct 10<span>th</span>, 2024</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://michaelevans.org/blog/2024/10/10/modernizing-your-android-apps-data-storage-sharedpreferences-to-datastore/" data-via="m_evans10" data-counturl="http://michaelevans.org/blog/2024/10/10/modernizing-your-android-apps-data-storage-sharedpreferences-to-datastore/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2024/09/07/mastering-ktlint-a-guide-to-crafting-your-own-rules/" title="Previous Post: Mastering ktlint: A Guide to Crafting Your Own Rules">&laquo; Mastering ktlint: A Guide to Crafting Your Own Rules</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2024/12/14/ui-testing-made-easy-the-robot-test-pattern-on-android/" title="Next Post: UI Testing Made Easy: The Robot Test Pattern on Android">UI Testing Made Easy: The Robot Test Pattern on Android &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2024/12/14/ui-testing-made-easy-the-robot-test-pattern-on-android/">UI Testing Made Easy: The Robot Test Pattern on Android</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2024/10/10/modernizing-your-android-apps-data-storage-sharedpreferences-to-datastore/">Modernizing Your Android App's Data Storage: SharedPreferences to DataStore</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2024/09/07/mastering-ktlint-a-guide-to-crafting-your-own-rules/">Mastering ktlint: A Guide to Crafting Your Own Rules</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2024/07/29/stop-repeating-yourself-2-using-test-fixtures-with-agp/">Stop Repeating Yourself 2: Using Test Fixtures with AGP</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2024/06/27/understanding-referrals-using-google-play/">Understanding Referrals using Google Play</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/MichaelEvans">@MichaelEvans</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'MichaelEvans',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/114052868601022948953?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2024 - Michael Evans -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mevans';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://michaelevans.org/blog/2024/10/10/modernizing-your-android-apps-data-storage-sharedpreferences-to-datastore/';
+        var disqus_url = 'http://michaelevans.org/blog/2024/10/10/modernizing-your-android-apps-data-storage-sharedpreferences-to-datastore/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

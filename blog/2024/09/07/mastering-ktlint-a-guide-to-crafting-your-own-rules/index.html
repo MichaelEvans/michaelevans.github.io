@@ -1,0 +1,486 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="msvalidate.01" content="275BF9CDA457668389C1F9916C380DD0" />
+  <title>Mastering ktlint: A Guide to Crafting Your Own Rules - Michael Evans</title>
+  <meta name="author" content="Michael Evans">
+
+  
+  <meta name="description" content="Ktlint is a powerful linting tool for Kotlin code that helps maintain code quality and consistency. While it comes with a set of built-in rules, &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://michaelevans.org/blog/2024/09/07/mastering-ktlint-a-guide-to-crafting-your-own-rules/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Michael Evans" type="application/atom+xml">
+  <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-28589266-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Michael Evans</a></h1>
+  
+    <h2>A bunch of technobabble.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:michaelevans.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Mastering Ktlint: A Guide to Crafting Your Own Rules</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2024-09-07T11:49:37-04:00" pubdate data-updated="true">Sep 7<span>th</span>, 2024</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><a href="https://github.com/pinterest/ktlint">Ktlint</a> is a powerful linting tool for Kotlin code that helps maintain code quality and consistency. While it comes with a set of built-in rules, there may be cases where you want to create custom rules tailored to your project&rsquo;s specific requirements. In this tutorial, we&rsquo;ll walk you through the process of writing a custom ktlint rule that detects and removes Android Log statements from your Kotlin code.</p>
+
+<hr />
+
+<h2>Prerequisites</h2>
+
+<p>Before we dive into writing custom ktlint rules, ensure you have ktlint installed in your project. The tasks ktlintApplyToIdea and addKtlintCheckTask are provided by the ktlint Gradle plugin. If you haven&rsquo;t already, include the plugin in your project by adding the following to your <code>build.gradle.kts</code> file:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>plugins {
+</span><span class='line'>    id("org.jlleitschuh.gradle.ktlint") version "&lt;latest-version&gt;"
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once the plugin is applied, run the following command to set up ktlint in your project:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>./gradlew ktlintApplyToIdea addKtlintCheckTask</span></code></pre></td></tr></table></div></figure>
+
+
+<hr />
+
+<h2>Writing a Custom ktlint Rule</h2>
+
+<h3>1. Create a New Module</h3>
+
+<p>To write a custom ktlint rule, start by creating a new module in your Kotlin project.</p>
+
+<h3>2. Set Up Your Project</h3>
+
+<p>In your new module, make sure you have ktlint as a dependency. Add it to your <code>build.gradle.kts</code> or <code>build.gradle</code> file:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>dependencies {
+</span><span class='line'>    ktlint("io.gitlab.arturbosch.detekt:detekt-formatting:&lt;ktlint-version&gt;")
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>3. Define the ktlint Rule</h3>
+
+<p>Now, let&rsquo;s define our custom rule. Create a Kotlin class that extends the <code>Rule</code> class and override the <code>visit</code> method to define the logic for your rule. In this example, we want to detect Android Log statements.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>import io.gitlab.arturbosch.detekt.api.Rule
+</span><span class='line'>import org.jetbrains.kotlin.psi.KtCallExpression
+</span><span class='line'>
+</span><span class='line'>class LogStatementRule : Rule() {
+</span><span class='line'>    override fun visitCallExpression(expression: KtCallExpression) {
+</span><span class='line'>        if (expression.calleeExpression?.text == "Log" &&
+</span><span class='line'>            expression.valueArguments.size == 1
+</span><span class='line'>        ) {
+</span><span class='line'>            // Report a finding
+</span><span class='line'>            report(
+</span><span class='line'>                finding = "Found Android Log statement",
+</span><span class='line'>                documentable = expression
+</span><span class='line'>            )
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>4. Create a Test</h3>
+
+<p>As with any code we write, it&rsquo;s great practice to write tests for your custom rule to ensure it behaves as expected. Use the ktlint testing library to create a test case that demonstrates the rule&rsquo;s functionality.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>import io.gitlab.arturbosch.detekt.test.lint
+</span><span class='line'>import org.spekframework.spek2.Spek
+</span><span class='line'>import org.spekframework.spek2.style.specification.describe
+</span><span class='line'>
+</span><span class='line'>object LogStatementRuleSpec : Spek({
+</span><span class='line'>    describe("a LogStatementRule") {
+</span><span class='line'>        val subject = LogStatementRule()
+</span><span class='line'>
+</span><span class='line'>        it("should report Android Log statements") {
+</span><span class='line'>            val code = """
+</span><span class='line'>                import android.util.Log
+</span><span class='line'>                fun example() {
+</span><span class='line'>                    Log.d("Tag", "Message")
+</span><span class='line'>                }
+</span><span class='line'>            """.trimIndent()
+</span><span class='line'>
+</span><span class='line'>            subject.lint(code)
+</span><span class='line'>                .shouldContainOnly(subject.findings.single())
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>        it("should not report other function calls") {
+</span><span class='line'>            val code = """
+</span><span class='line'>                fun example() {
+</span><span class='line'>                    someFunction()
+</span><span class='line'>                }
+</span><span class='line'>            """.trimIndent()
+</span><span class='line'>
+</span><span class='line'>            subject.lint(code)
+</span><span class='line'>                .shouldBeEmpty()
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>})</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>5. Add the Rule to ktlint Configuration</h3>
+
+<p>To make your custom rule part of your ktlint configuration, add it to the <code>.editorconfig</code> file in your project:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># .editorconfig
+</span><span class='line'># Custom ktlint rules
+</span><span class='line'>ktlint.ruleset = LogStatementRule</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>6. Run ktlint</h3>
+
+<p>Run ktlint in your project to check for Android Log statements and automatically remove them using the <code>--apply-to-idea</code> flag:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>./gradlew ktlintApplyToIdea</span></code></pre></td></tr></table></div></figure>
+
+
+<hr />
+
+<h2>Conclusion</h2>
+
+<p>In this tutorial, we&rsquo;ve shown you how to write a custom ktlint rule to detect and remove Android Log statements from your Kotlin code. Custom ktlint rules can help you maintain code quality and consistency by enforcing project-specific coding standards. This is obviously a simple example, but this is a good example to adapt for other custom rules that fit your project&rsquo;s needs.</p>
+
+<p>Ktlint is a powerful tool that, when combined with custom rules, can significantly improve your Kotlin codebase&rsquo;s quality and readability. Happy coding!</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Michael Evans</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2024-09-07T11:49:37-04:00" pubdate data-updated="true">Sep 7<span>th</span>, 2024</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://michaelevans.org/blog/2024/09/07/mastering-ktlint-a-guide-to-crafting-your-own-rules/" data-via="m_evans10" data-counturl="http://michaelevans.org/blog/2024/09/07/mastering-ktlint-a-guide-to-crafting-your-own-rules/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2024/07/29/stop-repeating-yourself-2-using-test-fixtures-with-agp/" title="Previous Post: Stop Repeating Yourself 2: Using Test Fixtures with AGP">&laquo; Stop Repeating Yourself 2: Using Test Fixtures with AGP</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2024/10/10/modernizing-your-android-apps-data-storage-sharedpreferences-to-datastore/" title="Next Post: Modernizing Your Android App's Data Storage: SharedPreferences to DataStore">Modernizing Your Android App's Data Storage: SharedPreferences to DataStore &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2024/12/14/ui-testing-made-easy-the-robot-test-pattern-on-android/">UI Testing Made Easy: The Robot Test Pattern on Android</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2024/10/10/modernizing-your-android-apps-data-storage-sharedpreferences-to-datastore/">Modernizing Your Android App's Data Storage: SharedPreferences to DataStore</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2024/09/07/mastering-ktlint-a-guide-to-crafting-your-own-rules/">Mastering ktlint: A Guide to Crafting Your Own Rules</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2024/07/29/stop-repeating-yourself-2-using-test-fixtures-with-agp/">Stop Repeating Yourself 2: Using Test Fixtures with AGP</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2024/06/27/understanding-referrals-using-google-play/">Understanding Referrals using Google Play</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/MichaelEvans">@MichaelEvans</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'MichaelEvans',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/114052868601022948953?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2024 - Michael Evans -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mevans';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://michaelevans.org/blog/2024/09/07/mastering-ktlint-a-guide-to-crafting-your-own-rules/';
+        var disqus_url = 'http://michaelevans.org/blog/2024/09/07/mastering-ktlint-a-guide-to-crafting-your-own-rules/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

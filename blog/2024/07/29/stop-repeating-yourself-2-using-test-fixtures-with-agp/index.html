@@ -1,0 +1,430 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="msvalidate.01" content="275BF9CDA457668389C1F9916C380DD0" />
+  <title>Stop Repeating Yourself 2: Using Test Fixtures with AGP - Michael Evans</title>
+  <meta name="author" content="Michael Evans">
+
+  
+  <meta name="description" content="Modern Android development often involves modularization to enhance build performance and maintainability. As you break down your app into multiple &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://michaelevans.org/blog/2024/07/29/stop-repeating-yourself-2-using-test-fixtures-with-agp/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Michael Evans" type="application/atom+xml">
+  <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-28589266-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Michael Evans</a></h1>
+  
+    <h2>A bunch of technobabble.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:michaelevans.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Stop Repeating Yourself 2: Using Test Fixtures With AGP</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2024-07-29T19:43:27-04:00" pubdate data-updated="true">Jul 29<span>th</span>, 2024</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Modern Android development often involves modularization to enhance build performance and maintainability. As you break down your app into multiple modules, sharing test utilities such as fixtures, mocks, or fakes between modules can become challenging. A <a href="https://michaelevans.org/blog/2019/09/21/stop-repeating-yourself-sharing-test-code-across-android-modules/">few years ago</a> I wrote about the concept of test fixtures, but at the time they <a href="https://issuetracker.google.com/issues/139438142">weren&rsquo;t supported</a> for Android modules. Thankfully, with Android Gradle Plugin (AGP) 8.5.0, Google introduced native support for test fixtures, streamlining this process significantly.</p>
+
+<h3>What Are Test Fixtures?</h3>
+
+<p>Test fixtures are reusable components such as test data, helper classes, or mocks that you can use to support your tests. Prior to AGP 8.5.0, sharing these utilities across modules often required workarounds like creating dedicated &ldquo;test&rdquo; modules or manually wiring dependencies. With AGP 8.5.0, the <code>testFixture</code>s feature makes it easier to declare and consume test fixtures directly from your modules.</p>
+
+<h3>Setting Up Test Fixtures</h3>
+
+<p>To enable test fixtures for a module, you need to include the <code>testFixtures</code> feature in your module&rsquo;s <code>build.gradle.kts</code> file. Here’s how you can set it up:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>android {
+</span><span class='line'>    // Enable test fixtures for the module
+</span><span class='line'>    testFixtures.enable = true
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>dependencies {
+</span><span class='line'>    // Declare dependencies for your test fixtures
+</span><span class='line'>    testFixturesImplementation("com.example:some-library:1.0.0")
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The testFixtures source set is automatically created under the src directory:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>module-name/
+</span><span class='line'>  src/
+</span><span class='line'>    main/
+</span><span class='line'>      java/
+</span><span class='line'>    testFixtures/
+</span><span class='line'>      java/
+</span><span class='line'>      kotlin/
+</span><span class='line'>    test/
+</span><span class='line'>      java/</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can now place reusable test utilities, such as mock data generators or fake implementations, inside the <code>testFixtures</code> directory.</p>
+
+<h3>Consuming Test Fixtures</h3>
+
+<p>Modules can consume test fixtures by declaring a dependency on the <code>testFixtures</code> configuration of another module. For example, if <code>module-b</code> needs to use the test fixtures from <code>module-a</code>, add the following dependency:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>dependencies {
+</span><span class='line'>    testImplementation(testFixtures(project(":module-a")))
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once this dependency is added, the test code in module-b can seamlessly access the fixtures provided by <code>module-a</code>.</p>
+
+<h3>Example: Sharing a Fake API Client</h3>
+
+<p>Suppose you have a fake API client used in multiple test cases. You can define it in the <code>testFixtures</code> source set of <code>module-a</code>:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>// module-a/src/testFixtures/kotlin/com/example/api/FakeApiClient.kt
+</span><span class='line'>package com.example.api
+</span><span class='line'>
+</span><span class='line'>class FakeApiClient {
+</span><span class='line'>    fun getFakeData(): String = "Fake Data"
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then, in <code>module-b</code>, you can consume and use this fake client:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>// module-b/src/test/kotlin/com/example/test/ApiClientTest.kt
+</span><span class='line'>package com.example.test
+</span><span class='line'>
+</span><span class='line'>import com.example.api.FakeApiClient
+</span><span class='line'>import org.junit.Test
+</span><span class='line'>
+</span><span class='line'>class ApiClientTest {
+</span><span class='line'>
+</span><span class='line'>    @Test
+</span><span class='line'>    fun testFakeData() {
+</span><span class='line'>        val fakeApiClient = FakeApiClient()
+</span><span class='line'>        assert(fakeApiClient.getFakeData() == "Fake Data")
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Conclusion</h3>
+
+<p>The testFixtures feature in AGP 8.5.0 is a game-changer for modularized Android projects. It eliminates the friction of sharing test utilities, allowing you to write cleaner, more maintainable test setups. If you’re working on a modularized project and haven’t tried testFixtures yet, now is the perfect time to incorporate it into your testing strategy.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Michael Evans</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2024-07-29T19:43:27-04:00" pubdate data-updated="true">Jul 29<span>th</span>, 2024</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://michaelevans.org/blog/2024/07/29/stop-repeating-yourself-2-using-test-fixtures-with-agp/" data-via="m_evans10" data-counturl="http://michaelevans.org/blog/2024/07/29/stop-repeating-yourself-2-using-test-fixtures-with-agp/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2024/06/27/understanding-referrals-using-google-play/" title="Previous Post: Understanding Referrals using Google Play">&laquo; Understanding Referrals using Google Play</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2024/09/07/mastering-ktlint-a-guide-to-crafting-your-own-rules/" title="Next Post: Mastering ktlint: A Guide to Crafting Your Own Rules">Mastering ktlint: A Guide to Crafting Your Own Rules &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2024/12/14/ui-testing-made-easy-the-robot-test-pattern-on-android/">UI Testing Made Easy: The Robot Test Pattern on Android</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2024/10/10/modernizing-your-android-apps-data-storage-sharedpreferences-to-datastore/">Modernizing Your Android App's Data Storage: SharedPreferences to DataStore</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2024/09/07/mastering-ktlint-a-guide-to-crafting-your-own-rules/">Mastering ktlint: A Guide to Crafting Your Own Rules</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2024/07/29/stop-repeating-yourself-2-using-test-fixtures-with-agp/">Stop Repeating Yourself 2: Using Test Fixtures with AGP</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2024/06/27/understanding-referrals-using-google-play/">Understanding Referrals using Google Play</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/MichaelEvans">@MichaelEvans</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'MichaelEvans',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/114052868601022948953?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2024 - Michael Evans -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mevans';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://michaelevans.org/blog/2024/07/29/stop-repeating-yourself-2-using-test-fixtures-with-agp/';
+        var disqus_url = 'http://michaelevans.org/blog/2024/07/29/stop-repeating-yourself-2-using-test-fixtures-with-agp/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

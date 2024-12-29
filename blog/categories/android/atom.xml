@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Android | Michael Evans]]></title>
   <link href="http://michaelevans.org/blog/categories/android/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2022-10-23T21:32:25-04:00</updated>
+  <updated>2024-12-29T00:15:11-05:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -12,6 +12,243 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Understanding Referrals using Google Play]]></title>
+    <link href="http://michaelevans.org/blog/2024/06/27/understanding-referrals-using-google-play/"/>
+    <updated>2024-06-27T19:41:33-04:00</updated>
+    <id>http://michaelevans.org/blog/2024/06/27/understanding-referrals-using-google-play</id>
+    <content type="html"><![CDATA[<p>Tracking how users install your app can be tricky, especially when you want to measure the effectiveness of your campaigns or ads. That’s where the <a href="https://developer.android.com/google/play/installreferrer">Google Play Install Referrer API</a> comes in handy—it gives you reliable data about how users found your app.</p>
+
+<p>If you’re developing an Android application, this guide will walk you through how to set up and use the InstallReferrerClient with Kotlin&rsquo;s callbackFlow to make integration simpler and more maintainable.</p>
+
+<h3>What is the Install Referrer?</h3>
+
+<p>The install referrer contains information about the source of the app installation. For example, if a user clicks an ad campaign link that leads to your app’s Play Store page, the referrer might include details about the campaign source, medium, or other specifics.</p>
+
+<p>Here’s how this data can help:</p>
+
+<ul>
+<li>Attribution: Identify which campaigns drive installs.</li>
+<li>Measure Success: Evaluate your marketing efforts' impact.</li>
+<li>Prevent Fraud: Verify referrer data to avoid fraudulent installs.</li>
+</ul>
+
+
+<h3>Setting Up and Using the InstallReferrerClient</h3>
+
+<p>Step 1: Add the Dependency</p>
+
+<p>First, include the Install Referrer library in your build.gradle file:</p>
+
+<p><code>
+implementation 'com.android.installreferrer:installreferrer:2.2'
+</code></p>
+
+<p>Step 2: Use <code>callbackFlow</code> for our implementation</p>
+
+<p>The InstallReferrerClient is callback-based, but Kotlin’s <code>callbackFlow</code> lets you handle this more elegantly. Here’s an example:</p>
+
+<p>```
+import com.android.installreferrer.api.InstallReferrerClient
+import com.android.installreferrer.api.InstallReferrerStateListener
+import com.android.installreferrer.api.ReferrerDetails
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow</p>
+
+<p>fun fetchInstallReferrer(context: Context) = callbackFlow {</p>
+
+<pre><code>val referrerClient = InstallReferrerClient.newBuilder(context).build()
+
+val listener = object : InstallReferrerStateListener {
+    override fun onInstallReferrerSetupFinished(responseCode: Int) {
+        when (responseCode) {
+            InstallReferrerClient.InstallReferrerResponse.OK -&gt; {
+                try {
+                    val response: ReferrerDetails = referrerClient.installReferrer
+                    trySend(Result.success(response))
+                } catch (e: Exception) {
+                    trySend(Result.failure(e))
+                } finally {
+                    referrerClient.endConnection()
+                }
+            }
+            InstallReferrerClient.InstallReferrerResponse.FEATURE_NOT_SUPPORTED -&gt; {
+                trySend(Result.failure(UnsupportedOperationException("Feature not supported")))
+            }
+            InstallReferrerClient.InstallReferrerResponse.SERVICE_UNAVAILABLE -&gt; {
+                trySend(Result.failure(IllegalStateException("Service unavailable")))
+            }
+        }
+    }
+
+    override fun onInstallReferrerServiceDisconnected() {
+        // Handle service disconnection if needed
+    }
+}
+
+referrerClient.startConnection(listener)
+
+awaitClose {
+    referrerClient.endConnection()
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Step 3: Consuming the Flow</p>
+
+<p>Collect the flow to retrieve and process the install referrer details:</p>
+
+<p>```
+fetchInstallReferrer(context).collect { result &ndash;></p>
+
+<pre><code>    result.onSuccess { referrerDetails -&gt;
+        val referrerUrl = referrerDetails.installReferrer
+        val clickTimestamp = referrerDetails.referrerClickTimestampSeconds
+        val installTimestamp = referrerDetails.installBeginTimestampSeconds
+
+        println("Referrer URL: $referrerUrl")
+        println("Click Time: $clickTimestamp")
+        println("Install Time: $installTimestamp")
+    }
+
+    result.onFailure { exception -&gt;
+        println("Error: ${exception.message}")
+    }
+}
+</code></pre>
+
+<p>```</p>
+
+<h3>Wrapping Up</h3>
+
+<p>With this data, you&rsquo;ll gain valuable insights into your app’s install sources, helping you make data-driven marketing decisions. Happy coding!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Accessing Test Resources using Kotlin Multiplatform]]></title>
+    <link href="http://michaelevans.org/blog/2024/04/17/accessing-test-resources-using-kotlin-multiplatform/"/>
+    <updated>2024-04-17T20:11:01-04:00</updated>
+    <id>http://michaelevans.org/blog/2024/04/17/accessing-test-resources-using-kotlin-multiplatform</id>
+    <content type="html"><![CDATA[<p>Kotlin Multiplatform (KMP) offers a powerful way to share code across platforms like Android, iOS, and the JVM. However, when it comes to testing, you might encounter a common challenge: how to handle test resources such as JSON files, configurations, or other data needed for tests. In this post, we’ll dive into strategies for accessing test resources in KMP projects.</p>
+
+<h3>Why Test Resources Matter</h3>
+
+<p>Test resources are essential for validating your code against real-world scenarios. For example, if you’re writing a library to parse JSON, you’d want to test it against diverse JSON samples representing different edge cases. While resource access is straightforward in single-platform projects, KMP’s multi-target nature requires some additional setup.</p>
+
+<h3>The Challenge in Kotlin Multiplatform</h3>
+
+<p>In KMP, test code resides in the <code>commonTest</code> source set, but resources aren’t directly bundled with it. Each platform manages file paths and resource access differently, so you need platform-specific setups for your resources and shared logic to load them efficiently.</p>
+
+<h3>Organizing Test Resources</h3>
+
+<p>Start by structuring your resources in a way that aligns with your project layout:</p>
+
+<p>```
+project-root/
+  src/</p>
+
+<pre><code>commonTest/
+  kotlin/
+    ...
+androidTest/
+  resources/
+    test-data.json
+jvmTest/
+  resources/
+    test-data.json
+iosTest/
+  resources/
+    test-data.json
+</code></pre>
+
+<p>```</p>
+
+<p>This setup ensures that each target platform can access its respective resources while keeping them logically grouped.</p>
+
+<h3>Loading Resources by Platform</h3>
+
+<p>For Android, place your test resources in the <code>androidTest/resources</code> directory. Use the <code>javaClass.classLoader</code> to load them:</p>
+
+<p>```
+fun loadTestResource(resourceName: String): String {</p>
+
+<pre><code>val inputStream = javaClass.classLoader?.getResourceAsStream(resourceName)
+return inputStream?.bufferedReader()?.use { it.readText() }
+    ?: throw IllegalArgumentException("Resource not found: $resourceName")
+</code></pre>
+
+<p>}
+```</p>
+
+<p>For iOS, add your resources to the test target in Xcode. Use platform-specific code to load them:</p>
+
+<p>```
+import platform.Foundation.*</p>
+
+<p>fun loadTestResource(resourceName: String): String {</p>
+
+<pre><code>val bundle = NSBundle.bundleForClass(MyTestClass::class)
+val path = bundle.pathForResource(resourceName, ofType = null)
+    ?: throw IllegalArgumentException("Resource not found: $resourceName")
+return NSString.stringWithContentsOfFile(path, encoding = NSUTF8StringEncoding, error = null) as String
+</code></pre>
+
+<p>}
+```</p>
+
+<h3>Sharing the Resource Loader</h3>
+
+<p>To avoid duplication, define a common function in <code>commonTest</code> and use the <code>expect/actual</code> pattern for platform-specific implementations:</p>
+
+<p>```
+// commonTest
+expect fun loadTestResource(resourceName: String): String</p>
+
+<p>// androidTest
+actual fun loadTestResource(resourceName: String): String {</p>
+
+<pre><code>val inputStream = javaClass.classLoader?.getResourceAsStream(resourceName)
+return inputStream?.bufferedReader()?.use { it.readText() }
+    ?: throw IllegalArgumentException("Resource not found: $resourceName")
+</code></pre>
+
+<p>}</p>
+
+<p>// iosTest
+actual fun loadTestResource(resourceName: String): String {</p>
+
+<pre><code>val bundle = NSBundle.bundleForClass(MyTestClass::class)
+val path = bundle.pathForResource(resourceName, ofType = null)
+    ?: throw IllegalArgumentException("Resource not found: $resourceName")
+return NSString.stringWithContentsOfFile(path, encoding = NSUTF8StringEncoding, error = null) as String
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Putting It All Together</p>
+
+<p>With this setup, your <code>commonTest</code> code can seamlessly access resources across platforms. For example:</p>
+
+<p>```
+@Test
+fun testJsonParsing() {</p>
+
+<pre><code>val jsonData = loadTestResource("test-data.json")
+val parsedData = parseJson(jsonData)
+assertEquals(expectedData, parsedData)
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Accessing test resources in Kotlin Multiplatform involves a bit of extra setup, but the payoff is a unified testing strategy across platforms. By leveraging the expect/actual pattern, you can create platform-specific resource loaders while keeping your test logic shared and consistent. Dive into KMP’s capabilities, and streamline your tests for every target platform!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Building Flipper Plugins for Fun and Profit]]></title>
@@ -378,196 +615,6 @@ client.addPlugin(DatabasesFlipperPlugin(context))
 <p><img class="center" src="/images/2020/03/10/writing_queries.png" width="800" height="800"></p>
 
 <p>I&rsquo;ve <a href="https://github.com/MichaelEvans/architecture-components-samples/commit/274ea5702cb5f10ea13012ce6d9fc6b6896f471e">pushed a branch</a> of the Github Browser Architecture Component sample with these changes to GitHub if you&rsquo;d like to try it out. Next time we&rsquo;ll take advantage of Flipper&rsquo;s extensibility to create our own plugins to make debugging our app easier!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Dropping Columns Like It's Hot]]></title>
-    <link href="http://michaelevans.org/blog/2020/02/10/dropping-columns-like-its-hot/"/>
-    <updated>2020-02-10T20:03:03-05:00</updated>
-    <id>http://michaelevans.org/blog/2020/02/10/dropping-columns-like-its-hot</id>
-    <content type="html"><![CDATA[<p>Recently, I was doing some code cleanup and noticed that there were some data in the database that was no longer needed. I think most developers clean up their codebase of deprecated patterns and unused code, but I personally have not done a good job of ensuring that the same cleanup happens for unused columns in my databases.</p>
-
-<p>Dropping tables that are no longer used is pretty easy (especially if you can just use something like Room&rsquo;s <a href="https://developer.android.com/training/data-storage/room/migrating-db-versions">Migrations</a>) but when trying to remove unused columns, I ran into an unexpected problem. I thought to myself, it’s pretty easy to add or rename a column, why would dropping one be any harder? The existing database library I was using already had a convenient &ldquo;drop column&rdquo; method, so I simply called that and tried to run the migration. During the process, I ended up with a <code>ForeignKeyConstraintException</code>! I quickly scanned the schema to see what could have caused that, and didn&rsquo;t see anything obvious. The table I was trying to modify didn&rsquo;t have any foreign keys itself, and the column I was dropping was not a foreign key. Curious to understand what was happening, I started to dig into what this method call was doing.</p>
-
-<!-- more -->
-
-
-<p>I saw that although you can add a column with SQLite&rsquo;s <code>ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${columnType}</code> statements, there&rsquo;s <a href="https://www.sqlite.org/lang_altertable.html">no support for removing a column out of the box</a>. The library method I was using emulates dropping a column by doing the following:</p>
-
-<ol>
-<li>Rename the existing table into <code>$tablename_old</code></li>
-<li>Creating a new table with all the existing columns, minus the one we don’t want</li>
-<li>Copying all the data from <code>$tablename_old</code> to <code>$tablename</code></li>
-<li>Dropping <code>$tablename_old</code>, since we don’t need it anymore.</li>
-</ol>
-
-
-<p>This process seems to make a lot of sense &ndash; since we can’t remove the column on its own, let’s just make a new table with the structure we want and copy over the data that we want to keep. So why does this process not work?</p>
-
-<h3>The Gotcha!</h3>
-
-<p>If you read the SQlite documentation linked above closely, you might have noticed an important note:</p>
-
-<blockquote><p>Compatibility Note: The behavior of ALTER TABLE when renaming a table was enhanced in versions 3.25.0 (2018-09-15) and 3.26.0 (2018-12-01) in order to carry the rename operation forward into triggers and views that reference the renamed table. This is considered an improvement. Applications that depend on the older (and arguably buggy) behavior can use the PRAGMA legacy_alter_table=ON statement or the SQLITE_DBCONFIG_LEGACY_ALTER_TABLE configuration parameter on sqlite3_db_config() interface to make ALTER TABLE RENAME behave as it did prior to version 3.25.0.</p></blockquote>
-
-<p>What this means is that when we use <code>ALTER</code> to rename a table, any triggers/views/foreign keys that reference that table will now be updated to support it. As an example:</p>
-
-<p>Let&rsquo;s say we had a table <code>users</code> with a few columns: <code>id</code>, <code>first_name</code>, <code>last_name</code>, and <code>age</code>, and we had a table <code>orders</code> with the columns <code>id</code>, <code>order_number</code> and <code>user_id</code>, where <code>user_id</code> was a foreign key back to the <code>users</code> table. It might look a little like this:</p>
-
-<p><img class="center" src="/images/2020/02/10/before_step1.png" width="400" height="400"></p>
-
-<p>Following the steps above, let&rsquo;s try to drop the <code>age</code> column. First we&rsquo;ll rename the existing table into <code>users_old</code>, and create the new table:</p>
-
-<p><img class="center" src="/images/2020/02/10/before_step2.png" width="400" height="600"></p>
-
-<p>Then we copy the the data, and try to drop <code>users_old</code>, and this is where we run into the exception. The grey line in the diagram is our foreign key association, and that will no longer be valid because the <code>orders</code> table will be trying to reference <code>users_old</code> which we are trying to drop.</p>
-
-<p><img class="center" src="/images/2020/02/10/before_step3.png" width="400" height="600"></p>
-
-<p>Fortunately the documentation lists out a better sequence of steps to perform this operation:</p>
-
-<ol>
-<li>Create the new table</li>
-<li>Copy over the data we need</li>
-<li>Drop old table</li>
-<li>Rename the new table with the name of the old table</li>
-</ol>
-
-
-<p>Looking at it more visually &ndash; we&rsquo;ll start with the same tables and create a new table named <code>users_new</code> to hold the preserved data:</p>
-
-<p><img class="center" src="/images/2020/02/10/after_step1.png" width="400" height="600"></p>
-
-<p>Then we&rsquo;ll do the data copy, drop, the old table (but the foreign key relation will still reference the <code>users</code> table), and rename <code>users_new</code> to <code>users</code>.</p>
-
-<p><img class="center" src="/images/2020/02/10/after_step2.png" width="400" height="400"></p>
-
-<p>These steps will ensure that no existing links (views, triggers, etc) are modified. That way when we rename the table in the final step, the existing links will end up referencing the new table already.</p>
-
-<p><img class="center" src="/images/2020/02/10/after_step3.png" width="400" height="400"></p>
-
-<p>TLDR:</p>
-
-<p>```
-override fun migrate(database: SupportSQLiteDatabase) {</p>
-
-<pre><code>// Create the new table
-database.execSQL("CREATE TABLE users_new (id INTEGER, first_name TEXT, last_name TEXT, PRIMARY KEY(userid))")
-// Copy the data
-database.execSQL("INSERT INTO users_new (id, first_name, last_name) SELECT id, first_name, last_name FROM users")
-// Remove the old table
-database.execSQL("DROP TABLE users")
-// Change the table name to the correct one
-database.execSQL("ALTER TABLE users_new RENAME TO users")
-</code></pre>
-
-<p>}
-```</p>
-
-<p>Hopefully this discovery helps you better clean up those unused columns in your databases!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Stop Repeating Yourself: Sharing test code across Android Modules]]></title>
-    <link href="http://michaelevans.org/blog/2019/09/21/stop-repeating-yourself-sharing-test-code-across-android-modules/"/>
-    <updated>2019-09-21T21:34:52-04:00</updated>
-    <id>http://michaelevans.org/blog/2019/09/21/stop-repeating-yourself-sharing-test-code-across-android-modules</id>
-    <content type="html"><![CDATA[<p>It seems like nowadays, the <a href="https://jeroenmols.com/blog/2019/03/06/modularizationwhy/">best advice</a> <a href="https://robinhood.engineering/breaking-up-the-app-module-monolith-the-story-of-robinhoods-android-app-707fb993a50c">is to modularize</a> <a href="https://www.youtube.com/watch?v=PZBg5DIzNww">your Android app</a>. It&rsquo;s a great suggestion for many reasons, including but not limited to:</p>
-
-<pre><code>- improved build performance
-- enables on-demand delivery
-- pushes you to build reusable, discrete components
-</code></pre>
-
-<p>Sounds great, right? Are there any downsides? There is one in particular which has been a a pain point for many.</p>
-
-<p>Often times when you&rsquo;re writing tests, you&rsquo;ll want to use some <a href="https://testing.googleblog.com/2013/07/testing-on-toilet-know-your-test-doubles.html">test doubles</a> like fakes or fixtures in order to help simulate the system under test. Maybe you have a <code>FakeUser</code> instance that you use in your tests to avoid having to mock a <code>User</code> every time your test calls for one. Generally these classes live alongside tests in <code>src/test</code> directories and are used to test out your code within a module.</p>
-
-<p>For example, maybe you have a model object like:</p>
-
-<p>```
-public class User {</p>
-
-<pre><code>private final String firstName;
-private final String lastName;
-
-public User(String firstName, String lastName) {
-    this.firstName = firstName;
-    this.lastName = lastName;
-}
-
-public String getFirstName() {
-    return firstName;
-}
-
-public String getLastName() {
-    return lastName;
-}
-</code></pre>
-
-<p>}
-```</p>
-
-<p>You might have some code in <code>src/test</code> that creates a bunch of fake users for your tests like:</p>
-
-<p>```
-class TheOfficeFixtures {</p>
-
-<pre><code>    public static User manager = new User("Michael", "Scott");
-    public static User assistantToTheRegionalManager = new User("Dwight", "Schrute");
-}
-</code></pre>
-
-<p>}
-```</p>
-
-<p>This works great if you&rsquo;re testing code <em>within</em> a module, but as soon as you&rsquo;d like to use these fake users in other modules, you&rsquo;ll note that these classes aren&rsquo;t shared!</p>
-
-<p>This code can&rsquo;t be shared between modules because Gradle doesn&rsquo;t expose the output of your test source set as a build artifact. There are all kinds of solutions for this problem out there, including <a href="https://treatwell.engineering/mock-factory-for-android-testing-in-multi-module-system-7654f45808be">creating a special module for all your fixtures</a>, and using <a href="https://stackoverflow.com/questions/5644011/multi-project-test-dependencies-with-gradle">gradle dependency hacks</a> to wire up source sets.</p>
-
-<p>However, that&rsquo;s not necessary anymore! As of version 5.6, Gradle now ships a new &lsquo;test-fixtures&rsquo; plugin! This plugin creates a new <code>testFixtures</code> source set, and configures that source set so that:</p>
-
-<pre><code>- classes in this set can see the main source set classes
-- test sources can see the test fixtures classes
-</code></pre>
-
-<h3>Using the Plugin</h3>
-
-<p>You can apply the <code>java-test-fixtures</code> plugin in your build.gradle script:</p>
-
-<p>```
-plugins {</p>
-
-<pre><code>id 'java-test-fixtures'
-</code></pre>
-
-<p>}
-```</p>
-
-<p>This plugin will define the necessary source set, and handle all the wiring up of test artifacts. We can now  move those test fixtures from <code>src/test/java</code> to <code>src/testFixtures/java</code>, and that&rsquo;s it! These classes will be ready to be consumed by other modules.</p>
-
-<h3>Wiring it all together</h3>
-
-<p>Finally, we need to use a special keyword to pull these new fixtures in as a dependency for our tests. In our  gradle configuration, we add a test dependency (either API or Implementation) like so:</p>
-
-<p>```
-dependencies {</p>
-
-<pre><code>testImplementation(testFixtures(project(":lib")))
-</code></pre>
-
-<p>}
-```</p>
-
-<p>And that&rsquo;s it! Our other module can now consume these test fixtures without any sort of intermediate modules or workarounds.</p>
-
-<p>If you&rsquo;d like to check out the complete configuration with examples sharing fixtures between both Kotlin and Java modules to a shared &ldquo;app&rdquo; module, I&rsquo;ve uploaded a sample project demonstrating how to use this new configuration <a href="https://github.com/MichaelEvans/TestFixturesExample">here</a>.</p>
-
-<h2>Important Caveat</h2>
-
-<p>It&rsquo;s important to note that this feature is currently only available with the <code>java-library</code> plugin, and has limited functionality in Kotlin modules, and not yet available for Android modules. There are currently feature requests on <a href="https://youtrack.jetbrains.com/issue/KT-33877">YouTrack</a> and the <a href="https://issuetracker.google.com/issues/139438142">Android Issue Tracker</a> to take advantage of this new functionality.</p>
 ]]></content>
   </entry>
   
