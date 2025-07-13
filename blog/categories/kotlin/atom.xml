@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Kotlin | Michael Evans]]></title>
   <link href="http://michaelevans.org/blog/categories/kotlin/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2025-07-13T00:35:52-04:00</updated>
+  <updated>2025-07-13T00:38:37-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Smooth Theme Transitions in Compose with Animated ColorSchemes]]></title>
-    <link href="http://michaelevans.org/blog/2025/07/11/smooth-theme-transitions-in-compose-with-animated-colorschemes/"/>
-    <updated>2025-07-11T23:38:27-04:00</updated>
-    <id>http://michaelevans.org/blog/2025/07/11/smooth-theme-transitions-in-compose-with-animated-colorschemes</id>
+    <link href="http://michaelevans.org/blog/2025/07/01/smooth-theme-transitions-in-compose-with-animated-colorschemes/"/>
+    <updated>2025-07-01T23:38:27-04:00</updated>
+    <id>http://michaelevans.org/blog/2025/07/01/smooth-theme-transitions-in-compose-with-animated-colorschemes</id>
     <content type="html"><![CDATA[<p>If your Jetpack Compose app supports light and dark themes, you’ve probably noticed the default behavior: a sudden cut between color schemes when the system UI mode changes.</p>
 
 <p>I think we&rsquo;ve all seen theme changes that look like this:</p>
