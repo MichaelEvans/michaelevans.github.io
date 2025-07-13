@@ -4,7 +4,7 @@
   <title><![CDATA[Michael Evans]]></title>
   <link href="http://michaelevans.org/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2024-12-29T00:16:42-05:00</updated>
+  <updated>2025-07-13T00:35:52-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -12,6 +12,363 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Smooth Theme Transitions in Compose with Animated ColorSchemes]]></title>
+    <link href="http://michaelevans.org/blog/2025/07/11/smooth-theme-transitions-in-compose-with-animated-colorschemes/"/>
+    <updated>2025-07-11T23:38:27-04:00</updated>
+    <id>http://michaelevans.org/blog/2025/07/11/smooth-theme-transitions-in-compose-with-animated-colorschemes</id>
+    <content type="html"><![CDATA[<p>If your Jetpack Compose app supports light and dark themes, you’ve probably noticed the default behavior: a sudden cut between color schemes when the system UI mode changes.</p>
+
+<p>I think we&rsquo;ve all seen theme changes that look like this:</p>
+
+<p><video width='270' height='600' preload='none' controls ><source src='http://michaelevans.org/images/2025/07/01/instant.webm' type='video/webm; codecs=vp8, vorbis'>Your browser does not support the video tag.</video></p>
+
+<p>We can do better.</p>
+
+<p>By wrapping your theme setup with some animation, we can achieve <strong>smooth transitions between light and dark themes</strong> that feel much more polished — without rebuilding your entire app structure.</p>
+
+<!-- more -->
+
+
+<p></p>
+
+<h2>The Idea: Animate the ColorScheme</h2>
+
+<p>Jetpack Compose’s <code>MaterialTheme</code> accepts a <code>ColorScheme</code>. If we gradually animate the colors inside that scheme when the system toggles between dark and light, we can fade the colors smoothly across the entire app.</p>
+
+<p>Here’s a simplified example:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>@Composable
+</span><span class='line'>fun AnimatedTheme(
+</span><span class='line'>    darkTheme: Boolean = isSystemInDarkTheme(),
+</span><span class='line'>    content: @Composable () -&gt; Unit
+</span><span class='line'>) {
+</span><span class='line'>    val targetScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+</span><span class='line'>
+</span><span class='line'>    val animatedScheme = targetScheme.copy(
+</span><span class='line'>        primary = animateColorAsState(targetScheme.primary).value,
+</span><span class='line'>        background = animateColorAsState(targetScheme.background).value,
+</span><span class='line'>        surface = animateColorAsState(targetScheme.surface).value,
+</span><span class='line'>        onPrimary = animateColorAsState(targetScheme.onPrimary).value,
+</span><span class='line'>        // Add more swatches as needed...
+</span><span class='line'>    )
+</span><span class='line'>
+</span><span class='line'>    MaterialTheme(
+</span><span class='line'>        colorScheme = animatedScheme,
+</span><span class='line'>        typography = Typography,
+</span><span class='line'>        shapes = Shapes,
+</span><span class='line'>        content = content
+</span><span class='line'>    )
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can expand this to include all 20+ color swatches if you want — but we’ll show a better way shortly.</p>
+
+<hr />
+
+<h2>The Problem: Too Many Animations</h2>
+
+<p>Manually animating every color swatch with <code>animateColorAsState</code> works, but:</p>
+
+<ul>
+<li>It’s <strong>verbose</strong></li>
+<li>It runs <strong>a lot of recompositions</strong> (even for unused swatches)</li>
+<li>It can be <strong>hard to keep up</strong> if <code>ColorScheme</code> changes</li>
+</ul>
+
+
+<hr />
+
+<h2>A Better Approach: Animating with updateTransition</h2>
+
+<p>A cleaner solution is to animate all properties as part of a single <code>Transition</code>. That way, Compose shares the animation clock and easing, and you&rsquo;re not scattering a dozen independent animation calls.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>private fun defaultColorTransitionSpec(): FiniteAnimationSpec&lt;Color&gt; =
+</span><span class='line'>    tween(durationMillis = 500, easing = LinearOutSlowInEasing)
+</span><span class='line'>
+</span><span class='line'>@Composable
+</span><span class='line'>fun AnimatedTheme(
+</span><span class='line'>    darkTheme: Boolean = isSystemInDarkTheme(),
+</span><span class='line'>    content: @Composable () -&gt; Unit
+</span><span class='line'>) {
+</span><span class='line'>    val targetScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+</span><span class='line'>    val transition = updateTransition(targetScheme, label = "themeTransition")
+</span><span class='line'>
+</span><span class='line'>    val primary by transition.animateColor(
+</span><span class='line'>        label = "primary",
+</span><span class='line'>        transitionSpec = { defaultColorTransitionSpec() }) { it.primary }
+</span><span class='line'>    val background by transition.animateColor(
+</span><span class='line'>        label = "background",
+</span><span class='line'>        transitionSpec = { defaultColorTransitionSpec() }) { it.background }
+</span><span class='line'>    val surface by transition.animateColor(
+</span><span class='line'>        label = "surface",
+</span><span class='line'>        transitionSpec = { defaultColorTransitionSpec() }) { it.surface }
+</span><span class='line'>    val onPrimary by transition.animateColor(
+</span><span class='line'>        label = "onPrimary",
+</span><span class='line'>        transitionSpec = { defaultColorTransitionSpec() }) { it.onPrimary }
+</span><span class='line'>
+</span><span class='line'>    val animatedScheme = targetScheme.copy(
+</span><span class='line'>        primary = primary,
+</span><span class='line'>        background = background,
+</span><span class='line'>        surface = surface,
+</span><span class='line'>        onPrimary = onPrimary
+</span><span class='line'>    )
+</span><span class='line'>    MaterialTheme(colorScheme = animatedScheme, content = content)
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This version:</p>
+
+<ul>
+<li>Uses a single <code>Transition</code> to group related animations</li>
+<li>Shares the same easing/duration across all swatches</li>
+<li>Is easier to extend or modify incrementally</li>
+</ul>
+
+
+<p>After we add our animations, it will look more like this:</p>
+
+<p><video width='270' height='600' preload='none' controls ><source src='http://michaelevans.org/images/2025/07/01/animated.webm' type='video/webm; codecs=vp8, vorbis'>Your browser does not support the video tag.</video></p>
+
+<hr />
+
+<h2>Final Notes</h2>
+
+<ul>
+<li>If you want to animate <strong>all</strong> color properties, you&rsquo;ll still need to call <code>animateColor</code> for each one — but this pattern scales better than copy-pasting 25 <code>animateColorAsState</code> calls.</li>
+<li>For most apps, animating just a <strong>handful</strong> of swatches (<code>primary</code>, <code>background</code>, <code>surface</code>, <code>onPrimary</code>, <code>error</code>) gives most of the perceived polish.</li>
+<li>Avoid using reflection or deep copying here — it’s better to be explicit and in control of what’s animated.</li>
+</ul>
+
+
+<hr />
+
+<h2>Wrap-Up</h2>
+
+<p>This technique brings a much smoother feel to your app, especially if your users frequently switch between light and dark mode (or you support a manual toggle).</p>
+
+<p>(Hopefully the Compose team eventually provides a helper for this boilerplate.)</p>
+
+<p>Happy theming!</p>
+
+<h2>Sample Code</h2>
+
+<p>Want to try it out yourself? I’ve published a small sample project on GitHub that demonstrates both animated and non-animated theme switching:</p>
+
+<p><a href="https://github.com/MichaelEvans/AnimatedThemeExample">View the sample project on GitHub</a></p>
+
+<p>It includes the exact code from this post and the toggle UI shown in the GIFs.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Turning Any Android Callback into a Flow with callbackFlow]]></title>
+    <link href="http://michaelevans.org/blog/2025/03/22/turning-any-android-callback-into-a-flow-with-callbackflow/"/>
+    <updated>2025-03-22T23:10:16-04:00</updated>
+    <id>http://michaelevans.org/blog/2025/03/22/turning-any-android-callback-into-a-flow-with-callbackflow</id>
+    <content type="html"><![CDATA[<p>If you&rsquo;ve been working with Android for any amount of time, you&rsquo;ve probably run into APIs that expose their results using callbacks or listeners. Whether it&rsquo;s something like <code>LocationManager</code>, a custom SDK, or a third-party service like Firebase, you&rsquo;re often stuck adapting old-school async patterns into your modern reactive code.</p>
+
+<p>This approach is especially helpful in apps using Jetpack Compose, coroutines, or unidirectional data flow.</p>
+
+<p>Fortunately, Kotlin&rsquo;s <code>callbackFlow</code> makes this much easier. In this post, we&rsquo;ll show how to wrap a listener-based API using <code>callbackFlow</code>, so you can collect updates as a <code>Flow</code>. We&rsquo;ll use the Firebase Realtime Database as an example, but this pattern works for nearly anything.</p>
+
+<!-- more -->
+
+
+<h2>The Problem: Listeners Aren’t Reactive</h2>
+
+<p>Here’s the classic way of listening to changes in the Firebase Realtime Database:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>val postListener = object : ValueEventListener {
+</span><span class='line'>    override fun onDataChange(dataSnapshot: DataSnapshot) {
+</span><span class='line'>        val post = dataSnapshot.getValue&lt;Post&gt;()
+</span><span class='line'>        // update UI
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>    override fun onCancelled(error: DatabaseError) {
+</span><span class='line'>        Log.w(TAG, "loadPost:onCancelled", error.toException())
+</span><span class='line'>    }
+</span><span class='line'>}
+</span><span class='line'>postReference.addValueEventListener(postListener)</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This works fine — but it’s imperative and not easily composable with things like <code>StateFlow</code>, <code>LiveData</code>, or Jetpack Compose. Let’s fix that.</p>
+
+<h2>The Fix: Wrap It with callbackFlow</h2>
+
+<p>Kotlin’s <code>callbackFlow</code> is designed for exactly this kind of situation — where you need to bridge a listener-based API into a reactive stream.</p>
+
+<p>Here’s what it looks like for Firebase:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>fun Query.asFlow(): Flow&lt;DataSnapshot&gt; = callbackFlow {
+</span><span class='line'>    val listener = object : ValueEventListener {
+</span><span class='line'>        override fun onDataChange(snapshot: DataSnapshot) {
+</span><span class='line'>            trySend(snapshot).isSuccess // emit each snapshot into the Flow
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>        override fun onCancelled(error: DatabaseError) {
+</span><span class='line'>            close(error.toException()) // cancel the flow on error
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>    // Start listening for updates
+</span><span class='line'>    addValueEventListener(listener)
+</span><span class='line'>
+</span><span class='line'>    // Suspend until the flow is closed or cancelled, then clean up
+</span><span class='line'>    awaitClose { removeEventListener(listener) }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let’s break that down:</p>
+
+<ul>
+<li><code>callbackFlow { ... }</code>: Gives you a coroutine-safe way to emit values (<code>send</code> / <code>trySend</code>) from a callback-based API.</li>
+<li><code>trySend(snapshot)</code>: Emits a value into the flow. This is non-blocking and returns a <code>ChannelResult</code>, which we&rsquo;re ignoring here.</li>
+<li><code>close(error.toException())</code>: If the Firebase listener is cancelled, we close the flow with the exception. This cancels any active collectors.</li>
+<li><code>awaitClose { ... }</code>: Suspends the coroutine until the collector stops collecting (i.e., it’s cancelled or the flow completes), and is the right place to clean up listeners or resources.</li>
+</ul>
+
+
+<p>The result is a clean <code>Flow&lt;DataSnapshot&gt;</code> that behaves just like you’d want: it emits every time Firebase sends an update and automatically stops listening when the consumer stops collecting.</p>
+
+<h2>Consuming the Flow</h2>
+
+<p>You can now collect this from anywhere in your app. Here’s a quick example:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>lifecycleScope.launch {
+</span><span class='line'>    postReference.asFlow().collect { snapshot -&gt;
+</span><span class='line'>        val post = snapshot.getValue&lt;Post&gt;()
+</span><span class='line'>        // Update UI or state
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This could also be collected in a <code>ViewModel</code>, transformed with <code>map</code>, or turned into Compose <code>State</code>. But that’s outside the scope of this post — we just wanted to show the full round trip here.</p>
+
+<h2>A Note on <code>.snapshots</code></h2>
+
+<p>If you’re using the Firebase Realtime Database, you might have seen the (relatively new) <code>snapshots</code> extension, which does exactly this out of the box:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>postReference.snapshots.collect { snapshot -&gt; /* ... */ }</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So if you’re only dealing with Firebase, you might not need your own wrapper. But the <code>callbackFlow</code> approach is still incredibly useful for any API that doesn’t have a ready-made Flow extension.</p>
+
+<h2>Wrap-Up</h2>
+
+<p><code>callbackFlow</code> is a powerful tool for adapting listener-based or callback-heavy APIs into clean, composable Kotlin Flows. Once you wrap something like this, you can:</p>
+
+<ul>
+<li>Collect updates in your <code>ViewModel</code> or UI layer</li>
+<li>Combine it with other Flows</li>
+<li>Debounce, map, retry, or buffer updates</li>
+</ul>
+
+
+<p>Firebase was just the example here — but this trick works great for things like:</p>
+
+<ul>
+<li><code>SensorManager</code></li>
+<li><code>TextWatcher</code></li>
+<li><code>LocationManager</code></li>
+<li>WebSocket libraries</li>
+<li>Custom event systems</li>
+</ul>
+
+
+<p>Once you get used to wrapping listeners this way, it’s hard to go back.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[UI Testing Made Easy: The Robot Test Pattern on Android]]></title>
@@ -2864,202 +3221,6 @@ diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.Toolbar appc
 <p>Now go forth and test those inter-app component interactions!</p>
 
 <p>The sample code for this blog post can be found <a href="https://github.com/MichaelEvans/Espresso-Samples/tree/master/espresso-intents-sample">here</a>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Droidcon NYC 2015: @AnnotationProcessors("ByExample")]]></title>
-    <link href="http://michaelevans.org/blog/2015/09/09/droidcon-nyc-2015-at-annotationprocessors-byexample/"/>
-    <updated>2015-09-09T16:30:48-04:00</updated>
-    <id>http://michaelevans.org/blog/2015/09/09/droidcon-nyc-2015-at-annotationprocessors-byexample</id>
-    <content type="html"><![CDATA[<p>Here are slides and the video for my talk from Droidcon NYC 2015 on writing your own Annotation Processor:</p>
-
-<iframe width="640" height="510" src="http://www.youtube.com/embed/dBUAqPs0TB0 " frameborder="0" webkitAllowFullScreen mozallowfullscreen allowfullscreen></iframe>
-
-
-<p></p>
-
-<script async="true" class="speakerdeck-embed" data-id="95e696d902d845dcb5079e0691eb5f3f" data-ratio="1.77777777777778" src="//speakerdeck.com/assets/embed.js"> </script>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Using Espresso for Easy UI Testing]]></title>
-    <link href="http://michaelevans.org/blog/2015/08/03/using-espresso-for-easy-ui-testing/"/>
-    <updated>2015-08-03T22:16:49-04:00</updated>
-    <id>http://michaelevans.org/blog/2015/08/03/using-espresso-for-easy-ui-testing</id>
-    <content type="html"><![CDATA[<p>One thing that I notice when I talk to Android developers is that a lot of them don&rsquo;t put an emphasis on testing. They say that it&rsquo;s too hard to write them or that they are too hard to integrate and set up, or give a bunch of other reasons why they don&rsquo;t. But it&rsquo;s actually pretty simple to write <a href="https://code.google.com/p/android-test-kit/wiki/Espresso">Espresso</a> tests, and they really aren&rsquo;t that hard to integrate with your code base.</p>
-
-<!-- more -->
-
-
-<h2>Easy to write</h2>
-
-<p>Espresso tests are dead simple to write. They come in three parts.</p>
-
-<ol>
-<li>ViewMatchers &ndash; something to find the view to act upon/assert something about</li>
-<li>ViewActions &ndash; something to perform an action (type text, click a button)</li>
-<li>ViewAssertions &ndash; something to verify what you expect</li>
-</ol>
-
-
-<p>For example, the following test would type the name &ldquo;Steve&rdquo; into an EditText with the id <code>name_field</code>, click a Button with the id <code>greet_button</code> and then verify that the text &ldquo;Hello Steve!&rdquo; appears on the screen:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Test</span>
-</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">testSayHello</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">onView</span><span class="o">(</span><span class="n">withId</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">name_field</span><span class="o">)).</span><span class="na">perform</span><span class="o">(</span><span class="n">typeText</span><span class="o">(</span><span class="s">&quot;Steve&quot;</span><span class="o">));</span>
-</span><span class='line'>  <span class="n">onView</span><span class="o">(</span><span class="n">withId</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">greet_button</span><span class="o">)).</span><span class="na">perform</span><span class="o">(</span><span class="n">click</span><span class="o">());</span>
-</span><span class='line'>  <span class="n">onView</span><span class="o">(</span><span class="n">withText</span><span class="o">(</span><span class="s">&quot;Hello Steve!&quot;</span><span class="o">)).</span><span class="na">check</span><span class="o">(</span><span class="n">matches</span><span class="o">(</span><span class="n">isDisplayed</span><span class="o">()));</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Seems simple enough right? But what about when other threads are involved?</p>
-
-<h2>Integration</h2>
-
-<p>From the Espresso documentation:</p>
-
-<blockquote><p>The centerpiece of Espresso is its ability to seamlessly synchronize all test operations with the application under test. By default, Espresso waits for UI events in the current message queue to process and default AsyncTasks* to complete before it moves on to the next test operation. This should address the majority of application/test synchronization in your application.&#8221;</p></blockquote>
-
-
-<p>But if you&rsquo;re like me, you&rsquo;re not writing AsyncTasks to handle your background operations. My go-to tool for making HTTP requests (probably one of the most common uses of AsyncTask) is <a href="http://square.github.io/retrofit/">Retrofit</a>. So what can we do? Espresso has an API called <code>registerIdlingResource</code>, which allows you to synchronize your custom logic with Espresso.</p>
-
-<p>With this knowledge, one way you might approach this is to implement a mock version of your Retrofit interface, and then use something like this:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MockApiService</span> <span class="kd">implements</span> <span class="n">ApiService</span><span class="o">,</span> <span class="n">IdlingResource</span> <span class="o">{</span>
-</span><span class='line'>  
-</span><span class='line'>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">ApiService</span> <span class="n">api</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">AtomicInteger</span> <span class="n">counter</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">ResourceCallback</span><span class="o">&gt;</span> <span class="n">callbacks</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="nf">MockApiService</span><span class="o">(</span><span class="n">ApiService</span> <span class="n">api</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">api</span> <span class="o">=</span> <span class="n">api</span><span class="o">;</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">callbacks</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span> 
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">counter</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AtomicInteger</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@Override</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">Response</span> <span class="nf">doWork</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">counter</span><span class="o">.</span><span class="na">incrementAndGet</span><span class="o">();</span>
-</span><span class='line'>      <span class="k">return</span> <span class="nf">decrementAndNotify</span><span class="o">(</span><span class="n">api</span><span class="o">.</span><span class="na">doWork</span><span class="o">());</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@Override</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getName</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">getClass</span><span class="o">().</span><span class="na">getName</span><span class="o">();</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@Override</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isIdleNow</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">counter</span><span class="o">.</span><span class="na">get</span><span class="o">()</span> <span class="o">==</span> <span class="mi">0</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@Override</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">registerIdleTransitionCallback</span><span class="o">(</span><span class="n">ResourceCallback</span> <span class="n">resourceCallback</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">callbacks</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">resourceCallback</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">private</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">T</span> <span class="n">decrementAndNotify</span><span class="o">(</span><span class="n">T</span> <span class="n">data</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">counter</span><span class="o">.</span><span class="na">decrementAndGet</span><span class="o">();</span>
-</span><span class='line'>      <span class="n">notifyIdle</span><span class="o">();</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">data</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">private</span> <span class="kt">void</span> <span class="nf">notifyIdle</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">if</span> <span class="o">(</span><span class="n">counter</span><span class="o">.</span><span class="na">get</span><span class="o">()</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>          <span class="k">for</span> <span class="o">(</span><span class="n">ResourceCallback</span> <span class="n">cb</span> <span class="o">:</span> <span class="n">callbacks</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>              <span class="n">cb</span><span class="o">.</span><span class="na">onTransitionToIdle</span><span class="o">();</span>
-</span><span class='line'>          <span class="o">}</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This tells Espresso that your app is idle after the methods are called. But you should immediately see the problem here &ndash; you&rsquo;ll end up writing a TON of boilerplate. As you have more methods in your interface, and lot of repeated increment and decrement code&hellip;there must be a better way. (There is!)</p>
-
-<p>The &ldquo;trick&rdquo; lies right in the selling point in the Espresso documentation, &ldquo;Espresso waits for UI events&hellip; and default <em><strong>AsyncTasks</strong></em> to complete&rdquo;. If we could somehow execute our Retrofit requests on the AsyncTasks&#8217; ThreadPoolExecutor, we&rsquo;d get sychronization for free!</p>
-
-<p>Fortunately, Retrofit&rsquo;s <code>RestAdapter.Builder</code> class has just such a method!</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="k">new</span> <span class="n">RestAdapter</span><span class="o">.</span><span class="na">Builder</span><span class="o">()</span>
-</span><span class='line'>   <span class="o">.</span><span class="na">setExecutors</span><span class="o">(</span><span class="n">AsyncTask</span><span class="o">.</span><span class="na">THREAD_POOL_EXECUTOR</span><span class="o">,</span> <span class="k">new</span> <span class="n">MainThreadExecutor</span><span class="o">())</span>
-</span><span class='line'>   <span class="o">.</span><span class="na">build</span><span class="o">();</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>And it&rsquo;s that simple &ndash; Now you have no excuse not to write some Espresso tests!</p>
-
-<h4>More Resources</h4>
-
-<ul>
-<li><a href="https://code.google.com/p/android-test-kit/wiki/EspressoV2CheatSheet">The Espresso V2 Cheatsheet</a></li>
-<li><a href="http://blog.sqisland.com/2015/04/espresso-custom-idling-resource.html">Read more about writing custom idling resources</a></li>
-</ul>
-
-
-<p>Thanks to <a href="https://twitter.com/queencodemonkey">Huyen Tue Dao</a> for editing this post!</p>
 ]]></content>
   </entry>
   

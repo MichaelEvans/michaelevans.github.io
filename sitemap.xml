@@ -253,12 +253,24 @@
         <lastmod>2024-12-29T00:14:47-05:00</lastmod>
     </url>
     <url>
+        <loc>
+            http://michaelevans.org/blog/2025/03/22/turning-any-android-callback-into-a-flow-with-callbackflow/
+        </loc>
+        <lastmod>2025-07-12T23:23:04-04:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://michaelevans.org/blog/2025/07/11/smooth-theme-transitions-in-compose-with-animated-colorschemes/
+        </loc>
+        <lastmod>2025-07-13T00:32:37-04:00</lastmod>
+    </url>
+    <url>
         <loc>http://michaelevans.org/</loc>
-        <lastmod>2024-12-29T00:14:47-05:00</lastmod>
+        <lastmod>2025-07-13T00:32:37-04:00</lastmod>
     </url>
     <url>
         <loc>http://michaelevans.org/blog/archives/</loc>
-        <lastmod>2024-12-29T00:14:47-05:00</lastmod>
+        <lastmod>2025-07-13T00:32:37-04:00</lastmod>
     </url>
     <url>
         <loc>http://michaelevans.org/night-mode-enabler-privacy-policy/</loc>

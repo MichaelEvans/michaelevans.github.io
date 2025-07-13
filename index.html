@@ -10,7 +10,7 @@
   <meta name="author" content="Michael Evans">
 
   
-  <meta name="description" content="As Android applications grow in complexity, maintaining a robust testing strategy becomes increasingly challenging. The &ldquo;Robot Testing Pattern& &hellip;">
+  <meta name="description" content="If your Jetpack Compose app supports light and dark themes, you’ve probably noticed the default behavior: a sudden cut between color schemes when the &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -79,6 +79,104 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2025/07/11/smooth-theme-transitions-in-compose-with-animated-colorschemes/">Smooth Theme Transitions in Compose With Animated ColorSchemes</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2025-07-11T23:38:27-04:00" pubdate data-updated="true">Jul 11<span>th</span>, 2025</time>
+        
+         | <a href="/blog/2025/07/11/smooth-theme-transitions-in-compose-with-animated-colorschemes/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>If your Jetpack Compose app supports light and dark themes, you’ve probably noticed the default behavior: a sudden cut between color schemes when the system UI mode changes.</p>
+
+<p>I think we&rsquo;ve all seen theme changes that look like this:</p>
+
+<p><video width='270' height='600' preload='none' controls ><source src='/images/2025/07/01/instant.webm' type='video/webm; codecs=vp8, vorbis'>Your browser does not support the video tag.</video></p>
+
+<p>We can do better.</p>
+
+<p>By wrapping your theme setup with some animation, we can achieve <strong>smooth transitions between light and dark themes</strong> that feel much more polished — without rebuilding your entire app structure.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2025/07/11/smooth-theme-transitions-in-compose-with-animated-colorschemes/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2025/03/22/turning-any-android-callback-into-a-flow-with-callbackflow/">Turning Any Android Callback Into a Flow With callbackFlow</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2025-03-22T23:10:16-04:00" pubdate data-updated="true">Mar 22<span>nd</span>, 2025</time>
+        
+         | <a href="/blog/2025/03/22/turning-any-android-callback-into-a-flow-with-callbackflow/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>If you&rsquo;ve been working with Android for any amount of time, you&rsquo;ve probably run into APIs that expose their results using callbacks or listeners. Whether it&rsquo;s something like <code>LocationManager</code>, a custom SDK, or a third-party service like Firebase, you&rsquo;re often stuck adapting old-school async patterns into your modern reactive code.</p>
+
+<p>This approach is especially helpful in apps using Jetpack Compose, coroutines, or unidirectional data flow.</p>
+
+<p>Fortunately, Kotlin&rsquo;s <code>callbackFlow</code> makes this much easier. In this post, we&rsquo;ll show how to wrap a listener-based API using <code>callbackFlow</code>, so you can collect updates as a <code>Flow</code>. We&rsquo;ll use the Firebase Realtime Database as an example, but this pattern works for nearly anything.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2025/03/22/turning-any-android-callback-into-a-flow-with-callbackflow/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -1663,196 +1761,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2020/03/10/improving-app-debugging-with-flipper/">Improving App Debugging With Flipper</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2020-03-10T20:10:22-04:00" pubdate data-updated="true">Mar 10<span>th</span>, 2020</time>
-        
-         | <a href="/blog/2020/03/10/improving-app-debugging-with-flipper/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Some time last year, Facebook released a new mobile debugging tool, named <a href="https://fbflipper.com/">Flipper</a>. It&rsquo;s essentially the successor to the widely popular <a href="http://facebook.github.io/stetho/">Stetho</a>. Although after talking to many developers, it seems like this newer tool is relatively unknown.</p>
-
-<p>Like Stetho, Flipper has many built-in features &ndash; including a layout inspector, a database inspector and a network inspector. Unlike Stetho though, Flipper has a very extensible API which allows for tons of customization. Over the next few articles, we&rsquo;re going to take a look at Flipper and its plugins, the APIs it provides, and how we can leverage them to help us debug various parts of our app. This post will focus on getting set up with Flipper, as well as taking a look at two of its most useful default plugins.</p>
-
-<h2>Getting Started</h2>
-
-<p>Getting started with Flipper is really easy:</p>
-
-<ul>
-<li><a href="https://fbflipper.com/">Download the desktop client</a>,</li>
-<li>Add the dependencies in your build.gradle:</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>repositories {
-</span><span class='line'>  jcenter()
-</span><span class='line'>}
-</span><span class='line'>
-</span><span class='line'>dependencies {
-</span><span class='line'>  debugImplementation 'com.facebook.flipper:flipper:0.33.1'
-</span><span class='line'>  debugImplementation 'com.facebook.soloader:soloader:0.8.2'
-</span><span class='line'>
-</span><span class='line'>  releaseImplementation 'com.facebook.flipper:flipper-noop:0.33.1'
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>Initialize the Flipper client when your application starts:</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>class SampleApplication : Application() {
-</span><span class='line'>    override fun onCreate() {
-</span><span class='line'>        super.onCreate()
-</span><span class='line'>        SoLoader.init(this, false)
-</span><span class='line'>
-</span><span class='line'>        if (BuildConfig.DEBUG && FlipperUtils.shouldEnableFlipper(this)) {
-</span><span class='line'>            val client = AndroidFlipperClient.getInstance(this)
-</span><span class='line'>            client.addPlugin(InspectorFlipperPlugin(this, DescriptorMapping.withDefaults()))
-</span><span class='line'>            client.start()
-</span><span class='line'>        }
-</span><span class='line'>    }
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>And that&rsquo;s it! Opening the desktop client should show you an overview of your app with the Inspector plugin configured.</p>
-
-<h2>Inspector Plugin</h2>
-
-<p>The Inspector Plugin is similar to the one found in <a href="https://developer.android.com/studio/debug/layout-inspector">Android Studio 4.0</a>, but has a few neat features. I like it because it operates in real-time, and doesn&rsquo;t require any attaching to process in Studio every time you want to inspect a layout.</p>
-
-<p>Another thing you can do in the Layout Inspector that&rsquo;s really cool is actually <em>edit</em> properties! Pretty mind blowing to make tweaks in the inspector and watch the views change in realtime. It&rsquo;s really handy for experimenting with changing padding, and text colors. It doesn&rsquo;t actually edit any of your xml files, but this allows you to iterate quickly to make sure everything looks right.</p>
-
-<p>Let&rsquo;s find a view we want to update (like our repository name):</p>
-
-<p><img class="center" src="/images/2020/03/10/inspecting.png" width="800" height="800"></p>
-
-<p><img class="center" src="/images/2020/03/10/selecting.png" width="800" height="800"></p>
-
-<p>We can click on the the color swatch to open a color picker:</p>
-
-<p><img class="center" src="/images/2020/03/10/editing.png" width="800" height="800"></p>
-
-<p>And now when we look over at our device:</p>
-
-<p><img class="center" src="/images/2020/03/10/previewing.png" width="800" height="800"></p>
-
-<p>Neat!</p>
-
-<h2>Database Browser / Plugin</h2>
-
-<p>Something I&rsquo;ve wanted for a long time was a way to view the contents of my database from Android Studio. Right now, if you want to visualize your data or try out some queries &ndash; the best solution is to pull the sqlite database file off your emulator/device and run sqlite locally. But with Flipper, there&rsquo;s a better way!</p>
-
-<p>All we need to do is configure the database plugin, and our tables should show up right away:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>client.addPlugin(DatabasesFlipperPlugin(context))</span></code></pre></td></tr></table></div></figure>
-
-
-<p><img class="center" src="/images/2020/03/10/database_browser.png" width="800" height="800"></p>
-
-<p>Now we can easily inspect the contents of our tables, and even run queries on the live running application!</p>
-
-<p><img class="center" src="/images/2020/03/10/writing_queries.png" width="800" height="800"></p>
-
-<p>I&rsquo;ve <a href="https://github.com/MichaelEvans/architecture-components-samples/commit/274ea5702cb5f10ea13012ce6d9fc6b6896f471e">pushed a branch</a> of the Github Browser Architecture Component sample with these changes to GitHub if you&rsquo;d like to try it out. Next time we&rsquo;ll take advantage of Flipper&rsquo;s extensibility to create our own plugins to make debugging our app easier!</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2020/02/10/dropping-columns-like-its-hot/">Dropping Columns Like It&#8217;s Hot</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2020-02-10T20:03:03-05:00" pubdate data-updated="true">Feb 10<span>th</span>, 2020</time>
-        
-         | <a href="/blog/2020/02/10/dropping-columns-like-its-hot/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Recently, I was doing some code cleanup and noticed that there were some data in the database that was no longer needed. I think most developers clean up their codebase of deprecated patterns and unused code, but I personally have not done a good job of ensuring that the same cleanup happens for unused columns in my databases.</p>
-
-<p>Dropping tables that are no longer used is pretty easy (especially if you can just use something like Room&rsquo;s <a href="https://developer.android.com/training/data-storage/room/migrating-db-versions">Migrations</a>) but when trying to remove unused columns, I ran into an unexpected problem. I thought to myself, it’s pretty easy to add or rename a column, why would dropping one be any harder? The existing database library I was using already had a convenient &ldquo;drop column&rdquo; method, so I simply called that and tried to run the migration. During the process, I ended up with a <code>ForeignKeyConstraintException</code>! I quickly scanned the schema to see what could have caused that, and didn&rsquo;t see anything obvious. The table I was trying to modify didn&rsquo;t have any foreign keys itself, and the column I was dropping was not a foreign key. Curious to understand what was happening, I started to dig into what this method call was doing.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2020/02/10/dropping-columns-like-its-hot/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -1868,6 +1776,14 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2025/07/11/smooth-theme-transitions-in-compose-with-animated-colorschemes/">Smooth Theme Transitions in Compose with Animated ColorSchemes</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2025/03/22/turning-any-android-callback-into-a-flow-with-callbackflow/">Turning Any Android Callback into a Flow with callbackFlow</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2024/12/14/ui-testing-made-easy-the-robot-test-pattern-on-android/">UI Testing Made Easy: The Robot Test Pattern on Android</a>
       </li>
     
@@ -1877,14 +1793,6 @@
     
       <li class="post">
         <a href="/blog/2024/09/07/mastering-ktlint-a-guide-to-crafting-your-own-rules/">Mastering ktlint: A Guide to Crafting Your Own Rules</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2024/07/29/stop-repeating-yourself-2-using-test-fixtures-with-agp/">Stop Repeating Yourself 2: Using Test Fixtures with AGP</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2024/06/27/understanding-referrals-using-google-play/">Understanding Referrals using Google Play</a>
       </li>
     
   </ul>
@@ -1938,7 +1846,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2024 - Michael Evans -
+  Copyright &copy; 2025 - Michael Evans -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

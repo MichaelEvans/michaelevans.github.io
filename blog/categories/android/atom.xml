@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Android | Michael Evans]]></title>
   <link href="http://michaelevans.org/blog/categories/android/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2024-12-29T00:16:42-05:00</updated>
+  <updated>2025-07-13T00:35:52-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -12,6 +12,303 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Smooth Theme Transitions in Compose with Animated ColorSchemes]]></title>
+    <link href="http://michaelevans.org/blog/2025/07/11/smooth-theme-transitions-in-compose-with-animated-colorschemes/"/>
+    <updated>2025-07-11T23:38:27-04:00</updated>
+    <id>http://michaelevans.org/blog/2025/07/11/smooth-theme-transitions-in-compose-with-animated-colorschemes</id>
+    <content type="html"><![CDATA[<p>If your Jetpack Compose app supports light and dark themes, you’ve probably noticed the default behavior: a sudden cut between color schemes when the system UI mode changes.</p>
+
+<p>I think we&rsquo;ve all seen theme changes that look like this:</p>
+
+<p><video width='270' height='600' preload='none' controls ><source src='/images/2025/07/01/instant.webm' type='video/webm; codecs=vp8, vorbis'>Your browser does not support the video tag.</video></p>
+
+<p>We can do better.</p>
+
+<p>By wrapping your theme setup with some animation, we can achieve <strong>smooth transitions between light and dark themes</strong> that feel much more polished — without rebuilding your entire app structure.</p>
+
+<!-- more -->
+
+
+<p></p>
+
+<h2>The Idea: Animate the ColorScheme</h2>
+
+<p>Jetpack Compose’s <code>MaterialTheme</code> accepts a <code>ColorScheme</code>. If we gradually animate the colors inside that scheme when the system toggles between dark and light, we can fade the colors smoothly across the entire app.</p>
+
+<p>Here’s a simplified example:</p>
+
+<p>```
+@Composable
+fun AnimatedTheme(</p>
+
+<pre><code>darkTheme: Boolean = isSystemInDarkTheme(),
+content: @Composable () -&gt; Unit
+</code></pre>
+
+<p>) {</p>
+
+<pre><code>val targetScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+
+val animatedScheme = targetScheme.copy(
+    primary = animateColorAsState(targetScheme.primary).value,
+    background = animateColorAsState(targetScheme.background).value,
+    surface = animateColorAsState(targetScheme.surface).value,
+    onPrimary = animateColorAsState(targetScheme.onPrimary).value,
+    // Add more swatches as needed...
+)
+
+MaterialTheme(
+    colorScheme = animatedScheme,
+    typography = Typography,
+    shapes = Shapes,
+    content = content
+)
+</code></pre>
+
+<p>}
+```</p>
+
+<p>You can expand this to include all 20+ color swatches if you want — but we’ll show a better way shortly.</p>
+
+<hr />
+
+<h2>The Problem: Too Many Animations</h2>
+
+<p>Manually animating every color swatch with <code>animateColorAsState</code> works, but:</p>
+
+<ul>
+<li>It’s <strong>verbose</strong></li>
+<li>It runs <strong>a lot of recompositions</strong> (even for unused swatches)</li>
+<li>It can be <strong>hard to keep up</strong> if <code>ColorScheme</code> changes</li>
+</ul>
+
+
+<hr />
+
+<h2>A Better Approach: Animating with updateTransition</h2>
+
+<p>A cleaner solution is to animate all properties as part of a single <code>Transition</code>. That way, Compose shares the animation clock and easing, and you&rsquo;re not scattering a dozen independent animation calls.</p>
+
+<p>```
+private fun defaultColorTransitionSpec(): FiniteAnimationSpec<Color> =</p>
+
+<pre><code>tween(durationMillis = 500, easing = LinearOutSlowInEasing)
+</code></pre>
+
+<p>@Composable
+fun AnimatedTheme(</p>
+
+<pre><code>darkTheme: Boolean = isSystemInDarkTheme(),
+content: @Composable () -&gt; Unit
+</code></pre>
+
+<p>) {</p>
+
+<pre><code>val targetScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+val transition = updateTransition(targetScheme, label = "themeTransition")
+
+val primary by transition.animateColor(
+    label = "primary",
+    transitionSpec = { defaultColorTransitionSpec() }) { it.primary }
+val background by transition.animateColor(
+    label = "background",
+    transitionSpec = { defaultColorTransitionSpec() }) { it.background }
+val surface by transition.animateColor(
+    label = "surface",
+    transitionSpec = { defaultColorTransitionSpec() }) { it.surface }
+val onPrimary by transition.animateColor(
+    label = "onPrimary",
+    transitionSpec = { defaultColorTransitionSpec() }) { it.onPrimary }
+
+val animatedScheme = targetScheme.copy(
+    primary = primary,
+    background = background,
+    surface = surface,
+    onPrimary = onPrimary
+)
+MaterialTheme(colorScheme = animatedScheme, content = content)
+</code></pre>
+
+<p>}
+```</p>
+
+<p>This version:</p>
+
+<ul>
+<li>Uses a single <code>Transition</code> to group related animations</li>
+<li>Shares the same easing/duration across all swatches</li>
+<li>Is easier to extend or modify incrementally</li>
+</ul>
+
+
+<p>After we add our animations, it will look more like this:</p>
+
+<p><video width='270' height='600' preload='none' controls ><source src='/images/2025/07/01/animated.webm' type='video/webm; codecs=vp8, vorbis'>Your browser does not support the video tag.</video></p>
+
+<hr />
+
+<h2>Final Notes</h2>
+
+<ul>
+<li>If you want to animate <strong>all</strong> color properties, you&rsquo;ll still need to call <code>animateColor</code> for each one — but this pattern scales better than copy-pasting 25 <code>animateColorAsState</code> calls.</li>
+<li>For most apps, animating just a <strong>handful</strong> of swatches (<code>primary</code>, <code>background</code>, <code>surface</code>, <code>onPrimary</code>, <code>error</code>) gives most of the perceived polish.</li>
+<li>Avoid using reflection or deep copying here — it’s better to be explicit and in control of what’s animated.</li>
+</ul>
+
+
+<hr />
+
+<h2>Wrap-Up</h2>
+
+<p>This technique brings a much smoother feel to your app, especially if your users frequently switch between light and dark mode (or you support a manual toggle).</p>
+
+<p>(Hopefully the Compose team eventually provides a helper for this boilerplate.)</p>
+
+<p>Happy theming!</p>
+
+<h2>Sample Code</h2>
+
+<p>Want to try it out yourself? I’ve published a small sample project on GitHub that demonstrates both animated and non-animated theme switching:</p>
+
+<p><a href="https://github.com/MichaelEvans/AnimatedThemeExample">View the sample project on GitHub</a></p>
+
+<p>It includes the exact code from this post and the toggle UI shown in the GIFs.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Turning Any Android Callback into a Flow with callbackFlow]]></title>
+    <link href="http://michaelevans.org/blog/2025/03/22/turning-any-android-callback-into-a-flow-with-callbackflow/"/>
+    <updated>2025-03-22T23:10:16-04:00</updated>
+    <id>http://michaelevans.org/blog/2025/03/22/turning-any-android-callback-into-a-flow-with-callbackflow</id>
+    <content type="html"><![CDATA[<p>If you&rsquo;ve been working with Android for any amount of time, you&rsquo;ve probably run into APIs that expose their results using callbacks or listeners. Whether it&rsquo;s something like <code>LocationManager</code>, a custom SDK, or a third-party service like Firebase, you&rsquo;re often stuck adapting old-school async patterns into your modern reactive code.</p>
+
+<p>This approach is especially helpful in apps using Jetpack Compose, coroutines, or unidirectional data flow.</p>
+
+<p>Fortunately, Kotlin&rsquo;s <code>callbackFlow</code> makes this much easier. In this post, we&rsquo;ll show how to wrap a listener-based API using <code>callbackFlow</code>, so you can collect updates as a <code>Flow</code>. We&rsquo;ll use the Firebase Realtime Database as an example, but this pattern works for nearly anything.</p>
+
+<!-- more -->
+
+
+<h2>The Problem: Listeners Aren’t Reactive</h2>
+
+<p>Here’s the classic way of listening to changes in the Firebase Realtime Database:</p>
+
+<p>```
+val postListener = object : ValueEventListener {</p>
+
+<pre><code>override fun onDataChange(dataSnapshot: DataSnapshot) {
+    val post = dataSnapshot.getValue&lt;Post&gt;()
+    // update UI
+}
+
+override fun onCancelled(error: DatabaseError) {
+    Log.w(TAG, "loadPost:onCancelled", error.toException())
+}
+</code></pre>
+
+<p>}
+postReference.addValueEventListener(postListener)
+```</p>
+
+<p>This works fine — but it’s imperative and not easily composable with things like <code>StateFlow</code>, <code>LiveData</code>, or Jetpack Compose. Let’s fix that.</p>
+
+<h2>The Fix: Wrap It with callbackFlow</h2>
+
+<p>Kotlin’s <code>callbackFlow</code> is designed for exactly this kind of situation — where you need to bridge a listener-based API into a reactive stream.</p>
+
+<p>Here’s what it looks like for Firebase:</p>
+
+<p>```
+fun Query.asFlow(): Flow<DataSnapshot> = callbackFlow {</p>
+
+<pre><code>val listener = object : ValueEventListener {
+    override fun onDataChange(snapshot: DataSnapshot) {
+        trySend(snapshot).isSuccess // emit each snapshot into the Flow
+    }
+
+    override fun onCancelled(error: DatabaseError) {
+        close(error.toException()) // cancel the flow on error
+    }
+}
+
+// Start listening for updates
+addValueEventListener(listener)
+
+// Suspend until the flow is closed or cancelled, then clean up
+awaitClose { removeEventListener(listener) }
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Let’s break that down:</p>
+
+<ul>
+<li><code>callbackFlow { ... }</code>: Gives you a coroutine-safe way to emit values (<code>send</code> / <code>trySend</code>) from a callback-based API.</li>
+<li><code>trySend(snapshot)</code>: Emits a value into the flow. This is non-blocking and returns a <code>ChannelResult</code>, which we&rsquo;re ignoring here.</li>
+<li><code>close(error.toException())</code>: If the Firebase listener is cancelled, we close the flow with the exception. This cancels any active collectors.</li>
+<li><code>awaitClose { ... }</code>: Suspends the coroutine until the collector stops collecting (i.e., it’s cancelled or the flow completes), and is the right place to clean up listeners or resources.</li>
+</ul>
+
+
+<p>The result is a clean <code>Flow&lt;DataSnapshot&gt;</code> that behaves just like you’d want: it emits every time Firebase sends an update and automatically stops listening when the consumer stops collecting.</p>
+
+<h2>Consuming the Flow</h2>
+
+<p>You can now collect this from anywhere in your app. Here’s a quick example:</p>
+
+<p>```
+lifecycleScope.launch {</p>
+
+<pre><code>postReference.asFlow().collect { snapshot -&gt;
+    val post = snapshot.getValue&lt;Post&gt;()
+    // Update UI or state
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<p>This could also be collected in a <code>ViewModel</code>, transformed with <code>map</code>, or turned into Compose <code>State</code>. But that’s outside the scope of this post — we just wanted to show the full round trip here.</p>
+
+<h2>A Note on <code>.snapshots</code></h2>
+
+<p>If you’re using the Firebase Realtime Database, you might have seen the (relatively new) <code>snapshots</code> extension, which does exactly this out of the box:</p>
+
+<p><code>
+postReference.snapshots.collect { snapshot -&gt; /* ... */ }
+</code></p>
+
+<p>So if you’re only dealing with Firebase, you might not need your own wrapper. But the <code>callbackFlow</code> approach is still incredibly useful for any API that doesn’t have a ready-made Flow extension.</p>
+
+<h2>Wrap-Up</h2>
+
+<p><code>callbackFlow</code> is a powerful tool for adapting listener-based or callback-heavy APIs into clean, composable Kotlin Flows. Once you wrap something like this, you can:</p>
+
+<ul>
+<li>Collect updates in your <code>ViewModel</code> or UI layer</li>
+<li>Combine it with other Flows</li>
+<li>Debounce, map, retry, or buffer updates</li>
+</ul>
+
+
+<p>Firebase was just the example here — but this trick works great for things like:</p>
+
+<ul>
+<li><code>SensorManager</code></li>
+<li><code>TextWatcher</code></li>
+<li><code>LocationManager</code></li>
+<li>WebSocket libraries</li>
+<li>Custom event systems</li>
+</ul>
+
+
+<p>Once you get used to wrapping listeners this way, it’s hard to go back.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Understanding Referrals using Google Play]]></title>
@@ -472,149 +769,6 @@ export {plugin, Component};
 <p>As this post demonstrates &ndash; the Flipper SDK is pretty flexible and allows you to build all sorts of custom development tools to help ease everday tasks. Come up with an idea for a cool plugin? Send me a <a href="https://twitter.com/m_evans10">tweet</a>, I&rsquo;d love to hear about it!</p>
 
 <p>(Thanks to <a href="https://twitter.com/zarahjutz">Zarah</a> for the editing and feedback for this post!)</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Android Developer Challenge]]></title>
-    <link href="http://michaelevans.org/blog/2020/06/21/android-developer-challenge/"/>
-    <updated>2020-06-21T23:41:17-04:00</updated>
-    <id>http://michaelevans.org/blog/2020/06/21/android-developer-challenge</id>
-    <content type="html"><![CDATA[<p>Late last year, Google announced the <a href="https://developer.android.com/dev-challenge">Android Developer Challenge</a>, a contest for Android developers to show off new experiences made possible by on-device Machine Learning. Since then, tons of developers have submitted their ideas and been hard at work developing their apps. Today, the <a href="https://android-developers.googleblog.com/2020/06/dev-challenge-winners.html">winners of the challenge have been announced</a>!</p>
-
-<!-- more -->
-
-
-<p>I was lucky to get access to a cool trial box that Google sent out, complete with little goodies to try out some of the apps from the winners! Here are some obligatory unboxing photos:</p>
-
-<p><img class="center" src="/images/2020/06/21/box_a.jpg" width="800" height="800"></p>
-
-<p><img class="center" src="/images/2020/06/21/box_b.jpg" width="800" height="800"></p>
-
-<p><img class="center" src="/images/2020/06/21/box_c.jpg" width="800" height="800"></p>
-
-<p>After checking out the cool loot, I downloaded the winning apps to check them out, and wanted to show off some of my favorites.</p>
-
-<h2>Trashly</h2>
-
-<p>The first app I tried was <a href="https://play.google.com/store/apps/details?id=com.epam.mobilelabs.trashly">Trashly</a>. The goal of this app is to make recycling easier by providing up-to-date information about where and how to recycle your items. You can type in any item that you&rsquo;re interested in recycling, but what&rsquo;s cooler (and relevant to the challenge) is that you can use the camera to detect an object and find out 1) if the item is recyclable, and 2) where you can go to recycle it. I tried this with a can of soda, which was instantly recognized:</p>
-
-<p><img class="center" src="/images/2020/06/21/trashly_capture.png" width="800" height="800"></p>
-
-<p><img class="center" src="/images/2020/06/21/trashly_info.png" width="800" height="800"></p>
-
-<p>And was given a map of nearby places that I could take my can to recycle. Very cool and useful!</p>
-
-<p><img class="center" src="/images/2020/06/21/trashly_map.png" width="800" height="800"></p>
-
-<h2>Leepi</h2>
-
-<p>The next app that I tried was <a href="https://play.google.com/store/apps/details?id=com.mangoai.leepi">Leepi</a>. It&rsquo;s a fun, educational app to help users learn American Sign Language. I personally had never learned Sign Language, so this was a really cool way to start! It uses the camera and on-device machine learning to interpret the user&rsquo;s hand positions to verify that they are doing the hand positions and gestures correctly.</p>
-
-<p><img class="center" src="/images/2020/06/21/leepi_a.png" width="800" height="800"></p>
-
-<p><img class="center" src="/images/2020/06/21/leepi_capture.png" width="800" height="800"></p>
-
-<h2>Path Finder</h2>
-
-<p>The last app I wanted to talk about was called <a href="https://play.google.com/store/apps/details?id=com.br.ml.brpathfinder">Path Finder</a>. The gist of this app is to use the camera and machine learning to build a heatmap of obstacles that might be problematic for visually impaired people in public environments. I tried the app out on the streets of New York City and have some screenshots of the results below. I am not sure how useful this would be in practice, but it certainly looks interesting. I would be curious to hear feedback from someone who is visually impaired to hear their thoughts on the presentation format.</p>
-
-<p><img class="center" src="/images/2020/06/21/pathfinder.png" width="800" height="800"></p>
-
-<p>If you&rsquo;re interested in seeing the very cool and interesting things you can do with on-device machine learning, I definitely encourage you to check out these and the rest of the winning apps. And if you&rsquo;re an author of one of these applications, congratulations on a job well done!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Improving App Debugging with Flipper]]></title>
-    <link href="http://michaelevans.org/blog/2020/03/10/improving-app-debugging-with-flipper/"/>
-    <updated>2020-03-10T20:10:22-04:00</updated>
-    <id>http://michaelevans.org/blog/2020/03/10/improving-app-debugging-with-flipper</id>
-    <content type="html"><![CDATA[<p>Some time last year, Facebook released a new mobile debugging tool, named <a href="https://fbflipper.com/">Flipper</a>. It&rsquo;s essentially the successor to the widely popular <a href="http://facebook.github.io/stetho/">Stetho</a>. Although after talking to many developers, it seems like this newer tool is relatively unknown.</p>
-
-<p>Like Stetho, Flipper has many built-in features &ndash; including a layout inspector, a database inspector and a network inspector. Unlike Stetho though, Flipper has a very extensible API which allows for tons of customization. Over the next few articles, we&rsquo;re going to take a look at Flipper and its plugins, the APIs it provides, and how we can leverage them to help us debug various parts of our app. This post will focus on getting set up with Flipper, as well as taking a look at two of its most useful default plugins.</p>
-
-<h2>Getting Started</h2>
-
-<p>Getting started with Flipper is really easy:</p>
-
-<ul>
-<li><a href="https://fbflipper.com/">Download the desktop client</a>,</li>
-<li>Add the dependencies in your build.gradle:
-```
-repositories {
-jcenter()
-}</li>
-</ul>
-
-
-<p>dependencies {
-  debugImplementation &lsquo;com.facebook.flipper:flipper:0.33.1&rsquo;
-  debugImplementation &lsquo;com.facebook.soloader:soloader:0.8.2&rsquo;</p>
-
-<p>  releaseImplementation &lsquo;com.facebook.flipper:flipper-noop:0.33.1&rsquo;
-}
-<code>
-- Initialize the Flipper client when your application starts:
-</code>
-class SampleApplication : Application() {</p>
-
-<pre><code>override fun onCreate() {
-    super.onCreate()
-    SoLoader.init(this, false)
-
-    if (BuildConfig.DEBUG &amp;&amp; FlipperUtils.shouldEnableFlipper(this)) {
-        val client = AndroidFlipperClient.getInstance(this)
-        client.addPlugin(InspectorFlipperPlugin(this, DescriptorMapping.withDefaults()))
-        client.start()
-    }
-}
-</code></pre>
-
-<p>}
-```</p>
-
-<p>And that&rsquo;s it! Opening the desktop client should show you an overview of your app with the Inspector plugin configured.</p>
-
-<h2>Inspector Plugin</h2>
-
-<p>The Inspector Plugin is similar to the one found in <a href="https://developer.android.com/studio/debug/layout-inspector">Android Studio 4.0</a>, but has a few neat features. I like it because it operates in real-time, and doesn&rsquo;t require any attaching to process in Studio every time you want to inspect a layout.</p>
-
-<p>Another thing you can do in the Layout Inspector that&rsquo;s really cool is actually <em>edit</em> properties! Pretty mind blowing to make tweaks in the inspector and watch the views change in realtime. It&rsquo;s really handy for experimenting with changing padding, and text colors. It doesn&rsquo;t actually edit any of your xml files, but this allows you to iterate quickly to make sure everything looks right.</p>
-
-<p>Let&rsquo;s find a view we want to update (like our repository name):</p>
-
-<p><img class="center" src="/images/2020/03/10/inspecting.png" width="800" height="800"></p>
-
-<p><img class="center" src="/images/2020/03/10/selecting.png" width="800" height="800"></p>
-
-<p>We can click on the the color swatch to open a color picker:</p>
-
-<p><img class="center" src="/images/2020/03/10/editing.png" width="800" height="800"></p>
-
-<p>And now when we look over at our device:</p>
-
-<p><img class="center" src="/images/2020/03/10/previewing.png" width="800" height="800"></p>
-
-<p>Neat!</p>
-
-<h2>Database Browser / Plugin</h2>
-
-<p>Something I&rsquo;ve wanted for a long time was a way to view the contents of my database from Android Studio. Right now, if you want to visualize your data or try out some queries &ndash; the best solution is to pull the sqlite database file off your emulator/device and run sqlite locally. But with Flipper, there&rsquo;s a better way!</p>
-
-<p>All we need to do is configure the database plugin, and our tables should show up right away:</p>
-
-<p><code>
-client.addPlugin(DatabasesFlipperPlugin(context))
-</code></p>
-
-<p><img class="center" src="/images/2020/03/10/database_browser.png" width="800" height="800"></p>
-
-<p>Now we can easily inspect the contents of our tables, and even run queries on the live running application!</p>
-
-<p><img class="center" src="/images/2020/03/10/writing_queries.png" width="800" height="800"></p>
-
-<p>I&rsquo;ve <a href="https://github.com/MichaelEvans/architecture-components-samples/commit/274ea5702cb5f10ea13012ce6d9fc6b6896f471e">pushed a branch</a> of the Github Browser Architecture Component sample with these changes to GitHub if you&rsquo;d like to try it out. Next time we&rsquo;ll take advantage of Flipper&rsquo;s extensibility to create our own plugins to make debugging our app easier!</p>
 ]]></content>
   </entry>
   

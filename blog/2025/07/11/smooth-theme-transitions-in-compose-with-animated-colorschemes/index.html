@@ -1,0 +1,508 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="msvalidate.01" content="275BF9CDA457668389C1F9916C380DD0" />
+  <title>Smooth Theme Transitions in Compose with Animated ColorSchemes - Michael Evans</title>
+  <meta name="author" content="Michael Evans">
+
+  
+  <meta name="description" content="Learn how to animate between light and dark themes in Jetpack Compose using `animateColorAsState` and `updateTransition` for smoother UI transitions.">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://michaelevans.org/blog/2025/07/11/smooth-theme-transitions-in-compose-with-animated-colorschemes/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Michael Evans" type="application/atom+xml">
+  <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-28589266-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Michael Evans</a></h1>
+  
+    <h2>A bunch of technobabble.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:michaelevans.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Smooth Theme Transitions in Compose With Animated ColorSchemes</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2025-07-11T23:38:27-04:00" pubdate data-updated="true">Jul 11<span>th</span>, 2025</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>If your Jetpack Compose app supports light and dark themes, you’ve probably noticed the default behavior: a sudden cut between color schemes when the system UI mode changes.</p>
+
+<p>I think we&rsquo;ve all seen theme changes that look like this:</p>
+
+<p><video width='270' height='600' preload='none' controls ><source src='/images/2025/07/01/instant.webm' type='video/webm; codecs=vp8, vorbis'>Your browser does not support the video tag.</video></p>
+
+<p>We can do better.</p>
+
+<p>By wrapping your theme setup with some animation, we can achieve <strong>smooth transitions between light and dark themes</strong> that feel much more polished — without rebuilding your entire app structure.</p>
+
+<!-- more -->
+
+
+<p></p>
+
+<h2>The Idea: Animate the ColorScheme</h2>
+
+<p>Jetpack Compose’s <code>MaterialTheme</code> accepts a <code>ColorScheme</code>. If we gradually animate the colors inside that scheme when the system toggles between dark and light, we can fade the colors smoothly across the entire app.</p>
+
+<p>Here’s a simplified example:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>@Composable
+</span><span class='line'>fun AnimatedTheme(
+</span><span class='line'>    darkTheme: Boolean = isSystemInDarkTheme(),
+</span><span class='line'>    content: @Composable () -&gt; Unit
+</span><span class='line'>) {
+</span><span class='line'>    val targetScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+</span><span class='line'>
+</span><span class='line'>    val animatedScheme = targetScheme.copy(
+</span><span class='line'>        primary = animateColorAsState(targetScheme.primary).value,
+</span><span class='line'>        background = animateColorAsState(targetScheme.background).value,
+</span><span class='line'>        surface = animateColorAsState(targetScheme.surface).value,
+</span><span class='line'>        onPrimary = animateColorAsState(targetScheme.onPrimary).value,
+</span><span class='line'>        // Add more swatches as needed...
+</span><span class='line'>    )
+</span><span class='line'>
+</span><span class='line'>    MaterialTheme(
+</span><span class='line'>        colorScheme = animatedScheme,
+</span><span class='line'>        typography = Typography,
+</span><span class='line'>        shapes = Shapes,
+</span><span class='line'>        content = content
+</span><span class='line'>    )
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can expand this to include all 20+ color swatches if you want — but we’ll show a better way shortly.</p>
+
+<hr />
+
+<h2>The Problem: Too Many Animations</h2>
+
+<p>Manually animating every color swatch with <code>animateColorAsState</code> works, but:</p>
+
+<ul>
+<li>It’s <strong>verbose</strong></li>
+<li>It runs <strong>a lot of recompositions</strong> (even for unused swatches)</li>
+<li>It can be <strong>hard to keep up</strong> if <code>ColorScheme</code> changes</li>
+</ul>
+
+
+<hr />
+
+<h2>A Better Approach: Animating with updateTransition</h2>
+
+<p>A cleaner solution is to animate all properties as part of a single <code>Transition</code>. That way, Compose shares the animation clock and easing, and you&rsquo;re not scattering a dozen independent animation calls.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>private fun defaultColorTransitionSpec(): FiniteAnimationSpec&lt;Color&gt; =
+</span><span class='line'>    tween(durationMillis = 500, easing = LinearOutSlowInEasing)
+</span><span class='line'>
+</span><span class='line'>@Composable
+</span><span class='line'>fun AnimatedTheme(
+</span><span class='line'>    darkTheme: Boolean = isSystemInDarkTheme(),
+</span><span class='line'>    content: @Composable () -&gt; Unit
+</span><span class='line'>) {
+</span><span class='line'>    val targetScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+</span><span class='line'>    val transition = updateTransition(targetScheme, label = "themeTransition")
+</span><span class='line'>
+</span><span class='line'>    val primary by transition.animateColor(
+</span><span class='line'>        label = "primary",
+</span><span class='line'>        transitionSpec = { defaultColorTransitionSpec() }) { it.primary }
+</span><span class='line'>    val background by transition.animateColor(
+</span><span class='line'>        label = "background",
+</span><span class='line'>        transitionSpec = { defaultColorTransitionSpec() }) { it.background }
+</span><span class='line'>    val surface by transition.animateColor(
+</span><span class='line'>        label = "surface",
+</span><span class='line'>        transitionSpec = { defaultColorTransitionSpec() }) { it.surface }
+</span><span class='line'>    val onPrimary by transition.animateColor(
+</span><span class='line'>        label = "onPrimary",
+</span><span class='line'>        transitionSpec = { defaultColorTransitionSpec() }) { it.onPrimary }
+</span><span class='line'>
+</span><span class='line'>    val animatedScheme = targetScheme.copy(
+</span><span class='line'>        primary = primary,
+</span><span class='line'>        background = background,
+</span><span class='line'>        surface = surface,
+</span><span class='line'>        onPrimary = onPrimary
+</span><span class='line'>    )
+</span><span class='line'>    MaterialTheme(colorScheme = animatedScheme, content = content)
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This version:</p>
+
+<ul>
+<li>Uses a single <code>Transition</code> to group related animations</li>
+<li>Shares the same easing/duration across all swatches</li>
+<li>Is easier to extend or modify incrementally</li>
+</ul>
+
+
+<p>After we add our animations, it will look more like this:</p>
+
+<p><video width='270' height='600' preload='none' controls ><source src='/images/2025/07/01/animated.webm' type='video/webm; codecs=vp8, vorbis'>Your browser does not support the video tag.</video></p>
+
+<hr />
+
+<h2>Final Notes</h2>
+
+<ul>
+<li>If you want to animate <strong>all</strong> color properties, you&rsquo;ll still need to call <code>animateColor</code> for each one — but this pattern scales better than copy-pasting 25 <code>animateColorAsState</code> calls.</li>
+<li>For most apps, animating just a <strong>handful</strong> of swatches (<code>primary</code>, <code>background</code>, <code>surface</code>, <code>onPrimary</code>, <code>error</code>) gives most of the perceived polish.</li>
+<li>Avoid using reflection or deep copying here — it’s better to be explicit and in control of what’s animated.</li>
+</ul>
+
+
+<hr />
+
+<h2>Wrap-Up</h2>
+
+<p>This technique brings a much smoother feel to your app, especially if your users frequently switch between light and dark mode (or you support a manual toggle).</p>
+
+<p>(Hopefully the Compose team eventually provides a helper for this boilerplate.)</p>
+
+<p>Happy theming!</p>
+
+<h2>Sample Code</h2>
+
+<p>Want to try it out yourself? I’ve published a small sample project on GitHub that demonstrates both animated and non-animated theme switching:</p>
+
+<p><a href="https://github.com/MichaelEvans/AnimatedThemeExample">View the sample project on GitHub</a></p>
+
+<p>It includes the exact code from this post and the toggle UI shown in the GIFs.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Michael Evans</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2025-07-11T23:38:27-04:00" pubdate data-updated="true">Jul 11<span>th</span>, 2025</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/compose/'>Compose</a>, <a class='category' href='/blog/categories/kotlin/'>Kotlin</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://michaelevans.org/blog/2025/07/11/smooth-theme-transitions-in-compose-with-animated-colorschemes/" data-via="m_evans10" data-counturl="http://michaelevans.org/blog/2025/07/11/smooth-theme-transitions-in-compose-with-animated-colorschemes/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2025/03/22/turning-any-android-callback-into-a-flow-with-callbackflow/" title="Previous Post: Turning Any Android Callback into a Flow with callbackFlow">&laquo; Turning Any Android Callback into a Flow with callbackFlow</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2025/07/11/smooth-theme-transitions-in-compose-with-animated-colorschemes/">Smooth Theme Transitions in Compose with Animated ColorSchemes</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2025/03/22/turning-any-android-callback-into-a-flow-with-callbackflow/">Turning Any Android Callback into a Flow with callbackFlow</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2024/12/14/ui-testing-made-easy-the-robot-test-pattern-on-android/">UI Testing Made Easy: The Robot Test Pattern on Android</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2024/10/10/modernizing-your-android-apps-data-storage-sharedpreferences-to-datastore/">Modernizing Your Android App's Data Storage: SharedPreferences to DataStore</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2024/09/07/mastering-ktlint-a-guide-to-crafting-your-own-rules/">Mastering ktlint: A Guide to Crafting Your Own Rules</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/MichaelEvans">@MichaelEvans</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'MichaelEvans',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/114052868601022948953?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2025 - Michael Evans -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mevans';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://michaelevans.org/blog/2025/07/11/smooth-theme-transitions-in-compose-with-animated-colorschemes/';
+        var disqus_url = 'http://michaelevans.org/blog/2025/07/11/smooth-theme-transitions-in-compose-with-animated-colorschemes/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

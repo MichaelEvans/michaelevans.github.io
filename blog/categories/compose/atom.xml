@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Compose | Michael Evans]]></title>
+  <link href="http://michaelevans.org/blog/categories/compose/atom.xml" rel="self"/>
+  <link href="http://michaelevans.org/"/>
+  <updated>2025-07-13T00:35:52-04:00</updated>
+  <id>http://michaelevans.org/</id>
+  <author>
+    <name><![CDATA[Michael Evans]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Smooth Theme Transitions in Compose with Animated ColorSchemes]]></title>
+    <link href="http://michaelevans.org/blog/2025/07/11/smooth-theme-transitions-in-compose-with-animated-colorschemes/"/>
+    <updated>2025-07-11T23:38:27-04:00</updated>
+    <id>http://michaelevans.org/blog/2025/07/11/smooth-theme-transitions-in-compose-with-animated-colorschemes</id>
+    <content type="html"><![CDATA[<p>If your Jetpack Compose app supports light and dark themes, you’ve probably noticed the default behavior: a sudden cut between color schemes when the system UI mode changes.</p>
+
+<p>I think we&rsquo;ve all seen theme changes that look like this:</p>
+
+<p><video width='270' height='600' preload='none' controls ><source src='/images/2025/07/01/instant.webm' type='video/webm; codecs=vp8, vorbis'>Your browser does not support the video tag.</video></p>
+
+<p>We can do better.</p>
+
+<p>By wrapping your theme setup with some animation, we can achieve <strong>smooth transitions between light and dark themes</strong> that feel much more polished — without rebuilding your entire app structure.</p>
+
+<!-- more -->
+
+
+<p></p>
+
+<h2>The Idea: Animate the ColorScheme</h2>
+
+<p>Jetpack Compose’s <code>MaterialTheme</code> accepts a <code>ColorScheme</code>. If we gradually animate the colors inside that scheme when the system toggles between dark and light, we can fade the colors smoothly across the entire app.</p>
+
+<p>Here’s a simplified example:</p>
+
+<p>```
+@Composable
+fun AnimatedTheme(</p>
+
+<pre><code>darkTheme: Boolean = isSystemInDarkTheme(),
+content: @Composable () -&gt; Unit
+</code></pre>
+
+<p>) {</p>
+
+<pre><code>val targetScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+
+val animatedScheme = targetScheme.copy(
+    primary = animateColorAsState(targetScheme.primary).value,
+    background = animateColorAsState(targetScheme.background).value,
+    surface = animateColorAsState(targetScheme.surface).value,
+    onPrimary = animateColorAsState(targetScheme.onPrimary).value,
+    // Add more swatches as needed...
+)
+
+MaterialTheme(
+    colorScheme = animatedScheme,
+    typography = Typography,
+    shapes = Shapes,
+    content = content
+)
+</code></pre>
+
+<p>}
+```</p>
+
+<p>You can expand this to include all 20+ color swatches if you want — but we’ll show a better way shortly.</p>
+
+<hr />
+
+<h2>The Problem: Too Many Animations</h2>
+
+<p>Manually animating every color swatch with <code>animateColorAsState</code> works, but:</p>
+
+<ul>
+<li>It’s <strong>verbose</strong></li>
+<li>It runs <strong>a lot of recompositions</strong> (even for unused swatches)</li>
+<li>It can be <strong>hard to keep up</strong> if <code>ColorScheme</code> changes</li>
+</ul>
+
+
+<hr />
+
+<h2>A Better Approach: Animating with updateTransition</h2>
+
+<p>A cleaner solution is to animate all properties as part of a single <code>Transition</code>. That way, Compose shares the animation clock and easing, and you&rsquo;re not scattering a dozen independent animation calls.</p>
+
+<p>```
+private fun defaultColorTransitionSpec(): FiniteAnimationSpec<Color> =</p>
+
+<pre><code>tween(durationMillis = 500, easing = LinearOutSlowInEasing)
+</code></pre>
+
+<p>@Composable
+fun AnimatedTheme(</p>
+
+<pre><code>darkTheme: Boolean = isSystemInDarkTheme(),
+content: @Composable () -&gt; Unit
+</code></pre>
+
+<p>) {</p>
+
+<pre><code>val targetScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+val transition = updateTransition(targetScheme, label = "themeTransition")
+
+val primary by transition.animateColor(
+    label = "primary",
+    transitionSpec = { defaultColorTransitionSpec() }) { it.primary }
+val background by transition.animateColor(
+    label = "background",
+    transitionSpec = { defaultColorTransitionSpec() }) { it.background }
+val surface by transition.animateColor(
+    label = "surface",
+    transitionSpec = { defaultColorTransitionSpec() }) { it.surface }
+val onPrimary by transition.animateColor(
+    label = "onPrimary",
+    transitionSpec = { defaultColorTransitionSpec() }) { it.onPrimary }
+
+val animatedScheme = targetScheme.copy(
+    primary = primary,
+    background = background,
+    surface = surface,
+    onPrimary = onPrimary
+)
+MaterialTheme(colorScheme = animatedScheme, content = content)
+</code></pre>
+
+<p>}
+```</p>
+
+<p>This version:</p>
+
+<ul>
+<li>Uses a single <code>Transition</code> to group related animations</li>
+<li>Shares the same easing/duration across all swatches</li>
+<li>Is easier to extend or modify incrementally</li>
+</ul>
+
+
+<p>After we add our animations, it will look more like this:</p>
+
+<p><video width='270' height='600' preload='none' controls ><source src='/images/2025/07/01/animated.webm' type='video/webm; codecs=vp8, vorbis'>Your browser does not support the video tag.</video></p>
+
+<hr />
+
+<h2>Final Notes</h2>
+
+<ul>
+<li>If you want to animate <strong>all</strong> color properties, you&rsquo;ll still need to call <code>animateColor</code> for each one — but this pattern scales better than copy-pasting 25 <code>animateColorAsState</code> calls.</li>
+<li>For most apps, animating just a <strong>handful</strong> of swatches (<code>primary</code>, <code>background</code>, <code>surface</code>, <code>onPrimary</code>, <code>error</code>) gives most of the perceived polish.</li>
+<li>Avoid using reflection or deep copying here — it’s better to be explicit and in control of what’s animated.</li>
+</ul>
+
+
+<hr />
+
+<h2>Wrap-Up</h2>
+
+<p>This technique brings a much smoother feel to your app, especially if your users frequently switch between light and dark mode (or you support a manual toggle).</p>
+
+<p>(Hopefully the Compose team eventually provides a helper for this boilerplate.)</p>
+
+<p>Happy theming!</p>
+
+<h2>Sample Code</h2>
+
+<p>Want to try it out yourself? I’ve published a small sample project on GitHub that demonstrates both animated and non-animated theme switching:</p>
+
+<p><a href="https://github.com/MichaelEvans/AnimatedThemeExample">View the sample project on GitHub</a></p>
+
+<p>It includes the exact code from this post and the toggle UI shown in the GIFs.</p>
+]]></content>
+  </entry>
+  
+</feed>
