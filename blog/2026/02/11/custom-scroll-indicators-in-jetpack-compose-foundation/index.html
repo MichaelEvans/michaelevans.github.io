@@ -1,0 +1,706 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="msvalidate.01" content="275BF9CDA457668389C1F9916C380DD0" />
+  <title>Adding Scrollbars to Jetpack Compose - Michael Evans</title>
+  <meta name="author" content="Michael Evans">
+
+  
+  <meta name="description" content="How to add scrollbars to Jetpack Compose using the new Scroll Indicator APIs in Foundation 1.11-alpha-01, including basic setup and Material 3-style &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://michaelevans.org/blog/2026/02/11/custom-scroll-indicators-in-jetpack-compose-foundation/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Michael Evans" type="application/atom+xml">
+  <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-28589266-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Michael Evans</a></h1>
+  
+    <h2>A bunch of technobabble.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:michaelevans.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Adding Scrollbars to Jetpack Compose</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2026-02-11T21:14:16-05:00" pubdate data-updated="true">Feb 11<span>th</span>, 2026</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><strong>Update (February 25, 2026):</strong> The scroll indicator API described in this post was <a href="https://android-review.googlesource.com/c/platform/frameworks/support/+/3947642">reverted</a> in <a href="https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.11.0-alpha06">Compose Foundation 1.11.0-alpha06</a>. According to the changelog, the revert was because of API Council feedback, so we&rsquo;ll likely get a new version of the API before long. In the meantime, this article still applies to Foundation 1.11.0-alpha01 through alpha05, and the concepts might carry over when the replacement lands.</p>
+
+<p>Jetpack Compose Foundation 1.11-alpha-01 introduced a long-awaited feature: the ability to add custom scroll indicators to scrollable containers. If you&rsquo;ve been following Compose development, you&rsquo;ve probably noticed that scrollbars were conspicuously absent — unlike Android Views, which have had them built-in for years. This has been a <a href="https://stackoverflow.com/questions/66341823/jetpack-compose-scrollbars">frequently asked question</a> on Stack Overflow and <a href="https://www.reddit.com/r/androiddev/comments/14u32gg/timeline_with_scrollbar_in_lazycolumn_compose/">discussed</a> in the Android developer community, and it&rsquo;s been on the <a href="https://developer.android.com/jetpack/androidx/compose-roadmap">Compose roadmap</a> since at least September 2024 (though the roadmap may have changed by the time you&rsquo;re reading this).</p>
+
+<!-- more -->
+
+
+<h2>Why scroll indicators matter</h2>
+
+<p>Scrollbars have been around for decades and are an effective, interactive UI control. As <a href="https://blakewatson.com/journal/neglecting-the-scrollbar-a-costly-trend-in-ui-design/">Blake Watson points out</a>, scrollbars provide immediate visual feedback that&rsquo;s hard to replicate:</p>
+
+<ul>
+<li><strong>They indicate scrollability</strong> — Users can instantly see that content extends beyond the visible area</li>
+<li><strong>They show content length</strong> — The scrollbar&rsquo;s size relative to the track gives a sense of how much content exists</li>
+<li><strong>They show current position</strong> — Users know exactly where they are in the document</li>
+<li><strong>They show visible range</strong> — The thumb size indicates how much of the total content is currently visible</li>
+</ul>
+
+
+<p>Without scroll indicators, users in Compose apps have been left guessing about scrollable content, especially in long lists or documents. The new APIs finally give us the tools to address this.</p>
+
+<h2>Background: The missing scrollbar</h2>
+
+<p>Compose has always lacked built-in scroll indicators. While you could build custom solutions using <code>drawWithContent</code> and <code>LazyListState.layoutInfo</code> (as many developers have done), there was no official, supported API. This gap became more noticeable as Compose matured and developers expected feature parity with Views.</p>
+
+<p>Interestingly, the foundation for scroll indicators was laid quietly in version 1.10.0-alpha04, when <code>ScrollIndicatorState</code> was added to both <code>LazyListState</code> (<a href="https://android-review.googlesource.com/#/q/I5ee290fd937bdcd4f8916263f1c848abd9d0313e">Android review</a>) and <code>ScrollState</code> (<a href="https://android-review.googlesource.com/#/q/I27f667c1749bf373425873806d9d127b19ff0243">Android review</a>). This state object provides the necessary information — scroll offset, content size, viewport size — to render a scroll indicator, but the actual rendering API didn&rsquo;t arrive until 1.11-alpha-01.</p>
+
+<h2>The new APIs: An overview</h2>
+
+<p>Foundation 1.11-alpha-01 introduces the rendering APIs for scroll indicators:</p>
+
+<ol>
+<li><strong><code>Modifier.scrollIndicator</code></strong> — A modifier you apply to scrollable containers to add a scroll indicator</li>
+<li><strong><code>ScrollIndicatorFactory</code></strong> — An interface that defines how the indicator looks and behaves</li>
+</ol>
+
+
+<p>These work together with <code>ScrollIndicatorState</code> to provide the necessary information — scroll offset, content size, viewport size — needed to render a scroll indicator.</p>
+
+<p>The design is clean and follows Compose patterns: you provide a factory that creates the indicator composable, and the modifier handles the rest. The factory receives the <code>ScrollIndicatorState</code>, which contains all the information needed to render the indicator at the correct position and size.</p>
+
+<h2>Basic setup: Getting started</h2>
+
+<p>Adding a scroll indicator is surprisingly straightforward. Here&rsquo;s a minimal example:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>@Composable
+</span><span class='line'>fun ScrollableList(modifier: Modifier = Modifier) {
+</span><span class='line'>    val listState = rememberLazyListState()
+</span><span class='line'>    
+</span><span class='line'>    val scrollbarModifier = listState.scrollIndicatorState?.let {
+</span><span class='line'>        Modifier.scrollIndicator(
+</span><span class='line'>            state = it,
+</span><span class='line'>            orientation = Orientation.Vertical
+</span><span class='line'>        )
+</span><span class='line'>    } ?: Modifier
+</span><span class='line'>    
+</span><span class='line'>    LazyColumn(
+</span><span class='line'>        state = listState,
+</span><span class='line'>        modifier = modifier
+</span><span class='line'>            .fillMaxSize()
+</span><span class='line'>            .then(scrollbarModifier)
+</span><span class='line'>    ) {
+</span><span class='line'>        items(100) { index -&gt;
+</span><span class='line'>            Text(
+</span><span class='line'>                text = "Item $index",
+</span><span class='line'>                modifier = Modifier.padding(16.dp)
+</span><span class='line'>            )
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&rsquo;s it! Since <code>scrollIndicatorState</code> is nullable, we use <code>?.let</code> to conditionally create the scroll indicator modifier, then apply it with <code>.then()</code>. The default factory (when no factory is specified) provides a simple, functional scrollbar. The same pattern works for regular scrollable containers like <code>Column</code> or <code>Row</code> — just use <code>rememberScrollState()</code> instead of <code>rememberLazyListState()</code>.</p>
+
+<p><img src="/images/2026/02/11/default-scroll-indicator.png" width="400" height="800" title="Default Scroll Indicator" ></p>
+
+<h2>Customizing for Material 3 look</h2>
+
+<p>The default scroll indicator is functional but basic. If you want something that matches Material 3&rsquo;s scrollbar design (like what you&rsquo;d see in Views), you&rsquo;ll need to create a custom <code>ScrollIndicatorFactory</code>. Here&rsquo;s an implementation that approximates the Material 3 scrollbar, matching the constants from Android&rsquo;s <a href="https://cs.android.com/android/platform/superproject/main/+/main:frameworks/base/core/java/android/view/ViewConfiguration.java;l=50"><code>ViewConfiguration</code></a>:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>data class MaterialScrollIndicatorFactory(
+</span><span class='line'>    val thumbThickness: Dp = 4.dp,
+</span><span class='line'>    val padding: Dp = 2.dp,
+</span><span class='line'>    val thumbColor: Color = Color.Black,
+</span><span class='line'>    val thumbAlpha: Float = 0.5f,
+</span><span class='line'>    val fadeDelay: Int = 300, // milliseconds, matches SCROLL_BAR_DEFAULT_DELAY
+</span><span class='line'>    val fadeDuration: Int = 250, // milliseconds, matches SCROLL_BAR_FADE_DURATION
+</span><span class='line'>) : ScrollIndicatorFactory {
+</span><span class='line'>    override fun createNode(
+</span><span class='line'>        state: ScrollIndicatorState,
+</span><span class='line'>        orientation: Orientation
+</span><span class='line'>    ): DelegatableNode {
+</span><span class='line'>        return object : Modifier.Node(), DrawModifierNode {
+</span><span class='line'>            private val alpha = Animatable(0f)
+</span><span class='line'>            private var fadeOutJob: Job? = null
+</span><span class='line'>            
+</span><span class='line'>            override fun onAttach() {
+</span><span class='line'>                super.onAttach()
+</span><span class='line'>                
+</span><span class='line'>                // Monitor scroll offset changes to trigger fade animations
+</span><span class='line'>                coroutineScope.launch {
+</span><span class='line'>                    snapshotFlow { state.scrollOffset }
+</span><span class='line'>                        .collect { _ -&gt;
+</span><span class='line'>                            // Cancel any pending fade-out
+</span><span class='line'>                            fadeOutJob?.cancel()
+</span><span class='line'>                            
+</span><span class='line'>                            // Fade in immediately when scrolling
+</span><span class='line'>                            launch {
+</span><span class='line'>                                alpha.animateTo(
+</span><span class='line'>                                    targetValue = thumbAlpha,
+</span><span class='line'>                                    animationSpec = tween(
+</span><span class='line'>                                        durationMillis = 150,
+</span><span class='line'>                                        easing = FastOutSlowInEasing
+</span><span class='line'>                                    )
+</span><span class='line'>                                )
+</span><span class='line'>                            }
+</span><span class='line'>                            
+</span><span class='line'>                            // Schedule fade-out with delay
+</span><span class='line'>                            fadeOutJob = launch {
+</span><span class='line'>                                delay(fadeDelay.toLong())
+</span><span class='line'>                                alpha.animateTo(
+</span><span class='line'>                                    targetValue = 0f,
+</span><span class='line'>                                    animationSpec = tween(
+</span><span class='line'>                                        durationMillis = fadeDuration,
+</span><span class='line'>                                        easing = FastOutSlowInEasing
+</span><span class='line'>                                    )
+</span><span class='line'>                                )
+</span><span class='line'>                            }
+</span><span class='line'>                        }
+</span><span class='line'>                }
+</span><span class='line'>            }
+</span><span class='line'>            
+</span><span class='line'>            override fun ContentDrawScope.draw() {
+</span><span class='line'>                // Draw the original content.
+</span><span class='line'>                drawContent()
+</span><span class='line'>
+</span><span class='line'>                // Don't draw the scrollbar if the content fits within the viewport.
+</span><span class='line'>                if (state.contentSize &lt;= state.viewportSize) return
+</span><span class='line'>                
+</span><span class='line'>                // Don't draw if fully transparent
+</span><span class='line'>                if (alpha.value &lt;= 0f) return
+</span><span class='line'>
+</span><span class='line'>                val visibleContentRatio = state.viewportSize.toFloat() / state.contentSize
+</span><span class='line'>
+</span><span class='line'>                // Calculate the thumb's size and position along the scrolling axis.
+</span><span class='line'>                val thumbLength = state.viewportSize * visibleContentRatio
+</span><span class='line'>                val thumbPosition = state.scrollOffset * visibleContentRatio
+</span><span class='line'>
+</span><span class='line'>                val thumbThicknessPx = thumbThickness.toPx()
+</span><span class='line'>                val paddingPx = padding.toPx()
+</span><span class='line'>
+</span><span class='line'>                // Determine the scrollbar size and thumb position based on the orientation.
+</span><span class='line'>                val (topLeft, size) =
+</span><span class='line'>                    when (orientation) {
+</span><span class='line'>                        Orientation.Vertical -&gt; {
+</span><span class='line'>                            val x = size.width - thumbThicknessPx - paddingPx
+</span><span class='line'>                            Offset(x, thumbPosition) to Size(thumbThicknessPx, thumbLength)
+</span><span class='line'>                        }
+</span><span class='line'>                        Orientation.Horizontal -&gt; {
+</span><span class='line'>                            val y = size.height - thumbThicknessPx - paddingPx
+</span><span class='line'>                            Offset(thumbPosition, y) to Size(thumbLength, thumbThicknessPx)
+</span><span class='line'>                        }
+</span><span class='line'>                    }
+</span><span class='line'>
+</span><span class='line'>                // Draw the scrollbar thumb with rounded corners using animated alpha.
+</span><span class='line'>                val cornerRadius = thumbThickness.toPx() / 2f
+</span><span class='line'>                drawRoundRect(
+</span><span class='line'>                    color = thumbColor,
+</span><span class='line'>                    topLeft = topLeft,
+</span><span class='line'>                    size = size,
+</span><span class='line'>                    alpha = alpha.value,
+</span><span class='line'>                    cornerRadius = CornerRadius(cornerRadius, cornerRadius)
+</span><span class='line'>                )
+</span><span class='line'>            }
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then use it like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>@Composable
+</span><span class='line'>fun ScrollableList(modifier: Modifier = Modifier) {
+</span><span class='line'>    val listState = rememberLazyListState()
+</span><span class='line'>    val scrollbarFactory = remember { 
+</span><span class='line'>        MaterialScrollIndicatorFactory(
+</span><span class='line'>            thumbColor = MaterialTheme.colorScheme.onSurfaceVariant
+</span><span class='line'>        )
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    val scrollbarModifier = listState.scrollIndicatorState?.let {
+</span><span class='line'>        Modifier.scrollIndicator(
+</span><span class='line'>            factory = scrollbarFactory,
+</span><span class='line'>            state = it,
+</span><span class='line'>            orientation = Orientation.Vertical
+</span><span class='line'>        )
+</span><span class='line'>    } ?: Modifier
+</span><span class='line'>    
+</span><span class='line'>    LazyColumn(
+</span><span class='line'>        state = listState,
+</span><span class='line'>        modifier = modifier
+</span><span class='line'>            .fillMaxSize()
+</span><span class='line'>            .then(scrollbarModifier)
+</span><span class='line'>    ) {
+</span><span class='line'>        items(100) { index -&gt;
+</span><span class='line'>            Text(
+</span><span class='line'>                text = "Item $index",
+</span><span class='line'>                modifier = Modifier.padding(16.dp)
+</span><span class='line'>            )
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This implementation includes several Material 3 design characteristics:</p>
+
+<ul>
+<li><strong>Fade in/out animation</strong> — The scrollbar fades in immediately when scrolling starts (150ms) and fades out 300ms after scrolling stops, with a 250ms fade duration (matching <code>SCROLL_BAR_FADE_DURATION</code> and <code>SCROLL_BAR_DEFAULT_DELAY</code> from <code>ViewConfiguration</code>)</li>
+<li><strong>Thin thumb</strong> — 4dp thickness by default, matching <code>ViewConfiguration.SCROLL_BAR_SIZE</code></li>
+<li><strong>Rounded corners</strong> — Half the thumb thickness for a pill-shaped appearance</li>
+<li><strong>Proper positioning</strong> — Calculates thumb position and size based on scroll offset and content/viewport ratios using <code>snapshotFlow</code> to reactively respond to scroll changes</li>
+<li><strong>Customizable</strong> — Configurable thickness, padding, color, and alpha values via the data class parameters</li>
+</ul>
+
+
+<p>The key insight is that <code>ScrollIndicatorState</code> provides <code>scrollOffset</code>, <code>contentSize</code>, and <code>viewportSize</code>, which are all you need to calculate where the thumb should be and how big it should be.</p>
+
+<p><video width='400' height='800' preload='none' controls poster='Scroll'><source src='/images/2026/02/11/scroll-indicator-demo.webm' type='video/webm; codecs=vp8, vorbis'>Your browser does not support the video tag.</video></p>
+
+<h2>Future speculation</h2>
+
+<p>Right now, this is a foundation-level API. You get the building blocks, but if you want a Material-styled scrollbar, you need to build it yourself (or use a library). Given Google&rsquo;s pattern of providing Material components in the Material library, I&rsquo;d be surprised if we don&rsquo;t see a <code>MaterialScrollIndicatorFactory</code> or similar in a future Material Compose release. This would make it a one-liner to add a Material-styled scrollbar, similar to how <code>MaterialTheme</code> provides default styling for other components.</p>
+
+<p>Until then, the foundation API gives us the flexibility to create exactly what we need, whether that&rsquo;s a Material 3 look, a custom design, or something completely custom.</p>
+
+<h2>Conclusion</h2>
+
+<p>If you&rsquo;re working with long lists or scrollable content where users might benefit from visual scroll feedback, give these APIs a try. Even if you stick with the default factory, you&rsquo;re providing valuable UX improvements with minimal code. And if you need something more customized, the factory pattern gives you all the control you need.</p>
+
+<p>Happy scrolling!</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Michael Evans</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2026-02-11T21:14:16-05:00" pubdate data-updated="true">Feb 11<span>th</span>, 2026</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/compose/'>Compose</a>, <a class='category' href='/blog/categories/kotlin/'>Kotlin</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://michaelevans.org/blog/2026/02/11/custom-scroll-indicators-in-jetpack-compose-foundation/" data-via="m_evans10" data-counturl="http://michaelevans.org/blog/2026/02/11/custom-scroll-indicators-in-jetpack-compose-foundation/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2025/07/01/smooth-theme-transitions-in-compose-with-animated-colorschemes/" title="Previous Post: Smooth Theme Transitions in Compose with Animated ColorSchemes">&laquo; Smooth Theme Transitions in Compose with Animated ColorSchemes</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2026/02/11/custom-scroll-indicators-in-jetpack-compose-foundation/">Adding Scrollbars to Jetpack Compose</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2025/07/01/smooth-theme-transitions-in-compose-with-animated-colorschemes/">Smooth Theme Transitions in Compose with Animated ColorSchemes</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2025/03/22/turning-any-android-callback-into-a-flow-with-callbackflow/">Turning Any Android Callback into a Flow with callbackFlow</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2024/12/14/ui-testing-made-easy-the-robot-test-pattern-on-android/">UI Testing Made Easy: The Robot Test Pattern on Android</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2024/10/10/modernizing-your-android-apps-data-storage-sharedpreferences-to-datastore/">Modernizing Your Android App's Data Storage: SharedPreferences to DataStore</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/MichaelEvans">@MichaelEvans</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'MichaelEvans',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/114052868601022948953?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2026 - Michael Evans -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mevans';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://michaelevans.org/blog/2026/02/11/custom-scroll-indicators-in-jetpack-compose-foundation/';
+        var disqus_url = 'http://michaelevans.org/blog/2026/02/11/custom-scroll-indicators-in-jetpack-compose-foundation/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

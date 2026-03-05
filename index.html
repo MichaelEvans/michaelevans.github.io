@@ -10,7 +10,7 @@
   <meta name="author" content="Michael Evans">
 
   
-  <meta name="description" content="If your Jetpack Compose app supports light and dark themes, you’ve probably noticed the default behavior: a sudden cut between color schemes when the &hellip;">
+  <meta name="description" content="Update (February 25, 2026): The scroll indicator API described in this post was reverted in Compose Foundation 1.11.0-alpha06. According to the &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -79,6 +79,51 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2026/02/11/custom-scroll-indicators-in-jetpack-compose-foundation/">Adding Scrollbars to Jetpack Compose</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2026-02-11T21:14:16-05:00" pubdate data-updated="true">Feb 11<span>th</span>, 2026</time>
+        
+         | <a href="/blog/2026/02/11/custom-scroll-indicators-in-jetpack-compose-foundation/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><strong>Update (February 25, 2026):</strong> The scroll indicator API described in this post was <a href="https://android-review.googlesource.com/c/platform/frameworks/support/+/3947642">reverted</a> in <a href="https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.11.0-alpha06">Compose Foundation 1.11.0-alpha06</a>. According to the changelog, the revert was because of API Council feedback, so we&rsquo;ll likely get a new version of the API before long. In the meantime, this article still applies to Foundation 1.11.0-alpha01 through alpha05, and the concepts might carry over when the replacement lands.</p>
+
+<p>Jetpack Compose Foundation 1.11-alpha-01 introduced a long-awaited feature: the ability to add custom scroll indicators to scrollable containers. If you&rsquo;ve been following Compose development, you&rsquo;ve probably noticed that scrollbars were conspicuously absent — unlike Android Views, which have had them built-in for years. This has been a <a href="https://stackoverflow.com/questions/66341823/jetpack-compose-scrollbars">frequently asked question</a> on Stack Overflow and <a href="https://www.reddit.com/r/androiddev/comments/14u32gg/timeline_with_scrollbar_in_lazycolumn_compose/">discussed</a> in the Android developer community, and it&rsquo;s been on the <a href="https://developer.android.com/jetpack/androidx/compose-roadmap">Compose roadmap</a> since at least September 2024 (though the roadmap may have changed by the time you&rsquo;re reading this).</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2026/02/11/custom-scroll-indicators-in-jetpack-compose-foundation/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -1718,49 +1763,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2020/06/21/android-developer-challenge/">Android Developer Challenge</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2020-06-21T23:41:17-04:00" pubdate data-updated="true">Jun 21<span>st</span>, 2020</time>
-        
-         | <a href="/blog/2020/06/21/android-developer-challenge/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Late last year, Google announced the <a href="https://developer.android.com/dev-challenge">Android Developer Challenge</a>, a contest for Android developers to show off new experiences made possible by on-device Machine Learning. Since then, tons of developers have submitted their ideas and been hard at work developing their apps. Today, the <a href="https://android-developers.googleblog.com/2020/06/dev-challenge-winners.html">winners of the challenge have been announced</a>!</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2020/06/21/android-developer-challenge/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -1776,6 +1778,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2026/02/11/custom-scroll-indicators-in-jetpack-compose-foundation/">Adding Scrollbars to Jetpack Compose</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2025/07/01/smooth-theme-transitions-in-compose-with-animated-colorschemes/">Smooth Theme Transitions in Compose with Animated ColorSchemes</a>
       </li>
     
@@ -1789,10 +1795,6 @@
     
       <li class="post">
         <a href="/blog/2024/10/10/modernizing-your-android-apps-data-storage-sharedpreferences-to-datastore/">Modernizing Your Android App&#8217;s Data Storage: SharedPreferences to DataStore</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2024/09/07/mastering-ktlint-a-guide-to-crafting-your-own-rules/">Mastering ktlint: A Guide to Crafting Your Own Rules</a>
       </li>
     
   </ul>
@@ -1846,7 +1848,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2025 - Michael Evans -
+  Copyright &copy; 2026 - Michael Evans -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

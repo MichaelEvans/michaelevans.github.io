@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Kotlin | Michael Evans]]></title>
   <link href="http://michaelevans.org/blog/categories/kotlin/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2025-07-13T00:38:37-04:00</updated>
+  <updated>2026-03-04T21:14:42-05:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -12,6 +12,269 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Adding Scrollbars to Jetpack Compose]]></title>
+    <link href="http://michaelevans.org/blog/2026/02/11/custom-scroll-indicators-in-jetpack-compose-foundation/"/>
+    <updated>2026-02-11T21:14:16-05:00</updated>
+    <id>http://michaelevans.org/blog/2026/02/11/custom-scroll-indicators-in-jetpack-compose-foundation</id>
+    <content type="html"><![CDATA[<p><strong>Update (February 25, 2026):</strong> The scroll indicator API described in this post was <a href="https://android-review.googlesource.com/c/platform/frameworks/support/+/3947642">reverted</a> in <a href="https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.11.0-alpha06">Compose Foundation 1.11.0-alpha06</a>. According to the changelog, the revert was because of API Council feedback, so we&rsquo;ll likely get a new version of the API before long. In the meantime, this article still applies to Foundation 1.11.0-alpha01 through alpha05, and the concepts might carry over when the replacement lands.</p>
+
+<p>Jetpack Compose Foundation 1.11-alpha-01 introduced a long-awaited feature: the ability to add custom scroll indicators to scrollable containers. If you&rsquo;ve been following Compose development, you&rsquo;ve probably noticed that scrollbars were conspicuously absent — unlike Android Views, which have had them built-in for years. This has been a <a href="https://stackoverflow.com/questions/66341823/jetpack-compose-scrollbars">frequently asked question</a> on Stack Overflow and <a href="https://www.reddit.com/r/androiddev/comments/14u32gg/timeline_with_scrollbar_in_lazycolumn_compose/">discussed</a> in the Android developer community, and it&rsquo;s been on the <a href="https://developer.android.com/jetpack/androidx/compose-roadmap">Compose roadmap</a> since at least September 2024 (though the roadmap may have changed by the time you&rsquo;re reading this).</p>
+
+<!-- more -->
+
+
+<h2>Why scroll indicators matter</h2>
+
+<p>Scrollbars have been around for decades and are an effective, interactive UI control. As <a href="https://blakewatson.com/journal/neglecting-the-scrollbar-a-costly-trend-in-ui-design/">Blake Watson points out</a>, scrollbars provide immediate visual feedback that&rsquo;s hard to replicate:</p>
+
+<ul>
+<li><strong>They indicate scrollability</strong> — Users can instantly see that content extends beyond the visible area</li>
+<li><strong>They show content length</strong> — The scrollbar&rsquo;s size relative to the track gives a sense of how much content exists</li>
+<li><strong>They show current position</strong> — Users know exactly where they are in the document</li>
+<li><strong>They show visible range</strong> — The thumb size indicates how much of the total content is currently visible</li>
+</ul>
+
+
+<p>Without scroll indicators, users in Compose apps have been left guessing about scrollable content, especially in long lists or documents. The new APIs finally give us the tools to address this.</p>
+
+<h2>Background: The missing scrollbar</h2>
+
+<p>Compose has always lacked built-in scroll indicators. While you could build custom solutions using <code>drawWithContent</code> and <code>LazyListState.layoutInfo</code> (as many developers have done), there was no official, supported API. This gap became more noticeable as Compose matured and developers expected feature parity with Views.</p>
+
+<p>Interestingly, the foundation for scroll indicators was laid quietly in version 1.10.0-alpha04, when <code>ScrollIndicatorState</code> was added to both <code>LazyListState</code> (<a href="https://android-review.googlesource.com/#/q/I5ee290fd937bdcd4f8916263f1c848abd9d0313e">Android review</a>) and <code>ScrollState</code> (<a href="https://android-review.googlesource.com/#/q/I27f667c1749bf373425873806d9d127b19ff0243">Android review</a>). This state object provides the necessary information — scroll offset, content size, viewport size — to render a scroll indicator, but the actual rendering API didn&rsquo;t arrive until 1.11-alpha-01.</p>
+
+<h2>The new APIs: An overview</h2>
+
+<p>Foundation 1.11-alpha-01 introduces the rendering APIs for scroll indicators:</p>
+
+<ol>
+<li><strong><code>Modifier.scrollIndicator</code></strong> — A modifier you apply to scrollable containers to add a scroll indicator</li>
+<li><strong><code>ScrollIndicatorFactory</code></strong> — An interface that defines how the indicator looks and behaves</li>
+</ol>
+
+
+<p>These work together with <code>ScrollIndicatorState</code> to provide the necessary information — scroll offset, content size, viewport size — needed to render a scroll indicator.</p>
+
+<p>The design is clean and follows Compose patterns: you provide a factory that creates the indicator composable, and the modifier handles the rest. The factory receives the <code>ScrollIndicatorState</code>, which contains all the information needed to render the indicator at the correct position and size.</p>
+
+<h2>Basic setup: Getting started</h2>
+
+<p>Adding a scroll indicator is surprisingly straightforward. Here&rsquo;s a minimal example:</p>
+
+<p>```
+@Composable
+fun ScrollableList(modifier: Modifier = Modifier) {</p>
+
+<pre><code>val listState = rememberLazyListState()
+
+val scrollbarModifier = listState.scrollIndicatorState?.let {
+    Modifier.scrollIndicator(
+        state = it,
+        orientation = Orientation.Vertical
+    )
+} ?: Modifier
+
+LazyColumn(
+    state = listState,
+    modifier = modifier
+        .fillMaxSize()
+        .then(scrollbarModifier)
+) {
+    items(100) { index -&gt;
+        Text(
+            text = "Item $index",
+            modifier = Modifier.padding(16.dp)
+        )
+    }
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<p>That&rsquo;s it! Since <code>scrollIndicatorState</code> is nullable, we use <code>?.let</code> to conditionally create the scroll indicator modifier, then apply it with <code>.then()</code>. The default factory (when no factory is specified) provides a simple, functional scrollbar. The same pattern works for regular scrollable containers like <code>Column</code> or <code>Row</code> — just use <code>rememberScrollState()</code> instead of <code>rememberLazyListState()</code>.</p>
+
+<p><img src="/images/2026/02/11/default-scroll-indicator.png" width="400" height="800" title="Default Scroll Indicator" ></p>
+
+<h2>Customizing for Material 3 look</h2>
+
+<p>The default scroll indicator is functional but basic. If you want something that matches Material 3&rsquo;s scrollbar design (like what you&rsquo;d see in Views), you&rsquo;ll need to create a custom <code>ScrollIndicatorFactory</code>. Here&rsquo;s an implementation that approximates the Material 3 scrollbar, matching the constants from Android&rsquo;s <a href="https://cs.android.com/android/platform/superproject/main/+/main:frameworks/base/core/java/android/view/ViewConfiguration.java;l=50"><code>ViewConfiguration</code></a>:</p>
+
+<p>```
+data class MaterialScrollIndicatorFactory(</p>
+
+<pre><code>val thumbThickness: Dp = 4.dp,
+val padding: Dp = 2.dp,
+val thumbColor: Color = Color.Black,
+val thumbAlpha: Float = 0.5f,
+val fadeDelay: Int = 300, // milliseconds, matches SCROLL_BAR_DEFAULT_DELAY
+val fadeDuration: Int = 250, // milliseconds, matches SCROLL_BAR_FADE_DURATION
+</code></pre>
+
+<p>) : ScrollIndicatorFactory {</p>
+
+<pre><code>override fun createNode(
+    state: ScrollIndicatorState,
+    orientation: Orientation
+): DelegatableNode {
+    return object : Modifier.Node(), DrawModifierNode {
+        private val alpha = Animatable(0f)
+        private var fadeOutJob: Job? = null
+
+        override fun onAttach() {
+            super.onAttach()
+
+            // Monitor scroll offset changes to trigger fade animations
+            coroutineScope.launch {
+                snapshotFlow { state.scrollOffset }
+                    .collect { _ -&gt;
+                        // Cancel any pending fade-out
+                        fadeOutJob?.cancel()
+
+                        // Fade in immediately when scrolling
+                        launch {
+                            alpha.animateTo(
+                                targetValue = thumbAlpha,
+                                animationSpec = tween(
+                                    durationMillis = 150,
+                                    easing = FastOutSlowInEasing
+                                )
+                            )
+                        }
+
+                        // Schedule fade-out with delay
+                        fadeOutJob = launch {
+                            delay(fadeDelay.toLong())
+                            alpha.animateTo(
+                                targetValue = 0f,
+                                animationSpec = tween(
+                                    durationMillis = fadeDuration,
+                                    easing = FastOutSlowInEasing
+                                )
+                            )
+                        }
+                    }
+            }
+        }
+
+        override fun ContentDrawScope.draw() {
+            // Draw the original content.
+            drawContent()
+
+            // Don't draw the scrollbar if the content fits within the viewport.
+            if (state.contentSize &lt;= state.viewportSize) return
+
+            // Don't draw if fully transparent
+            if (alpha.value &lt;= 0f) return
+
+            val visibleContentRatio = state.viewportSize.toFloat() / state.contentSize
+
+            // Calculate the thumb's size and position along the scrolling axis.
+            val thumbLength = state.viewportSize * visibleContentRatio
+            val thumbPosition = state.scrollOffset * visibleContentRatio
+
+            val thumbThicknessPx = thumbThickness.toPx()
+            val paddingPx = padding.toPx()
+
+            // Determine the scrollbar size and thumb position based on the orientation.
+            val (topLeft, size) =
+                when (orientation) {
+                    Orientation.Vertical -&gt; {
+                        val x = size.width - thumbThicknessPx - paddingPx
+                        Offset(x, thumbPosition) to Size(thumbThicknessPx, thumbLength)
+                    }
+                    Orientation.Horizontal -&gt; {
+                        val y = size.height - thumbThicknessPx - paddingPx
+                        Offset(thumbPosition, y) to Size(thumbLength, thumbThicknessPx)
+                    }
+                }
+
+            // Draw the scrollbar thumb with rounded corners using animated alpha.
+            val cornerRadius = thumbThickness.toPx() / 2f
+            drawRoundRect(
+                color = thumbColor,
+                topLeft = topLeft,
+                size = size,
+                alpha = alpha.value,
+                cornerRadius = CornerRadius(cornerRadius, cornerRadius)
+            )
+        }
+    }
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Then use it like this:</p>
+
+<p>```
+@Composable
+fun ScrollableList(modifier: Modifier = Modifier) {</p>
+
+<pre><code>val listState = rememberLazyListState()
+val scrollbarFactory = remember { 
+    MaterialScrollIndicatorFactory(
+        thumbColor = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+}
+
+val scrollbarModifier = listState.scrollIndicatorState?.let {
+    Modifier.scrollIndicator(
+        factory = scrollbarFactory,
+        state = it,
+        orientation = Orientation.Vertical
+    )
+} ?: Modifier
+
+LazyColumn(
+    state = listState,
+    modifier = modifier
+        .fillMaxSize()
+        .then(scrollbarModifier)
+) {
+    items(100) { index -&gt;
+        Text(
+            text = "Item $index",
+            modifier = Modifier.padding(16.dp)
+        )
+    }
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<p>This implementation includes several Material 3 design characteristics:</p>
+
+<ul>
+<li><strong>Fade in/out animation</strong> — The scrollbar fades in immediately when scrolling starts (150ms) and fades out 300ms after scrolling stops, with a 250ms fade duration (matching <code>SCROLL_BAR_FADE_DURATION</code> and <code>SCROLL_BAR_DEFAULT_DELAY</code> from <code>ViewConfiguration</code>)</li>
+<li><strong>Thin thumb</strong> — 4dp thickness by default, matching <code>ViewConfiguration.SCROLL_BAR_SIZE</code></li>
+<li><strong>Rounded corners</strong> — Half the thumb thickness for a pill-shaped appearance</li>
+<li><strong>Proper positioning</strong> — Calculates thumb position and size based on scroll offset and content/viewport ratios using <code>snapshotFlow</code> to reactively respond to scroll changes</li>
+<li><strong>Customizable</strong> — Configurable thickness, padding, color, and alpha values via the data class parameters</li>
+</ul>
+
+
+<p>The key insight is that <code>ScrollIndicatorState</code> provides <code>scrollOffset</code>, <code>contentSize</code>, and <code>viewportSize</code>, which are all you need to calculate where the thumb should be and how big it should be.</p>
+
+<p><video width='400' height='800' preload='none' controls poster='Scroll'><source src='/images/2026/02/11/scroll-indicator-demo.webm' type='video/webm; codecs=vp8, vorbis'>Your browser does not support the video tag.</video></p>
+
+<h2>Future speculation</h2>
+
+<p>Right now, this is a foundation-level API. You get the building blocks, but if you want a Material-styled scrollbar, you need to build it yourself (or use a library). Given Google&rsquo;s pattern of providing Material components in the Material library, I&rsquo;d be surprised if we don&rsquo;t see a <code>MaterialScrollIndicatorFactory</code> or similar in a future Material Compose release. This would make it a one-liner to add a Material-styled scrollbar, similar to how <code>MaterialTheme</code> provides default styling for other components.</p>
+
+<p>Until then, the foundation API gives us the flexibility to create exactly what we need, whether that&rsquo;s a Material 3 look, a custom design, or something completely custom.</p>
+
+<h2>Conclusion</h2>
+
+<p>If you&rsquo;re working with long lists or scrollable content where users might benefit from visual scroll feedback, give these APIs a try. Even if you stick with the default factory, you&rsquo;re providing valuable UX improvements with minimal code. And if you need something more customized, the factory pattern gives you all the control you need.</p>
+
+<p>Happy scrolling!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Smooth Theme Transitions in Compose with Animated ColorSchemes]]></title>
