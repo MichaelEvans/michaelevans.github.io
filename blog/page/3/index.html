@@ -10,7 +10,7 @@
   <meta name="author" content="Michael Evans">
 
   
-  <meta name="description" content="A few weeks ago, I wrote a basic introduction on how to use Espresso to test the UI of an Android application. However, when I went to write &hellip;">
+  <meta name="description" content="I recently attended Google&rsquo;s Android Dev Summit where the Tools team presented a talk entitled Android Studio For Experts. The room was packed &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -21,16 +21,23 @@
   
   <link rel="canonical" href="http://michaelevans.org/blog/page/3/">
   <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/screen.css?v=1792965057" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="/javascripts/ender.js"></script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="Michael Evans" type="application/atom+xml">
   <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
-  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
-<link href='http://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+  <meta name="color-scheme" content="light dark">
+<script>
+  // Apply a saved preference before the first paint. The default follows the OS.
+  try {
+    var savedTheme = localStorage.getItem('blog-theme');
+    if (savedTheme === 'light' || savedTheme === 'dark') {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    }
+  } catch (error) {}
+</script>
+<script src="/javascripts/reading.js?v=1792965057" defer></script>
 
   
   <script type="text/javascript">
@@ -49,33 +56,41 @@
 </head>
 
 <body   >
-  <header role="banner"><hgroup>
-  <h1><a href="/">Michael Evans</a></h1>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" role="banner">
+    <div class="site-identity">
+  <a class="site-name" href="/">Michael Evans</a>
   
-    <h2>A bunch of technobabble.</h2>
+    <p class="site-subtitle">A bunch of technobabble.</p>
   
-</hgroup>
+</div>
 
-</header>
-  <nav role="navigation"><ul class="subscription" data-subscription="rss">
-  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
-  
-</ul>
-  
-<form action="https://google.com/search" method="get">
-  <fieldset role="search">
-    <input type="hidden" name="q" value="site:michaelevans.org" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-  </fieldset>
-</form>
-  
-<ul class="main-navigation">
-  <li><a href="/">Blog</a></li>
+
+    <nav class="site-navigation" aria-label="Main navigation"><ul class="main-navigation">
+  <li><a href="/">Writing</a></li>
   <li><a href="/blog/archives">Archives</a></li>
 </ul>
 
+<ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<div class="navigation-tools">
+  
+  <form action="https://google.com/search" method="get">
+    <fieldset role="search">
+      <input type="hidden" name="q" value="site:michaelevans.org" />
+      <input class="search" type="search" name="q" results="0" placeholder="Search posts…" aria-label="Search posts"/>
+    </fieldset>
+  </form>
+  
+  <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" hidden>
+    <span class="theme-moon">Dark</span><span class="theme-sun">Light</span>
+  </button>
+</div>
 </nav>
-  <div id="main">
+  </header>
+  <main id="main">
     <div id="content">
       <div class="blog-index">
   
@@ -85,8 +100,49 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2015/09/15/testing-intents-with-espresso-intents/">Testing Intents With Espresso Intents</a></h1>
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-01-06T20:25:53-05:00" pubdate data-updated="true">Jan 6<span>th</span>, 2016</time>
+        
+         | <a href="/blog/2016/01/06/android-studio-tips-and-tricks/#disqus_thread">Comments</a>
+        
+      </p>
     
+    
+      <h1 class="entry-title"><a href="/blog/2016/01/06/android-studio-tips-and-tricks/">Android Studio Tips and Tricks</a></h1>
+    
+
+  </header>
+
+
+  <div class="entry-content"><p>I recently attended Google&rsquo;s <a href="https://androiddevsummit.withgoogle.com/">Android Dev Summit</a> where the Tools team presented a talk entitled <a href="https://www.youtube.com/watch?v=Y2GC6P5hPeA">Android Studio For Experts</a>. The room was packed for the 90 minute session, where a lot of great Android Studio tips were shared. This gave me the idea of showing off some of my favorite Android Studio tips!</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2016/01/06/android-studio-tips-and-tricks/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
     
       <p class="meta">
         
@@ -107,6 +163,10 @@
         
       </p>
     
+    
+      <h1 class="entry-title"><a href="/blog/2015/09/15/testing-intents-with-espresso-intents/">Testing Intents With Espresso Intents</a></h1>
+    
+
   </header>
 
 
@@ -128,9 +188,6 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2015/09/09/droidcon-nyc-2015-at-annotationprocessors-byexample/">Droidcon NYC 2015: @AnnotationProcessors(&#8220;ByExample&#8221;)</a></h1>
-    
-    
       <p class="meta">
         
 
@@ -150,6 +207,10 @@
         
       </p>
     
+    
+      <h1 class="entry-title"><a href="/blog/2015/09/09/droidcon-nyc-2015-at-annotationprocessors-byexample/">Droidcon NYC 2015: @AnnotationProcessors(&#8220;ByExample&#8221;)</a></h1>
+    
+
   </header>
 
 
@@ -174,9 +235,6 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2015/08/03/using-espresso-for-easy-ui-testing/">Using Espresso for Easy UI Testing</a></h1>
-    
-    
       <p class="meta">
         
 
@@ -196,6 +254,10 @@
         
       </p>
     
+    
+      <h1 class="entry-title"><a href="/blog/2015/08/03/using-espresso-for-easy-ui-testing/">Using Espresso for Easy UI Testing</a></h1>
+    
+
   </header>
 
 
@@ -217,9 +279,6 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2015/07/14/improving-your-code-with-android-support-annotations/">Improving Your Code With Android Support Annotations</a></h1>
-    
-    
       <p class="meta">
         
 
@@ -239,6 +298,10 @@
         
       </p>
     
+    
+      <h1 class="entry-title"><a href="/blog/2015/07/14/improving-your-code-with-android-support-annotations/">Improving Your Code With Android Support Annotations</a></h1>
+    
+
   </header>
 
 
@@ -264,9 +327,6 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2015/05/07/android-ripples-with-rounded-corners/">Android Ripples With Rounded Corners</a></h1>
-    
-    
       <p class="meta">
         
 
@@ -286,6 +346,10 @@
         
       </p>
     
+    
+      <h1 class="entry-title"><a href="/blog/2015/05/07/android-ripples-with-rounded-corners/">Android Ripples With Rounded Corners</a></h1>
+    
+
   </header>
 
 
@@ -360,9 +424,6 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2014/07/09/blurred-background-effect-for-android/">Blurred Background Effect for Android</a></h1>
-    
-    
       <p class="meta">
         
 
@@ -382,6 +443,10 @@
         
       </p>
     
+    
+      <h1 class="entry-title"><a href="/blog/2014/07/09/blurred-background-effect-for-android/">Blurred Background Effect for Android</a></h1>
+    
+
   </header>
 
 
@@ -424,9 +489,6 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2014/06/07/building-obs-studio-for-os-x/">Building OBS Studio for OS X</a></h1>
-    
-    
       <p class="meta">
         
 
@@ -446,6 +508,10 @@
         
       </p>
     
+    
+      <h1 class="entry-title"><a href="/blog/2014/06/07/building-obs-studio-for-os-x/">Building OBS Studio for OS X</a></h1>
+    
+
   </header>
 
 
@@ -484,9 +550,6 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2014/04/13/embedding-google-plus-posts-in-octopress/">Embedding Google+ Posts in Octopress</a></h1>
-    
-    
       <p class="meta">
         
 
@@ -506,6 +569,10 @@
         
       </p>
     
+    
+      <h1 class="entry-title"><a href="/blog/2014/04/13/embedding-google-plus-posts-in-octopress/">Embedding Google+ Posts in Octopress</a></h1>
+    
+
   </header>
 
 
@@ -552,9 +619,6 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2014/03/03/adb-over-wifi/">ADB Over WiFi</a></h1>
-    
-    
       <p class="meta">
         
 
@@ -574,6 +638,10 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
         
       </p>
     
+    
+      <h1 class="entry-title"><a href="/blog/2014/03/03/adb-over-wifi/">ADB Over WiFi</a></h1>
+    
+
   </header>
 
 
@@ -597,54 +665,6 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/12/31/2013-in-review/">2013 in Review</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-12-31T11:27:05-05:00" pubdate data-updated="true">Dec 31<span>st</span>, 2013</time>
-        
-         | <a href="/blog/2013/12/31/2013-in-review/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Today is December 31st, and I decided to write up a blog post, reflecting on the year that I&rsquo;ve had. I&rsquo;ve learned a lot over the last twelve months, and done a lot of interesting things (okay, at least interesting to me). Here&rsquo;s a brief overview of what happened:</p>
-
-<div align='center'><div class='g-post' data-href='https://plus.google.com/114052868601022948953/posts/ZzXcKVs2fvH'></div></div>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/12/31/2013-in-review/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; Older</a>
@@ -662,6 +682,10 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2026/05/11/how-to-combine-pagingdata-with-other-flows-using-asitemsnapshotlistflow/">How to Combine PagingData with Other Flows Using asItemSnapshotListFlow</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2026/02/11/custom-scroll-indicators-in-jetpack-compose-foundation/">Adding Scrollbars to Jetpack Compose</a>
       </li>
     
@@ -675,10 +699,6 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
     
       <li class="post">
         <a href="/blog/2024/12/14/ui-testing-made-easy-the-robot-test-pattern-on-android/">UI Testing Made Easy: The Robot Test Pattern on Android</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2024/10/10/modernizing-your-android-apps-data-storage-sharedpreferences-to-datastore/">Modernizing Your Android App&#8217;s Data Storage: SharedPreferences to DataStore</a>
       </li>
     
   </ul>
@@ -730,10 +750,9 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
 </aside>
 
     </div>
-  </div>
+  </main>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2026 - Michael Evans -
-  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+  Copyright &copy; 2026 Michael Evans
 </p>
 
 </footer>

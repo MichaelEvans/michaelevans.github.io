@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Kotlin | Michael Evans]]></title>
   <link href="http://michaelevans.org/blog/categories/kotlin/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2026-03-04T21:14:42-05:00</updated>
+  <updated>2026-10-25T17:50:57-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -12,6 +12,187 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How to Combine PagingData with Other Flows Using asItemSnapshotListFlow]]></title>
+    <link href="http://michaelevans.org/blog/2026/05/11/how-to-combine-pagingdata-with-other-flows-using-asitemsnapshotlistflow/"/>
+    <updated>2026-05-11T21:01:11-04:00</updated>
+    <id>http://michaelevans.org/blog/2026/05/11/how-to-combine-pagingdata-with-other-flows-using-asitemsnapshotlistflow</id>
+    <content type="html"><![CDATA[<p>If you&rsquo;ve ever tried to combine a <code>Flow&lt;PagingData&lt;T&gt;&gt;</code> with another <code>Flow</code>, you&rsquo;ve probably discovered that <code>PagingData</code> doesn&rsquo;t behave like a regular list of items.</p>
+
+<p>That&rsquo;s by design. <code>PagingData</code> is meant to be consumed by Paging&rsquo;s presenters, like <code>PagingDataAdapter</code> or <code>LazyPagingItems</code>. Those presenters know how to listen for page events, trigger more loads as the user scrolls, and update the UI as new items arrive.</p>
+
+<p>But sometimes your screen needs the currently loaded items as state. Maybe you want to combine them with selected IDs, optimistic likes, or locally edited titles. This has been a common source of confusion for developers trying to <a href="https://stackoverflow.com/questions/66262502/combining-pagingdata-3-flow-with-another-flow">combine <code>PagingData</code> with another <code>Flow</code></a>, expose paging from an MVI-style screen (one where the UI renders a single state object), or update loaded items without forcing a full refresh.</p>
+
+<p>Paging <a href="https://developer.android.com/jetpack/androidx/releases/paging#3.5.0">3.5.0</a> adds a new API for this: <a href="https://developer.android.com/reference/kotlin/androidx/paging/package-summary#asitemsnapshotlistflow"><code>asItemSnapshotListFlow</code></a>.</p>
+
+<!-- more -->
+
+
+<h2>The new shape: loaded items as state</h2>
+
+<p>At its simplest, the new API looks like this:</p>
+
+<p>```kotlin
+val itemsFlow: Flow&lt;ItemSnapshotList<Post>> =</p>
+
+<pre><code>pager.flow.asItemSnapshotListFlow()
+</code></pre>
+
+<p>```</p>
+
+<p>Each emission gives you the currently loaded items in <code>snapshot.items</code>, along with counts of any placeholders before and after them. You can read and transform that list anywhere you collect the flow.</p>
+
+<p>One heads-up before we go further: reading from a snapshot doesn&rsquo;t tell Paging to load more, and <code>append()</code> and <code>prepend()</code> are the only way to do it with this API. If you render these items yourself, you&rsquo;ll need to call them. We&rsquo;ll get to that in <a href="#loading-more-data">Loading more data</a>.</p>
+
+<h2>Combining loaded items with other state</h2>
+
+<p>Suppose you have a feed of posts. The posts come from Paging, but the screen also tracks a few other things: which posts the user has liked, and which authors they&rsquo;ve muted.</p>
+
+<p>Here&rsquo;s the obvious first attempt:</p>
+
+<p>```kotlin
+val feed: Flow&lt;PagingData<PostUiModel>> =</p>
+
+<pre><code>combine(pager.flow, likeOverrides) { pagingData, overrides -&gt;
+    pagingData.map { post -&gt;
+        post.toUiModel(isLiked = overrides[post.id] ?: post.isLiked)
+    }
+}
+</code></pre>
+
+<p>```</p>
+
+<p>It compiles, and then it crashes:</p>
+
+<p><code>text
+java.lang.IllegalStateException: Attempt to collect twice from pageEventFlow,
+which is an illegal operation. Did you forget to call
+Flow&lt;PagingData&lt;*&gt;&gt;.cachedIn(coroutineScope)?
+</code></p>
+
+<p>When <code>likeOverrides</code> changes, <code>combine</code> hands the same <code>PagingData</code> to your UI again, and Paging won&rsquo;t let it be collected twice. Adding <a href="https://developer.android.com/topic/libraries/architecture/paging/v3-transform#avoid-duplicate"><code>cachedIn</code></a> before the <code>combine</code> fixes it, and for simple per-item transforms like this one, that&rsquo;s a perfectly good answer.</p>
+
+<p>It gets awkward when you need to treat the loaded items as data. Looking one up by ID or filtering by state that lives in another Flow both mean working inside <code>PagingData</code>&rsquo;s transform operators. <code>asItemSnapshotListFlow</code> gets you out of that:</p>
+
+<p>```kotlin
+val feed: Flow&lt;List<PostUiModel>> =</p>
+
+<pre><code>combine(
+    pager.flow.asItemSnapshotListFlow(),
+    likeOverrides,
+    mutedAuthorIds,
+) { snapshot, overrides, mutedIds -&gt;
+    snapshot.items
+        .filterNot { post -&gt; post.authorId in mutedIds }
+        .map { post -&gt;
+            post.toUiModel(isLiked = overrides[post.id] ?: post.isLiked)
+        }
+}
+</code></pre>
+
+<p>```</p>
+
+<p>That&rsquo;s an ordinary Flow of lists. Paging still loads incrementally, but the code doing the combining only sees what&rsquo;s loaded right now.</p>
+
+<p>It&rsquo;s a good fit for UI-only state: selection, muted rows, expanded or collapsed sections, local filters. None of that belongs in your database or network model. It&rsquo;s just how this screen reads the loaded items.</p>
+
+<h2>Optimistic likes and local display edits</h2>
+
+<p>When a user taps a like button, you want the UI to update right away, even while the network request is still running. The same goes for editing a display title locally before saving.</p>
+
+<p>Historically, Paging pushed you toward updating the backing data source and invalidating the <code>PagingSource</code>. That&rsquo;s still the right answer for durable data. But for a temporary visual change, going through a full paging refresh is a lot of ceremony for a heart icon.</p>
+
+<p>With <code>asItemSnapshotListFlow</code>, you can keep local overlays separate and apply them to the loaded snapshot:</p>
+
+<p>```kotlin
+private val likeOverrides = MutableStateFlow&lt;Map&lt;PostId, Boolean>>(emptyMap())
+private val localTitles = MutableStateFlow&lt;Map&lt;PostId, String>>(emptyMap())</p>
+
+<p>val feedUiModels: Flow&lt;List<PostUiModel>> =</p>
+
+<pre><code>combine(
+    pager.flow.asItemSnapshotListFlow(),
+    likeOverrides,
+    localTitles,
+) { snapshot, overrides, titles -&gt;
+    snapshot.items.map { post -&gt;
+        post.toUiModel(
+            isLiked = overrides[post.id] ?: post.isLiked,
+            title = titles[post.id] ?: post.title
+        )
+    }
+}
+</code></pre>
+
+<p>fun setLiked(id: PostId, liked: Boolean) {</p>
+
+<pre><code>likeOverrides.update { it + (id to liked) }
+viewModelScope.launch {
+    try {
+        repository.setLiked(id, liked)
+    } catch (e: IOException) {
+        likeOverrides.update { it - id }
+    }
+}
+</code></pre>
+
+<p>}</p>
+
+<p>fun editTitleLocally(id: PostId, title: String) {</p>
+
+<pre><code>localTitles.update { it + (id to title) }
+</code></pre>
+
+<p>}
+```</p>
+
+<p>These overlays don&rsquo;t replace your source of truth. If the request succeeds, you still need to update your backing data source, and once the refreshed item comes back with the new value you can drop the override so it can&rsquo;t mask a later change from the server. If the request fails, drop it right away, as <code>setLiked</code> does above.</p>
+
+<p>The payoff is that your UI doesn&rsquo;t wait on Paging to show a local change.</p>
+
+<p><a id="loading-more-data"></a></p>
+
+<h2>Loading more data</h2>
+
+<p>As mentioned up top, <code>append()</code> and <code>prepend()</code> are how you load more when you work from snapshots. Here&rsquo;s the shape in a ViewModel:</p>
+
+<p>```kotlin
+class FeedViewModel : ViewModel() {</p>
+
+<pre><code>private val pager = Pager(
+    config = PagingConfig(pageSize = 40),
+    pagingSourceFactory = pagingSourceFactory
+)
+
+val posts: Flow&lt;ItemSnapshotList&lt;Post&gt;&gt; =
+    pager.flow.asItemSnapshotListFlow()
+
+fun append() {
+    pager.append()
+}
+
+fun prepend() {
+    pager.prepend()
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Then call them from your UI when the user nears an edge of the list. The <a href="https://developer.android.com/jetpack/androidx/releases/paging#3.5.0-alpha01">3.5.0-alpha01 release notes</a> show a Compose example that puts a <code>LaunchedEffect</code> calling <code>append()</code> in an item at the end of the <code>LazyColumn</code>.</p>
+
+<p>The 3.5.0 <a href="https://developer.android.com/jetpack/androidx/releases/paging#3.5.0">release notes</a> also list <code>Pager.refresh()</code> and <code>Pager.retry()</code> for recovering from load errors when you work from snapshots.</p>
+
+<h2>Wrap-up</h2>
+
+<p>For a straightforward paged list, I&rsquo;d still reach for <code>collectAsLazyPagingItems()</code> or <code>PagingDataAdapter</code>, since they handle scroll-driven loading for you.</p>
+
+<p>I&rsquo;d use <code>asItemSnapshotListFlow</code> when the screen needs local edits, filters from another Flow, or lookups across the loaded items. You get a list you can work with using the Flow operators you already know.</p>
+
+<p>It does come with a couple of tradeoffs. Every emission gives you the whole loaded list, so any overlay change re-maps all of it, which is worth keeping in mind for very large lists. And you&rsquo;re responsible for loading more pages when you render snapshots yourself.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Adding Scrollbars to Jetpack Compose]]></title>

@@ -4,7 +4,7 @@
   <title><![CDATA[Michael Evans]]></title>
   <link href="http://michaelevans.org/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2026-03-04T21:14:42-05:00</updated>
+  <updated>2026-10-25T17:50:57-04:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -12,6 +12,238 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How to Combine PagingData with Other Flows Using asItemSnapshotListFlow]]></title>
+    <link href="http://michaelevans.org/blog/2026/05/11/how-to-combine-pagingdata-with-other-flows-using-asitemsnapshotlistflow/"/>
+    <updated>2026-05-11T21:01:11-04:00</updated>
+    <id>http://michaelevans.org/blog/2026/05/11/how-to-combine-pagingdata-with-other-flows-using-asitemsnapshotlistflow</id>
+    <content type="html"><![CDATA[<p>If you&rsquo;ve ever tried to combine a <code>Flow&lt;PagingData&lt;T&gt;&gt;</code> with another <code>Flow</code>, you&rsquo;ve probably discovered that <code>PagingData</code> doesn&rsquo;t behave like a regular list of items.</p>
+
+<p>That&rsquo;s by design. <code>PagingData</code> is meant to be consumed by Paging&rsquo;s presenters, like <code>PagingDataAdapter</code> or <code>LazyPagingItems</code>. Those presenters know how to listen for page events, trigger more loads as the user scrolls, and update the UI as new items arrive.</p>
+
+<p>But sometimes your screen needs the currently loaded items as state. Maybe you want to combine them with selected IDs, optimistic likes, or locally edited titles. This has been a common source of confusion for developers trying to <a href="https://stackoverflow.com/questions/66262502/combining-pagingdata-3-flow-with-another-flow">combine <code>PagingData</code> with another <code>Flow</code></a>, expose paging from an MVI-style screen (one where the UI renders a single state object), or update loaded items without forcing a full refresh.</p>
+
+<p>Paging <a href="https://developer.android.com/jetpack/androidx/releases/paging#3.5.0">3.5.0</a> adds a new API for this: <a href="https://developer.android.com/reference/kotlin/androidx/paging/package-summary#asitemsnapshotlistflow"><code>asItemSnapshotListFlow</code></a>.</p>
+
+<!-- more -->
+
+
+<h2>The new shape: loaded items as state</h2>
+
+<p>At its simplest, the new API looks like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='kotlin'><span class='line'><span class="k">val</span> <span class="n">itemsFlow</span><span class="p">:</span> <span class="n">Flow</span><span class="p">&lt;</span><span class="n">ItemSnapshotList</span><span class="p">&lt;</span><span class="n">Post</span><span class="p">&gt;&gt;</span> <span class="p">=</span>
+</span><span class='line'>    <span class="n">pager</span><span class="p">.</span><span class="n">flow</span><span class="p">.</span><span class="n">asItemSnapshotListFlow</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Each emission gives you the currently loaded items in <code>snapshot.items</code>, along with counts of any placeholders before and after them. You can read and transform that list anywhere you collect the flow.</p>
+
+<p>One heads-up before we go further: reading from a snapshot doesn&rsquo;t tell Paging to load more, and <code>append()</code> and <code>prepend()</code> are the only way to do it with this API. If you render these items yourself, you&rsquo;ll need to call them. We&rsquo;ll get to that in <a href="#loading-more-data">Loading more data</a>.</p>
+
+<h2>Combining loaded items with other state</h2>
+
+<p>Suppose you have a feed of posts. The posts come from Paging, but the screen also tracks a few other things: which posts the user has liked, and which authors they&rsquo;ve muted.</p>
+
+<p>Here&rsquo;s the obvious first attempt:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='kotlin'><span class='line'><span class="k">val</span> <span class="n">feed</span><span class="p">:</span> <span class="n">Flow</span><span class="p">&lt;</span><span class="n">PagingData</span><span class="p">&lt;</span><span class="n">PostUiModel</span><span class="p">&gt;&gt;</span> <span class="p">=</span>
+</span><span class='line'>    <span class="n">combine</span><span class="p">(</span><span class="n">pager</span><span class="p">.</span><span class="n">flow</span><span class="p">,</span> <span class="n">likeOverrides</span><span class="p">)</span> <span class="p">{</span> <span class="n">pagingData</span><span class="p">,</span> <span class="n">overrides</span> <span class="p">-&gt;</span>
+</span><span class='line'>        <span class="n">pagingData</span><span class="p">.</span><span class="n">map</span> <span class="p">{</span> <span class="n">post</span> <span class="p">-&gt;</span>
+</span><span class='line'>            <span class="n">post</span><span class="p">.</span><span class="n">toUiModel</span><span class="p">(</span><span class="n">isLiked</span> <span class="p">=</span> <span class="n">overrides</span><span class="p">[</span><span class="n">post</span><span class="p">.</span><span class="n">id</span><span class="p">]</span> <span class="p">?:</span> <span class="n">post</span><span class="p">.</span><span class="n">isLiked</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It compiles, and then it crashes:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>java.lang.IllegalStateException: Attempt to collect twice from pageEventFlow,
+</span><span class='line'>which is an illegal operation. Did you forget to call
+</span><span class='line'>Flow&lt;PagingData&lt;*&gt;&gt;.cachedIn(coroutineScope)?
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When <code>likeOverrides</code> changes, <code>combine</code> hands the same <code>PagingData</code> to your UI again, and Paging won&rsquo;t let it be collected twice. Adding <a href="https://developer.android.com/topic/libraries/architecture/paging/v3-transform#avoid-duplicate"><code>cachedIn</code></a> before the <code>combine</code> fixes it, and for simple per-item transforms like this one, that&rsquo;s a perfectly good answer.</p>
+
+<p>It gets awkward when you need to treat the loaded items as data. Looking one up by ID or filtering by state that lives in another Flow both mean working inside <code>PagingData</code>&rsquo;s transform operators. <code>asItemSnapshotListFlow</code> gets you out of that:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='kotlin'><span class='line'><span class="k">val</span> <span class="n">feed</span><span class="p">:</span> <span class="n">Flow</span><span class="p">&lt;</span><span class="n">List</span><span class="p">&lt;</span><span class="n">PostUiModel</span><span class="p">&gt;&gt;</span> <span class="p">=</span>
+</span><span class='line'>    <span class="n">combine</span><span class="p">(</span>
+</span><span class='line'>        <span class="n">pager</span><span class="p">.</span><span class="n">flow</span><span class="p">.</span><span class="n">asItemSnapshotListFlow</span><span class="p">(),</span>
+</span><span class='line'>        <span class="n">likeOverrides</span><span class="p">,</span>
+</span><span class='line'>        <span class="n">mutedAuthorIds</span><span class="p">,</span>
+</span><span class='line'>    <span class="p">)</span> <span class="p">{</span> <span class="n">snapshot</span><span class="p">,</span> <span class="n">overrides</span><span class="p">,</span> <span class="n">mutedIds</span> <span class="p">-&gt;</span>
+</span><span class='line'>        <span class="n">snapshot</span><span class="p">.</span><span class="n">items</span>
+</span><span class='line'>            <span class="p">.</span><span class="n">filterNot</span> <span class="p">{</span> <span class="n">post</span> <span class="p">-&gt;</span> <span class="n">post</span><span class="p">.</span><span class="n">authorId</span> <span class="k">in</span> <span class="n">mutedIds</span> <span class="p">}</span>
+</span><span class='line'>            <span class="p">.</span><span class="n">map</span> <span class="p">{</span> <span class="n">post</span> <span class="p">-&gt;</span>
+</span><span class='line'>                <span class="n">post</span><span class="p">.</span><span class="n">toUiModel</span><span class="p">(</span><span class="n">isLiked</span> <span class="p">=</span> <span class="n">overrides</span><span class="p">[</span><span class="n">post</span><span class="p">.</span><span class="n">id</span><span class="p">]</span> <span class="p">?:</span> <span class="n">post</span><span class="p">.</span><span class="n">isLiked</span><span class="p">)</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&rsquo;s an ordinary Flow of lists. Paging still loads incrementally, but the code doing the combining only sees what&rsquo;s loaded right now.</p>
+
+<p>It&rsquo;s a good fit for UI-only state: selection, muted rows, expanded or collapsed sections, local filters. None of that belongs in your database or network model. It&rsquo;s just how this screen reads the loaded items.</p>
+
+<h2>Optimistic likes and local display edits</h2>
+
+<p>When a user taps a like button, you want the UI to update right away, even while the network request is still running. The same goes for editing a display title locally before saving.</p>
+
+<p>Historically, Paging pushed you toward updating the backing data source and invalidating the <code>PagingSource</code>. That&rsquo;s still the right answer for durable data. But for a temporary visual change, going through a full paging refresh is a lot of ceremony for a heart icon.</p>
+
+<p>With <code>asItemSnapshotListFlow</code>, you can keep local overlays separate and apply them to the loaded snapshot:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+</pre></td><td class='code'><pre><code class='kotlin'><span class='line'><span class="k">private</span> <span class="k">val</span> <span class="n">likeOverrides</span> <span class="p">=</span> <span class="n">MutableStateFlow</span><span class="p">&lt;</span><span class="n">Map</span><span class="p">&lt;</span><span class="n">PostId</span><span class="p">,</span> <span class="n">Boolean</span><span class="p">&gt;&gt;(</span><span class="n">emptyMap</span><span class="p">())</span>
+</span><span class='line'><span class="k">private</span> <span class="k">val</span> <span class="n">localTitles</span> <span class="p">=</span> <span class="n">MutableStateFlow</span><span class="p">&lt;</span><span class="n">Map</span><span class="p">&lt;</span><span class="n">PostId</span><span class="p">,</span> <span class="n">String</span><span class="p">&gt;&gt;(</span><span class="n">emptyMap</span><span class="p">())</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">val</span> <span class="n">feedUiModels</span><span class="p">:</span> <span class="n">Flow</span><span class="p">&lt;</span><span class="n">List</span><span class="p">&lt;</span><span class="n">PostUiModel</span><span class="p">&gt;&gt;</span> <span class="p">=</span>
+</span><span class='line'>    <span class="n">combine</span><span class="p">(</span>
+</span><span class='line'>        <span class="n">pager</span><span class="p">.</span><span class="n">flow</span><span class="p">.</span><span class="n">asItemSnapshotListFlow</span><span class="p">(),</span>
+</span><span class='line'>        <span class="n">likeOverrides</span><span class="p">,</span>
+</span><span class='line'>        <span class="n">localTitles</span><span class="p">,</span>
+</span><span class='line'>    <span class="p">)</span> <span class="p">{</span> <span class="n">snapshot</span><span class="p">,</span> <span class="n">overrides</span><span class="p">,</span> <span class="n">titles</span> <span class="p">-&gt;</span>
+</span><span class='line'>        <span class="n">snapshot</span><span class="p">.</span><span class="n">items</span><span class="p">.</span><span class="n">map</span> <span class="p">{</span> <span class="n">post</span> <span class="p">-&gt;</span>
+</span><span class='line'>            <span class="n">post</span><span class="p">.</span><span class="n">toUiModel</span><span class="p">(</span>
+</span><span class='line'>                <span class="n">isLiked</span> <span class="p">=</span> <span class="n">overrides</span><span class="p">[</span><span class="n">post</span><span class="p">.</span><span class="n">id</span><span class="p">]</span> <span class="p">?:</span> <span class="n">post</span><span class="p">.</span><span class="n">isLiked</span><span class="p">,</span>
+</span><span class='line'>                <span class="n">title</span> <span class="p">=</span> <span class="n">titles</span><span class="p">[</span><span class="n">post</span><span class="p">.</span><span class="n">id</span><span class="p">]</span> <span class="p">?:</span> <span class="n">post</span><span class="p">.</span><span class="n">title</span>
+</span><span class='line'>            <span class="p">)</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">fun</span> <span class="nf">setLiked</span><span class="p">(</span><span class="n">id</span><span class="p">:</span> <span class="n">PostId</span><span class="p">,</span> <span class="n">liked</span><span class="p">:</span> <span class="n">Boolean</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">likeOverrides</span><span class="p">.</span><span class="n">update</span> <span class="p">{</span> <span class="n">it</span> <span class="p">+</span> <span class="p">(</span><span class="n">id</span> <span class="n">to</span> <span class="n">liked</span><span class="p">)</span> <span class="p">}</span>
+</span><span class='line'>    <span class="n">viewModelScope</span><span class="p">.</span><span class="n">launch</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">try</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">repository</span><span class="p">.</span><span class="n">setLiked</span><span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="n">liked</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="n">IOException</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">likeOverrides</span><span class="p">.</span><span class="n">update</span> <span class="p">{</span> <span class="n">it</span> <span class="p">-</span> <span class="n">id</span> <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">fun</span> <span class="nf">editTitleLocally</span><span class="p">(</span><span class="n">id</span><span class="p">:</span> <span class="n">PostId</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">localTitles</span><span class="p">.</span><span class="n">update</span> <span class="p">{</span> <span class="n">it</span> <span class="p">+</span> <span class="p">(</span><span class="n">id</span> <span class="n">to</span> <span class="n">title</span><span class="p">)</span> <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>These overlays don&rsquo;t replace your source of truth. If the request succeeds, you still need to update your backing data source, and once the refreshed item comes back with the new value you can drop the override so it can&rsquo;t mask a later change from the server. If the request fails, drop it right away, as <code>setLiked</code> does above.</p>
+
+<p>The payoff is that your UI doesn&rsquo;t wait on Paging to show a local change.</p>
+
+<p><a id="loading-more-data"></a></p>
+
+<h2>Loading more data</h2>
+
+<p>As mentioned up top, <code>append()</code> and <code>prepend()</code> are how you load more when you work from snapshots. Here&rsquo;s the shape in a ViewModel:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='kotlin'><span class='line'><span class="k">class</span> <span class="nc">FeedViewModel</span> <span class="p">:</span> <span class="n">ViewModel</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">private</span> <span class="k">val</span> <span class="n">pager</span> <span class="p">=</span> <span class="n">Pager</span><span class="p">(</span>
+</span><span class='line'>        <span class="n">config</span> <span class="p">=</span> <span class="n">PagingConfig</span><span class="p">(</span><span class="n">pageSize</span> <span class="p">=</span> <span class="m">40</span><span class="p">),</span>
+</span><span class='line'>        <span class="n">pagingSourceFactory</span> <span class="p">=</span> <span class="n">pagingSourceFactory</span>
+</span><span class='line'>    <span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">val</span> <span class="n">posts</span><span class="p">:</span> <span class="n">Flow</span><span class="p">&lt;</span><span class="n">ItemSnapshotList</span><span class="p">&lt;</span><span class="n">Post</span><span class="p">&gt;&gt;</span> <span class="p">=</span>
+</span><span class='line'>        <span class="n">pager</span><span class="p">.</span><span class="n">flow</span><span class="p">.</span><span class="n">asItemSnapshotListFlow</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">fun</span> <span class="nf">append</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">pager</span><span class="p">.</span><span class="n">append</span><span class="p">()</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">fun</span> <span class="nf">prepend</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">pager</span><span class="p">.</span><span class="n">prepend</span><span class="p">()</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then call them from your UI when the user nears an edge of the list. The <a href="https://developer.android.com/jetpack/androidx/releases/paging#3.5.0-alpha01">3.5.0-alpha01 release notes</a> show a Compose example that puts a <code>LaunchedEffect</code> calling <code>append()</code> in an item at the end of the <code>LazyColumn</code>.</p>
+
+<p>The 3.5.0 <a href="https://developer.android.com/jetpack/androidx/releases/paging#3.5.0">release notes</a> also list <code>Pager.refresh()</code> and <code>Pager.retry()</code> for recovering from load errors when you work from snapshots.</p>
+
+<h2>Wrap-up</h2>
+
+<p>For a straightforward paged list, I&rsquo;d still reach for <code>collectAsLazyPagingItems()</code> or <code>PagingDataAdapter</code>, since they handle scroll-driven loading for you.</p>
+
+<p>I&rsquo;d use <code>asItemSnapshotListFlow</code> when the screen needs local edits, filters from another Flow, or lookups across the loaded items. You get a list you can work with using the Flow operators you already know.</p>
+
+<p>It does come with a couple of tradeoffs. Every emission gives you the whole loaded list, so any overlay change re-maps all of it, which is worth keeping in mind for very large lists. And you&rsquo;re responsible for loading more pages when you render snapshots yourself.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Adding Scrollbars to Jetpack Compose]]></title>
@@ -3451,72 +3683,6 @@ diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.Toolbar appc
 <ol>
 <li id="fn:1">
 <p><code>kapt</code> is <a href="http://blog.jetbrains.com/kotlin/2015/06/better-annotation-processing-supporting-stubs-in-kapt/">the annotation processing tool for Kotlin</a><a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Android Studio Tips and Tricks]]></title>
-    <link href="http://michaelevans.org/blog/2016/01/06/android-studio-tips-and-tricks/"/>
-    <updated>2016-01-06T20:25:53-05:00</updated>
-    <id>http://michaelevans.org/blog/2016/01/06/android-studio-tips-and-tricks</id>
-    <content type="html"><![CDATA[<p>I recently attended Google&rsquo;s <a href="https://androiddevsummit.withgoogle.com/">Android Dev Summit</a> where the Tools team presented a talk entitled <a href="https://www.youtube.com/watch?v=Y2GC6P5hPeA">Android Studio For Experts</a>. The room was packed for the 90 minute session, where a lot of great Android Studio tips were shared. This gave me the idea of showing off some of my favorite Android Studio tips!</p>
-
-<!-- more -->
-
-
-<h2>Language Injection</h2>
-
-<p>Ever needed to type a JSON String? Perhaps you&rsquo;ve used one as a text fixture for one of your GSON deserializers and know that it&rsquo;s a huge pain to manage all those backslashes. Fortunately, IntelliJ has a feature called <em>Language Injection</em>, which allows you to edit the JSON fragment in its own editor, and then IntelliJ will properly inject that fragment into your code as an escaped String.</p>
-
-<p><img class="center" src="http://michaelevans.org/images/2016/01/06/fragment_intention.png" width="300" height="100" title="Intention Action" ></p>
-
-<p>Inject Language/Reference is an intention action<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>, so you can start it by using <kbd>⌥</kbd>+<kbd>Return</kbd>, or <kbd>⌘</kbd>+<kbd>⇧</kbd>+<kbd>A</kbd> and searching for it.</p>
-
-<p><img class="center" src="http://michaelevans.org/images/2016/01/06/fragment_editor.png" width="300" height="300" title="Editing JSON" ></p>
-
-<h2><a href="https://xkcd.com/1171/">Check RegExp</a></h2>
-
-<p>This is pretty similar to the last tip, but if you select the language of the fragment as &ldquo;RegExp&rdquo;, you&rsquo;ll get a handy regular expression tester!</p>
-
-<p><img class="center" src="http://michaelevans.org/images/2016/01/06/reg_exp_1.png" width="300" height="150" title="Editing Regex" ></p>
-
-<p><img class="center" src="http://michaelevans.org/images/2016/01/06/reg_exp_2.png" width="300" height="200" title="Valid Regex" ></p>
-
-<p><img class="center" src="http://michaelevans.org/images/2016/01/06/reg_exp_3.png" width="300" height="200" title="Invalid Regex" ></p>
-
-<h2>Smart(er) Completion</h2>
-
-<p>Now I’m pretty sure most of you have used IntelliJ’s code completion features. Press <kbd>⌥</kbd>+<kbd>Space</kbd>, and IntelliJ/Android Studio lists options to complete the names of classes, methods, fields, and keywords within the visibility scope. But have you ever noticed that the suggestions seem to be based off the characters you&rsquo;ve typed, rather than the actual <em>types</em> that are expected in the scope of the caret? Something like this:</p>
-
-<p><img class="center" src="http://michaelevans.org/images/2016/01/06/basic_autocomplete.png" width="300" height="200" title="Autocomplete" ></p>
-
-<p>Well if you use <em>Type Completion</em> (by pressing <kbd>⌥</kbd>+<kbd>⇧</kbd>+<kbd>Space</kbd>), you will see a list of suggestions containing only those types that are applicable to the current context. In the example below, you&rsquo;ll only get types that return a <code>Reader</code>, which is the type that the <code>BufferedReader</code>&rsquo;s constructor expects:</p>
-
-<p><img class="center" src="http://michaelevans.org/images/2016/01/06/smart_autocomplete.png" width="300" height="200" title="Better Autocomplete" ></p>
-
-<p>What&rsquo;s even cooler is that you can press it an additional time, and IntelliJ will do a deeper scan (looking at static method calls, chained expressions, etc.) to find more options for you:</p>
-
-<p><img class="center" src="http://michaelevans.org/images/2016/01/06/chained_autocomplete.png" width="300" height="200" title="Chained Autocomplete" ></p>
-
-<h2>Discovering Your Own Tips and Tricks</h2>
-
-<p>Another really cool feature is the <em>Productivity Guide</em>. It shows you usage statistics for a lot of IntelliJ&rsquo;s features, such as how many keystokes you have saved or possible bugs you&rsquo;ve avoided by using the various shortcuts. It&rsquo;s also very helpful for discovering features you might not have known about; you can scroll through the list of unused features to see what you&rsquo;re missing out on! To find the productivity guide, go to <code>Help -&gt; Productivity Guide</code>.</p>
-
-<p><img class="center" src="http://michaelevans.org/images/2016/01/06/productivity_guide.png" width="700" height="500" title="Invalid Regex" ></p>
-
-<h2>Bonus Round &ndash; IntelliJ 15 Only</h2>
-
-<p>Did you know IntelliJ has <a href="https://www.jetbrains.com/idea/help/testing-restful-web-services.html">its own REST client</a>? Super handy for testing out API calls without something like <a href="https://luckymarmot.com/paw">Paw</a> or <a href="https://chrome.google.com/webstore/detail/postman/fhbjgbiflinjbdggehcddcbncdddomop?hl=en">Postman</a>.</p>
-
-<p>Have any other favorite tips or tricks? Let me know!</p>
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p><a href="https://www.jetbrains.com/idea/help/intention-actions.html">Intention Actions</a> are those suggestions in the little popup menus that allow you to quick-fix things like classes that haven&rsquo;t been imported, etc.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
 

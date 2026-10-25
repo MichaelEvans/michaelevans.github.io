@@ -1,0 +1,528 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="msvalidate.01" content="275BF9CDA457668389C1F9916C380DD0" />
+  <title>How to Combine PagingData with Other Flows Using asItemSnapshotListFlow - Michael Evans</title>
+  <meta name="author" content="Michael Evans">
+
+  
+  <meta name="description" content="Learn how Paging 3.5.0's asItemSnapshotListFlow API makes it easier to combine loaded PagingData with other Flows and apply optimistic UI updates.">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://michaelevans.org/blog/2026/05/11/how-to-combine-pagingdata-with-other-flows-using-asitemsnapshotlistflow/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css?v=1792965057" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Michael Evans" type="application/atom+xml">
+  <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+  <meta name="color-scheme" content="light dark">
+<script>
+  // Apply a saved preference before the first paint. The default follows the OS.
+  try {
+    var savedTheme = localStorage.getItem('blog-theme');
+    if (savedTheme === 'light' || savedTheme === 'dark') {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    }
+  } catch (error) {}
+</script>
+<script src="/javascripts/reading.js?v=1792965057" defer></script>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-28589266-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" role="banner">
+    <div class="site-identity">
+  <a class="site-name" href="/">Michael Evans</a>
+  
+    <p class="site-subtitle">A bunch of technobabble.</p>
+  
+</div>
+
+
+    <nav class="site-navigation" aria-label="Main navigation"><ul class="main-navigation">
+  <li><a href="/">Writing</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+<ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<div class="navigation-tools">
+  
+  <form action="https://google.com/search" method="get">
+    <fieldset role="search">
+      <input type="hidden" name="q" value="site:michaelevans.org" />
+      <input class="search" type="search" name="q" results="0" placeholder="Search posts…" aria-label="Search posts"/>
+    </fieldset>
+  </form>
+  
+  <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" hidden>
+    <span class="theme-moon">Dark</span><span class="theme-sun">Light</span>
+  </button>
+</div>
+</nav>
+  </header>
+  <main id="main">
+    <div id="content">
+      <div class="post-layout">
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2026-05-11T21:01:11-04:00" pubdate data-updated="true">May 11<span>th</span>, 2026</time>
+        
+      </p>
+    
+    
+      <h1 class="entry-title">How to Combine PagingData With Other Flows Using asItemSnapshotListFlow</h1>
+    
+
+  </header>
+
+
+<div class="entry-content"><p>If you&rsquo;ve ever tried to combine a <code>Flow&lt;PagingData&lt;T&gt;&gt;</code> with another <code>Flow</code>, you&rsquo;ve probably discovered that <code>PagingData</code> doesn&rsquo;t behave like a regular list of items.</p>
+
+<p>That&rsquo;s by design. <code>PagingData</code> is meant to be consumed by Paging&rsquo;s presenters, like <code>PagingDataAdapter</code> or <code>LazyPagingItems</code>. Those presenters know how to listen for page events, trigger more loads as the user scrolls, and update the UI as new items arrive.</p>
+
+<p>But sometimes your screen needs the currently loaded items as state. Maybe you want to combine them with selected IDs, optimistic likes, or locally edited titles. This has been a common source of confusion for developers trying to <a href="https://stackoverflow.com/questions/66262502/combining-pagingdata-3-flow-with-another-flow">combine <code>PagingData</code> with another <code>Flow</code></a>, expose paging from an MVI-style screen (one where the UI renders a single state object), or update loaded items without forcing a full refresh.</p>
+
+<p>Paging <a href="https://developer.android.com/jetpack/androidx/releases/paging#3.5.0">3.5.0</a> adds a new API for this: <a href="https://developer.android.com/reference/kotlin/androidx/paging/package-summary#asitemsnapshotlistflow"><code>asItemSnapshotListFlow</code></a>.</p>
+
+<!-- more -->
+
+
+<h2>The new shape: loaded items as state</h2>
+
+<p>At its simplest, the new API looks like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='kotlin'><span class='line'><span class="k">val</span> <span class="n">itemsFlow</span><span class="p">:</span> <span class="n">Flow</span><span class="p">&lt;</span><span class="n">ItemSnapshotList</span><span class="p">&lt;</span><span class="n">Post</span><span class="p">&gt;&gt;</span> <span class="p">=</span>
+</span><span class='line'>    <span class="n">pager</span><span class="p">.</span><span class="n">flow</span><span class="p">.</span><span class="n">asItemSnapshotListFlow</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Each emission gives you the currently loaded items in <code>snapshot.items</code>, along with counts of any placeholders before and after them. You can read and transform that list anywhere you collect the flow.</p>
+
+<p>One heads-up before we go further: reading from a snapshot doesn&rsquo;t tell Paging to load more, and <code>append()</code> and <code>prepend()</code> are the only way to do it with this API. If you render these items yourself, you&rsquo;ll need to call them. We&rsquo;ll get to that in <a href="#loading-more-data">Loading more data</a>.</p>
+
+<h2>Combining loaded items with other state</h2>
+
+<p>Suppose you have a feed of posts. The posts come from Paging, but the screen also tracks a few other things: which posts the user has liked, and which authors they&rsquo;ve muted.</p>
+
+<p>Here&rsquo;s the obvious first attempt:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='kotlin'><span class='line'><span class="k">val</span> <span class="n">feed</span><span class="p">:</span> <span class="n">Flow</span><span class="p">&lt;</span><span class="n">PagingData</span><span class="p">&lt;</span><span class="n">PostUiModel</span><span class="p">&gt;&gt;</span> <span class="p">=</span>
+</span><span class='line'>    <span class="n">combine</span><span class="p">(</span><span class="n">pager</span><span class="p">.</span><span class="n">flow</span><span class="p">,</span> <span class="n">likeOverrides</span><span class="p">)</span> <span class="p">{</span> <span class="n">pagingData</span><span class="p">,</span> <span class="n">overrides</span> <span class="p">-&gt;</span>
+</span><span class='line'>        <span class="n">pagingData</span><span class="p">.</span><span class="n">map</span> <span class="p">{</span> <span class="n">post</span> <span class="p">-&gt;</span>
+</span><span class='line'>            <span class="n">post</span><span class="p">.</span><span class="n">toUiModel</span><span class="p">(</span><span class="n">isLiked</span> <span class="p">=</span> <span class="n">overrides</span><span class="p">[</span><span class="n">post</span><span class="p">.</span><span class="n">id</span><span class="p">]</span> <span class="p">?:</span> <span class="n">post</span><span class="p">.</span><span class="n">isLiked</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It compiles, and then it crashes:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>java.lang.IllegalStateException: Attempt to collect twice from pageEventFlow,
+</span><span class='line'>which is an illegal operation. Did you forget to call
+</span><span class='line'>Flow&lt;PagingData&lt;*&gt;&gt;.cachedIn(coroutineScope)?
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When <code>likeOverrides</code> changes, <code>combine</code> hands the same <code>PagingData</code> to your UI again, and Paging won&rsquo;t let it be collected twice. Adding <a href="https://developer.android.com/topic/libraries/architecture/paging/v3-transform#avoid-duplicate"><code>cachedIn</code></a> before the <code>combine</code> fixes it, and for simple per-item transforms like this one, that&rsquo;s a perfectly good answer.</p>
+
+<p>It gets awkward when you need to treat the loaded items as data. Looking one up by ID or filtering by state that lives in another Flow both mean working inside <code>PagingData</code>&rsquo;s transform operators. <code>asItemSnapshotListFlow</code> gets you out of that:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='kotlin'><span class='line'><span class="k">val</span> <span class="n">feed</span><span class="p">:</span> <span class="n">Flow</span><span class="p">&lt;</span><span class="n">List</span><span class="p">&lt;</span><span class="n">PostUiModel</span><span class="p">&gt;&gt;</span> <span class="p">=</span>
+</span><span class='line'>    <span class="n">combine</span><span class="p">(</span>
+</span><span class='line'>        <span class="n">pager</span><span class="p">.</span><span class="n">flow</span><span class="p">.</span><span class="n">asItemSnapshotListFlow</span><span class="p">(),</span>
+</span><span class='line'>        <span class="n">likeOverrides</span><span class="p">,</span>
+</span><span class='line'>        <span class="n">mutedAuthorIds</span><span class="p">,</span>
+</span><span class='line'>    <span class="p">)</span> <span class="p">{</span> <span class="n">snapshot</span><span class="p">,</span> <span class="n">overrides</span><span class="p">,</span> <span class="n">mutedIds</span> <span class="p">-&gt;</span>
+</span><span class='line'>        <span class="n">snapshot</span><span class="p">.</span><span class="n">items</span>
+</span><span class='line'>            <span class="p">.</span><span class="n">filterNot</span> <span class="p">{</span> <span class="n">post</span> <span class="p">-&gt;</span> <span class="n">post</span><span class="p">.</span><span class="n">authorId</span> <span class="k">in</span> <span class="n">mutedIds</span> <span class="p">}</span>
+</span><span class='line'>            <span class="p">.</span><span class="n">map</span> <span class="p">{</span> <span class="n">post</span> <span class="p">-&gt;</span>
+</span><span class='line'>                <span class="n">post</span><span class="p">.</span><span class="n">toUiModel</span><span class="p">(</span><span class="n">isLiked</span> <span class="p">=</span> <span class="n">overrides</span><span class="p">[</span><span class="n">post</span><span class="p">.</span><span class="n">id</span><span class="p">]</span> <span class="p">?:</span> <span class="n">post</span><span class="p">.</span><span class="n">isLiked</span><span class="p">)</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&rsquo;s an ordinary Flow of lists. Paging still loads incrementally, but the code doing the combining only sees what&rsquo;s loaded right now.</p>
+
+<p>It&rsquo;s a good fit for UI-only state: selection, muted rows, expanded or collapsed sections, local filters. None of that belongs in your database or network model. It&rsquo;s just how this screen reads the loaded items.</p>
+
+<h2>Optimistic likes and local display edits</h2>
+
+<p>When a user taps a like button, you want the UI to update right away, even while the network request is still running. The same goes for editing a display title locally before saving.</p>
+
+<p>Historically, Paging pushed you toward updating the backing data source and invalidating the <code>PagingSource</code>. That&rsquo;s still the right answer for durable data. But for a temporary visual change, going through a full paging refresh is a lot of ceremony for a heart icon.</p>
+
+<p>With <code>asItemSnapshotListFlow</code>, you can keep local overlays separate and apply them to the loaded snapshot:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+</pre></td><td class='code'><pre><code class='kotlin'><span class='line'><span class="k">private</span> <span class="k">val</span> <span class="n">likeOverrides</span> <span class="p">=</span> <span class="n">MutableStateFlow</span><span class="p">&lt;</span><span class="n">Map</span><span class="p">&lt;</span><span class="n">PostId</span><span class="p">,</span> <span class="n">Boolean</span><span class="p">&gt;&gt;(</span><span class="n">emptyMap</span><span class="p">())</span>
+</span><span class='line'><span class="k">private</span> <span class="k">val</span> <span class="n">localTitles</span> <span class="p">=</span> <span class="n">MutableStateFlow</span><span class="p">&lt;</span><span class="n">Map</span><span class="p">&lt;</span><span class="n">PostId</span><span class="p">,</span> <span class="n">String</span><span class="p">&gt;&gt;(</span><span class="n">emptyMap</span><span class="p">())</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">val</span> <span class="n">feedUiModels</span><span class="p">:</span> <span class="n">Flow</span><span class="p">&lt;</span><span class="n">List</span><span class="p">&lt;</span><span class="n">PostUiModel</span><span class="p">&gt;&gt;</span> <span class="p">=</span>
+</span><span class='line'>    <span class="n">combine</span><span class="p">(</span>
+</span><span class='line'>        <span class="n">pager</span><span class="p">.</span><span class="n">flow</span><span class="p">.</span><span class="n">asItemSnapshotListFlow</span><span class="p">(),</span>
+</span><span class='line'>        <span class="n">likeOverrides</span><span class="p">,</span>
+</span><span class='line'>        <span class="n">localTitles</span><span class="p">,</span>
+</span><span class='line'>    <span class="p">)</span> <span class="p">{</span> <span class="n">snapshot</span><span class="p">,</span> <span class="n">overrides</span><span class="p">,</span> <span class="n">titles</span> <span class="p">-&gt;</span>
+</span><span class='line'>        <span class="n">snapshot</span><span class="p">.</span><span class="n">items</span><span class="p">.</span><span class="n">map</span> <span class="p">{</span> <span class="n">post</span> <span class="p">-&gt;</span>
+</span><span class='line'>            <span class="n">post</span><span class="p">.</span><span class="n">toUiModel</span><span class="p">(</span>
+</span><span class='line'>                <span class="n">isLiked</span> <span class="p">=</span> <span class="n">overrides</span><span class="p">[</span><span class="n">post</span><span class="p">.</span><span class="n">id</span><span class="p">]</span> <span class="p">?:</span> <span class="n">post</span><span class="p">.</span><span class="n">isLiked</span><span class="p">,</span>
+</span><span class='line'>                <span class="n">title</span> <span class="p">=</span> <span class="n">titles</span><span class="p">[</span><span class="n">post</span><span class="p">.</span><span class="n">id</span><span class="p">]</span> <span class="p">?:</span> <span class="n">post</span><span class="p">.</span><span class="n">title</span>
+</span><span class='line'>            <span class="p">)</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">fun</span> <span class="nf">setLiked</span><span class="p">(</span><span class="n">id</span><span class="p">:</span> <span class="n">PostId</span><span class="p">,</span> <span class="n">liked</span><span class="p">:</span> <span class="n">Boolean</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">likeOverrides</span><span class="p">.</span><span class="n">update</span> <span class="p">{</span> <span class="n">it</span> <span class="p">+</span> <span class="p">(</span><span class="n">id</span> <span class="n">to</span> <span class="n">liked</span><span class="p">)</span> <span class="p">}</span>
+</span><span class='line'>    <span class="n">viewModelScope</span><span class="p">.</span><span class="n">launch</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">try</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">repository</span><span class="p">.</span><span class="n">setLiked</span><span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="n">liked</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="n">IOException</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">likeOverrides</span><span class="p">.</span><span class="n">update</span> <span class="p">{</span> <span class="n">it</span> <span class="p">-</span> <span class="n">id</span> <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">fun</span> <span class="nf">editTitleLocally</span><span class="p">(</span><span class="n">id</span><span class="p">:</span> <span class="n">PostId</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">localTitles</span><span class="p">.</span><span class="n">update</span> <span class="p">{</span> <span class="n">it</span> <span class="p">+</span> <span class="p">(</span><span class="n">id</span> <span class="n">to</span> <span class="n">title</span><span class="p">)</span> <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>These overlays don&rsquo;t replace your source of truth. If the request succeeds, you still need to update your backing data source, and once the refreshed item comes back with the new value you can drop the override so it can&rsquo;t mask a later change from the server. If the request fails, drop it right away, as <code>setLiked</code> does above.</p>
+
+<p>The payoff is that your UI doesn&rsquo;t wait on Paging to show a local change.</p>
+
+<p><a id="loading-more-data"></a></p>
+
+<h2>Loading more data</h2>
+
+<p>As mentioned up top, <code>append()</code> and <code>prepend()</code> are how you load more when you work from snapshots. Here&rsquo;s the shape in a ViewModel:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='kotlin'><span class='line'><span class="k">class</span> <span class="nc">FeedViewModel</span> <span class="p">:</span> <span class="n">ViewModel</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">private</span> <span class="k">val</span> <span class="n">pager</span> <span class="p">=</span> <span class="n">Pager</span><span class="p">(</span>
+</span><span class='line'>        <span class="n">config</span> <span class="p">=</span> <span class="n">PagingConfig</span><span class="p">(</span><span class="n">pageSize</span> <span class="p">=</span> <span class="m">40</span><span class="p">),</span>
+</span><span class='line'>        <span class="n">pagingSourceFactory</span> <span class="p">=</span> <span class="n">pagingSourceFactory</span>
+</span><span class='line'>    <span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">val</span> <span class="n">posts</span><span class="p">:</span> <span class="n">Flow</span><span class="p">&lt;</span><span class="n">ItemSnapshotList</span><span class="p">&lt;</span><span class="n">Post</span><span class="p">&gt;&gt;</span> <span class="p">=</span>
+</span><span class='line'>        <span class="n">pager</span><span class="p">.</span><span class="n">flow</span><span class="p">.</span><span class="n">asItemSnapshotListFlow</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">fun</span> <span class="nf">append</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">pager</span><span class="p">.</span><span class="n">append</span><span class="p">()</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">fun</span> <span class="nf">prepend</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">pager</span><span class="p">.</span><span class="n">prepend</span><span class="p">()</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then call them from your UI when the user nears an edge of the list. The <a href="https://developer.android.com/jetpack/androidx/releases/paging#3.5.0-alpha01">3.5.0-alpha01 release notes</a> show a Compose example that puts a <code>LaunchedEffect</code> calling <code>append()</code> in an item at the end of the <code>LazyColumn</code>.</p>
+
+<p>The 3.5.0 <a href="https://developer.android.com/jetpack/androidx/releases/paging#3.5.0">release notes</a> also list <code>Pager.refresh()</code> and <code>Pager.retry()</code> for recovering from load errors when you work from snapshots.</p>
+
+<h2>Wrap-up</h2>
+
+<p>For a straightforward paged list, I&rsquo;d still reach for <code>collectAsLazyPagingItems()</code> or <code>PagingDataAdapter</code>, since they handle scroll-driven loading for you.</p>
+
+<p>I&rsquo;d use <code>asItemSnapshotListFlow</code> when the screen needs local edits, filters from another Flow, or lookups across the loaded items. You get a list you can work with using the Flow operators you already know.</p>
+
+<p>It does come with a couple of tradeoffs. Every emission gives you the whole loaded list, so any overlay change re-maps all of it, which is worth keeping in mind for very large lists. And you&rsquo;re responsible for loading more pages when you render snapshots yourself.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Michael Evans</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2026-05-11T21:01:11-04:00" pubdate data-updated="true">May 11<span>th</span>, 2026</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/kotlin/'>Kotlin</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://michaelevans.org/blog/2026/05/11/how-to-combine-pagingdata-with-other-flows-using-asitemsnapshotlistflow/" data-via="m_evans10" data-counturl="http://michaelevans.org/blog/2026/05/11/how-to-combine-pagingdata-with-other-flows-using-asitemsnapshotlistflow/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2026/02/11/custom-scroll-indicators-in-jetpack-compose-foundation/" title="Previous Post: Adding Scrollbars to Jetpack Compose">&laquo; Adding Scrollbars to Jetpack Compose</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2026/05/11/how-to-combine-pagingdata-with-other-flows-using-asitemsnapshotlistflow/">How to Combine PagingData with Other Flows Using asItemSnapshotListFlow</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2026/02/11/custom-scroll-indicators-in-jetpack-compose-foundation/">Adding Scrollbars to Jetpack Compose</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2025/07/01/smooth-theme-transitions-in-compose-with-animated-colorschemes/">Smooth Theme Transitions in Compose with Animated ColorSchemes</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2025/03/22/turning-any-android-callback-into-a-flow-with-callbackflow/">Turning Any Android Callback into a Flow with callbackFlow</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2024/12/14/ui-testing-made-easy-the-robot-test-pattern-on-android/">UI Testing Made Easy: The Robot Test Pattern on Android</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/MichaelEvans">@MichaelEvans</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'MichaelEvans',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/114052868601022948953?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </main>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2026 Michael Evans
+</p>
+
+</footer>
+  
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

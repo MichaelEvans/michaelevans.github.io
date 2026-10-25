@@ -10,7 +10,7 @@
   <meta name="author" content="Michael Evans">
 
   
-  <meta name="description" content="Last week I open sourced an Android library called ColorArt, which is a port of the popular OS X library written by the guys over at Panic. It allows &hellip;">
+  <meta name="description" content="Today is December 31st, and I decided to write up a blog post, reflecting on the year that I&rsquo;ve had. I&rsquo;ve learned a lot over the last &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -21,16 +21,23 @@
   
   <link rel="canonical" href="http://michaelevans.org/blog/page/4/">
   <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/screen.css?v=1792965057" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="/javascripts/ender.js"></script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="Michael Evans" type="application/atom+xml">
   <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
-  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
-<link href='http://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+  <meta name="color-scheme" content="light dark">
+<script>
+  // Apply a saved preference before the first paint. The default follows the OS.
+  try {
+    var savedTheme = localStorage.getItem('blog-theme');
+    if (savedTheme === 'light' || savedTheme === 'dark') {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    }
+  } catch (error) {}
+</script>
+<script src="/javascripts/reading.js?v=1792965057" defer></script>
 
   
   <script type="text/javascript">
@@ -49,33 +56,41 @@
 </head>
 
 <body   >
-  <header role="banner"><hgroup>
-  <h1><a href="/">Michael Evans</a></h1>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" role="banner">
+    <div class="site-identity">
+  <a class="site-name" href="/">Michael Evans</a>
   
-    <h2>A bunch of technobabble.</h2>
+    <p class="site-subtitle">A bunch of technobabble.</p>
   
-</hgroup>
+</div>
 
-</header>
-  <nav role="navigation"><ul class="subscription" data-subscription="rss">
-  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
-  
-</ul>
-  
-<form action="https://google.com/search" method="get">
-  <fieldset role="search">
-    <input type="hidden" name="q" value="site:michaelevans.org" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-  </fieldset>
-</form>
-  
-<ul class="main-navigation">
-  <li><a href="/">Blog</a></li>
+
+    <nav class="site-navigation" aria-label="Main navigation"><ul class="main-navigation">
+  <li><a href="/">Writing</a></li>
   <li><a href="/blog/archives">Archives</a></li>
 </ul>
 
+<ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<div class="navigation-tools">
+  
+  <form action="https://google.com/search" method="get">
+    <fieldset role="search">
+      <input type="hidden" name="q" value="site:michaelevans.org" />
+      <input class="search" type="search" name="q" results="0" placeholder="Search posts…" aria-label="Search posts"/>
+    </fieldset>
+  </form>
+  
+  <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" hidden>
+    <span class="theme-moon">Dark</span><span class="theme-sun">Light</span>
+  </button>
+</div>
 </nav>
-  <div id="main">
+  </header>
+  <main id="main">
     <div id="content">
       <div class="blog-index">
   
@@ -85,8 +100,54 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android/">ColorArt: A Library to Do iTunes 11-style Color Matching for Android</a></h1>
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-12-31T11:27:05-05:00" pubdate data-updated="true">Dec 31<span>st</span>, 2013</time>
+        
+         | <a href="/blog/2013/12/31/2013-in-review/#disqus_thread">Comments</a>
+        
+      </p>
     
+    
+      <h1 class="entry-title"><a href="/blog/2013/12/31/2013-in-review/">2013 in Review</a></h1>
+    
+
+  </header>
+
+
+  <div class="entry-content"><p>Today is December 31st, and I decided to write up a blog post, reflecting on the year that I&rsquo;ve had. I&rsquo;ve learned a lot over the last twelve months, and done a lot of interesting things (okay, at least interesting to me). Here&rsquo;s a brief overview of what happened:</p>
+
+<div align='center'><div class='g-post' data-href='https://plus.google.com/114052868601022948953/posts/ZzXcKVs2fvH'></div></div>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/12/31/2013-in-review/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
     
       <p class="meta">
         
@@ -107,6 +168,10 @@
         
       </p>
     
+    
+      <h1 class="entry-title"><a href="/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android/">ColorArt: A Library to Do iTunes 11-style Color Matching for Android</a></h1>
+    
+
   </header>
 
 
@@ -130,9 +195,6 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/11/05/hands-on-with-google-helpouts/">Hands on With Google Helpouts</a></h1>
-    
-    
       <p class="meta">
         
 
@@ -152,6 +214,10 @@
         
       </p>
     
+    
+      <h1 class="entry-title"><a href="/blog/2013/11/05/hands-on-with-google-helpouts/">Hands on With Google Helpouts</a></h1>
+    
+
   </header>
 
 
@@ -178,9 +244,6 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/10/13/using-a-viewpager-in-a-scrollview/">Using a ViewPager in a ScrollView</a></h1>
-    
-    
       <p class="meta">
         
 
@@ -200,6 +263,10 @@
         
       </p>
     
+    
+      <h1 class="entry-title"><a href="/blog/2013/10/13/using-a-viewpager-in-a-scrollview/">Using a ViewPager in a ScrollView</a></h1>
+    
+
   </header>
 
 
@@ -221,9 +288,6 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/09/16/my-newest-app-bike-finder/">My Newest App: Bike Finder</a></h1>
-    
-    
       <p class="meta">
         
 
@@ -243,6 +307,10 @@
         
       </p>
     
+    
+      <h1 class="entry-title"><a href="/blog/2013/09/16/my-newest-app-bike-finder/">My Newest App: Bike Finder</a></h1>
+    
+
   </header>
 
 
@@ -266,9 +334,6 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/08/20/parse-android-todo-app-tutorial-part-two-users/">Parse Android To-do App Tutorial - Part Two - Users</a></h1>
-    
-    
       <p class="meta">
         
 
@@ -288,6 +353,10 @@
         
       </p>
     
+    
+      <h1 class="entry-title"><a href="/blog/2013/08/20/parse-android-todo-app-tutorial-part-two-users/">Parse Android To-do App Tutorial - Part Two - Users</a></h1>
+    
+
   </header>
 
 
@@ -309,9 +378,6 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse/">Tutorial: Building an Android To-Do List App Using Parse</a></h1>
-    
-    
       <p class="meta">
         
 
@@ -331,6 +397,10 @@
         
       </p>
     
+    
+      <h1 class="entry-title"><a href="/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse/">Tutorial: Building an Android To-Do List App Using Parse</a></h1>
+    
+
   </header>
 
 
@@ -352,9 +422,6 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/06/12/getting-mavericks-compressed-memory-feature-in-ubuntu/">Getting Mavericks&#8217; Compressed Memory Feature in Ubuntu</a></h1>
-    
-    
       <p class="meta">
         
 
@@ -374,6 +441,10 @@
         
       </p>
     
+    
+      <h1 class="entry-title"><a href="/blog/2013/06/12/getting-mavericks-compressed-memory-feature-in-ubuntu/">Getting Mavericks&#8217; Compressed Memory Feature in Ubuntu</a></h1>
+    
+
   </header>
 
 
@@ -399,9 +470,6 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/06/11/running-crouton-on-a-chromebook-pixel/">Running Crouton on a Chromebook Pixel</a></h1>
-    
-    
       <p class="meta">
         
 
@@ -421,6 +489,10 @@
         
       </p>
     
+    
+      <h1 class="entry-title"><a href="/blog/2013/06/11/running-crouton-on-a-chromebook-pixel/">Running Crouton on a Chromebook Pixel</a></h1>
+    
+
   </header>
 
 
@@ -444,9 +516,6 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/04/29/hands-on-with-google-glass/">Hands on With Google Glass</a></h1>
-    
-    
       <p class="meta">
         
 
@@ -466,6 +535,10 @@
         
       </p>
     
+    
+      <h1 class="entry-title"><a href="/blog/2013/04/29/hands-on-with-google-glass/">Hands on With Google Glass</a></h1>
+    
+
   </header>
 
 
@@ -480,51 +553,6 @@
   
     <footer>
       <a rel="full-article" href="/blog/2013/04/29/hands-on-with-google-glass/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/03/29/clickable-links-in-android-listviews/">Clickable Links in Android ListViews</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-03-29T00:14:00-04:00" pubdate data-updated="true">Mar 29<span>th</span>, 2013</time>
-        
-         | <a href="/blog/2013/03/29/clickable-links-in-android-listviews/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>As part of my newest app (<a href="https://play.google.com/store/apps/details?id=com.evans.hackernews">Hacker News for Android</a>), I needed to add the ability to click on links in a ListView, and have them open in the browser, while maintaining the ability for the user to click on the ListView row itself, and have the row listen to the click.</p>
-
-<p>If you try using <code>Linkify</code> and <code>LinkMovementMethod</code>, which you&rsquo;d use on normal links in a TextView, you&rsquo;ll find that you can no longer use the ListView properly.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/03/29/clickable-links-in-android-listviews/">Read on &rarr;</a>
     </footer>
   
 
@@ -548,6 +576,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2026/05/11/how-to-combine-pagingdata-with-other-flows-using-asitemsnapshotlistflow/">How to Combine PagingData with Other Flows Using asItemSnapshotListFlow</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2026/02/11/custom-scroll-indicators-in-jetpack-compose-foundation/">Adding Scrollbars to Jetpack Compose</a>
       </li>
     
@@ -561,10 +593,6 @@
     
       <li class="post">
         <a href="/blog/2024/12/14/ui-testing-made-easy-the-robot-test-pattern-on-android/">UI Testing Made Easy: The Robot Test Pattern on Android</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2024/10/10/modernizing-your-android-apps-data-storage-sharedpreferences-to-datastore/">Modernizing Your Android App&#8217;s Data Storage: SharedPreferences to DataStore</a>
       </li>
     
   </ul>
@@ -616,10 +644,9 @@
 </aside>
 
     </div>
-  </div>
+  </main>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2026 - Michael Evans -
-  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+  Copyright &copy; 2026 Michael Evans
 </p>
 
 </footer>

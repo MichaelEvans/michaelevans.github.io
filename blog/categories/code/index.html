@@ -21,16 +21,23 @@
   
   <link rel="canonical" href="http://michaelevans.orgblog/categories/code/">
   <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/screen.css?v=1792965057" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="/javascripts/ender.js"></script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="Michael Evans" type="application/atom+xml">
   <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
-  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
-<link href='http://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+  <meta name="color-scheme" content="light dark">
+<script>
+  // Apply a saved preference before the first paint. The default follows the OS.
+  try {
+    var savedTheme = localStorage.getItem('blog-theme');
+    if (savedTheme === 'light' || savedTheme === 'dark') {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    }
+  } catch (error) {}
+</script>
+<script src="/javascripts/reading.js?v=1792965057" defer></script>
 
   
   <script type="text/javascript">
@@ -49,33 +56,41 @@
 </head>
 
 <body   >
-  <header role="banner"><hgroup>
-  <h1><a href="/">Michael Evans</a></h1>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" role="banner">
+    <div class="site-identity">
+  <a class="site-name" href="/">Michael Evans</a>
   
-    <h2>A bunch of technobabble.</h2>
+    <p class="site-subtitle">A bunch of technobabble.</p>
   
-</hgroup>
+</div>
 
-</header>
-  <nav role="navigation"><ul class="subscription" data-subscription="rss">
-  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
-  
-</ul>
-  
-<form action="https://google.com/search" method="get">
-  <fieldset role="search">
-    <input type="hidden" name="q" value="site:michaelevans.org" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-  </fieldset>
-</form>
-  
-<ul class="main-navigation">
-  <li><a href="/">Blog</a></li>
+
+    <nav class="site-navigation" aria-label="Main navigation"><ul class="main-navigation">
+  <li><a href="/">Writing</a></li>
   <li><a href="/blog/archives">Archives</a></li>
 </ul>
 
+<ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<div class="navigation-tools">
+  
+  <form action="https://google.com/search" method="get">
+    <fieldset role="search">
+      <input type="hidden" name="q" value="site:michaelevans.org" />
+      <input class="search" type="search" name="q" results="0" placeholder="Search posts…" aria-label="Search posts"/>
+    </fieldset>
+  </form>
+  
+  <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" hidden>
+    <span class="theme-moon">Dark</span><span class="theme-sun">Light</span>
+  </button>
+</div>
 </nav>
-  <div id="main">
+  </header>
+  <main id="main">
     <div id="content">
       <div>
 <article role="article">
@@ -94,13 +109,13 @@
 
 <article>
   
-<h1><a href="/blog/2015/09/15/testing-intents-with-espresso-intents/">Testing Intents with Espresso Intents</a></h1>
-<time datetime="2015-09-15T22:03:57-04:00" pubdate><span class='month'>Sep</span> <span class='day'>15</span> <span class='year'>2015</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/development/'>Development</a>, <a class='category' href='/blog/categories/testing/'>Testing</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2015/09/15/testing-intents-with-espresso-intents/">Testing Intents with Espresso Intents</a></h3>
+<p class="archive-meta">
+  <time datetime="2015-09-15T22:03:57-04:00" pubdate>Sep 15</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/development/'>Development</a>, <a class='category' href='/blog/categories/testing/'>Testing</a></span>
+  
+</p>
 
 </article>
 
@@ -108,13 +123,13 @@
 
 <article>
   
-<h1><a href="/blog/2015/08/03/using-espresso-for-easy-ui-testing/">Using Espresso for Easy UI Testing</a></h1>
-<time datetime="2015-08-03T22:16:49-04:00" pubdate><span class='month'>Aug</span> <span class='day'>03</span> <span class='year'>2015</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/development/'>Development</a>, <a class='category' href='/blog/categories/testing/'>Testing</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2015/08/03/using-espresso-for-easy-ui-testing/">Using Espresso for Easy UI Testing</a></h3>
+<p class="archive-meta">
+  <time datetime="2015-08-03T22:16:49-04:00" pubdate>Aug 3</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/development/'>Development</a>, <a class='category' href='/blog/categories/testing/'>Testing</a></span>
+  
+</p>
 
 </article>
 
@@ -122,13 +137,13 @@
 
 <article>
   
-<h1><a href="/blog/2015/07/14/improving-your-code-with-android-support-annotations/">Improving your code with Android Support Annotations</a></h1>
-<time datetime="2015-07-14T22:46:56-04:00" pubdate><span class='month'>Jul</span> <span class='day'>14</span> <span class='year'>2015</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/development/'>Development</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2015/07/14/improving-your-code-with-android-support-annotations/">Improving your code with Android Support Annotations</a></h3>
+<p class="archive-meta">
+  <time datetime="2015-07-14T22:46:56-04:00" pubdate>Jul 14</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/development/'>Development</a></span>
+  
+</p>
 
 </article>
 
@@ -136,13 +151,13 @@
 
 <article>
   
-<h1><a href="/blog/2015/05/07/android-ripples-with-rounded-corners/">Android Ripples with Rounded Corners</a></h1>
-<time datetime="2015-05-07T22:55:36-04:00" pubdate><span class='month'>May</span> <span class='day'>07</span> <span class='year'>2015</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/development/'>Development</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2015/05/07/android-ripples-with-rounded-corners/">Android Ripples with Rounded Corners</a></h3>
+<p class="archive-meta">
+  <time datetime="2015-05-07T22:55:36-04:00" pubdate>May 7</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/development/'>Development</a></span>
+  
+</p>
 
 </article>
 
@@ -153,13 +168,13 @@
 
 <article>
   
-<h1><a href="/blog/2014/07/09/blurred-background-effect-for-android/">Blurred background effect for Android</a></h1>
-<time datetime="2014-07-09T23:04:46-04:00" pubdate><span class='month'>Jul</span> <span class='day'>09</span> <span class='year'>2014</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/development/'>Development</a>, <a class='category' href='/blog/categories/github/'>Github</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2014/07/09/blurred-background-effect-for-android/">Blurred background effect for Android</a></h3>
+<p class="archive-meta">
+  <time datetime="2014-07-09T23:04:46-04:00" pubdate>Jul 9</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/development/'>Development</a>, <a class='category' href='/blog/categories/github/'>Github</a></span>
+  
+</p>
 
 </article>
 
@@ -170,13 +185,13 @@
 
 <article>
   
-<h1><a href="/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android/">ColorArt: a library to do iTunes 11-style color matching for Android</a></h1>
-<time datetime="2013-12-12T00:02:34-05:00" pubdate><span class='month'>Dec</span> <span class='day'>12</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/development/'>Development</a>, <a class='category' href='/blog/categories/github/'>Github</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android/">ColorArt: a library to do iTunes 11-style color matching for Android</a></h3>
+<p class="archive-meta">
+  <time datetime="2013-12-12T00:02:34-05:00" pubdate>Dec 12</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/development/'>Development</a>, <a class='category' href='/blog/categories/github/'>Github</a></span>
+  
+</p>
 
 </article>
 
@@ -184,13 +199,13 @@
 
 <article>
   
-<h1><a href="/blog/2013/10/13/using-a-viewpager-in-a-scrollview/">Using a ViewPager in a ScrollView</a></h1>
-<time datetime="2013-10-13T20:48:00-04:00" pubdate><span class='month'>Oct</span> <span class='day'>13</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/tutorial/'>Tutorial</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2013/10/13/using-a-viewpager-in-a-scrollview/">Using a ViewPager in a ScrollView</a></h3>
+<p class="archive-meta">
+  <time datetime="2013-10-13T20:48:00-04:00" pubdate>Oct 13</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/tutorial/'>Tutorial</a></span>
+  
+</p>
 
 </article>
 
@@ -198,13 +213,13 @@
 
 <article>
   
-<h1><a href="/blog/2013/03/29/clickable-links-in-android-listviews/">Clickable Links in Android ListViews</a></h1>
-<time datetime="2013-03-29T00:14:00-04:00" pubdate><span class='month'>Mar</span> <span class='day'>29</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/tutorial/'>Tutorial</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2013/03/29/clickable-links-in-android-listviews/">Clickable Links in Android ListViews</a></h3>
+<p class="archive-meta">
+  <time datetime="2013-03-29T00:14:00-04:00" pubdate>Mar 29</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/tutorial/'>Tutorial</a></span>
+  
+</p>
 
 </article>
 
@@ -222,6 +237,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2026/05/11/how-to-combine-pagingdata-with-other-flows-using-asitemsnapshotlistflow/">How to Combine PagingData with Other Flows Using asItemSnapshotListFlow</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2026/02/11/custom-scroll-indicators-in-jetpack-compose-foundation/">Adding Scrollbars to Jetpack Compose</a>
       </li>
     
@@ -235,10 +254,6 @@
     
       <li class="post">
         <a href="/blog/2024/12/14/ui-testing-made-easy-the-robot-test-pattern-on-android/">UI Testing Made Easy: The Robot Test Pattern on Android</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2024/10/10/modernizing-your-android-apps-data-storage-sharedpreferences-to-datastore/">Modernizing Your Android App's Data Storage: SharedPreferences to DataStore</a>
       </li>
     
   </ul>
@@ -291,10 +306,9 @@
 
 
     </div>
-  </div>
+  </main>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2026 - Michael Evans -
-  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+  Copyright &copy; 2026 Michael Evans
 </p>
 
 </footer>

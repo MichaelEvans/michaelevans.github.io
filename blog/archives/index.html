@@ -10,8 +10,7 @@
   <meta name="author" content="Michael Evans">
 
   
-  <meta name="description" content="Blog Archive 2026 Adding Scrollbars to Jetpack Compose
-Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in Compose with &hellip;">
+  <meta name="description" content="Blog Archive 2026 How to Combine PagingData with Other Flows Using asItemSnapshotListFlow May 11 Android, Kotlin Adding Scrollbars to Jetpack &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -22,16 +21,23 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
   
   <link rel="canonical" href="http://michaelevans.org/blog/archives/">
   <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/screen.css?v=1792965057" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="/javascripts/ender.js"></script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <link href="/atom.xml" rel="alternate" title="Michael Evans" type="application/atom+xml">
   <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
-  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
-<link href='http://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+  <meta name="color-scheme" content="light dark">
+<script>
+  // Apply a saved preference before the first paint. The default follows the OS.
+  try {
+    var savedTheme = localStorage.getItem('blog-theme');
+    if (savedTheme === 'light' || savedTheme === 'dark') {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    }
+  } catch (error) {}
+</script>
+<script src="/javascripts/reading.js?v=1792965057" defer></script>
 
   
   <script type="text/javascript">
@@ -50,33 +56,41 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 </head>
 
 <body   >
-  <header role="banner"><hgroup>
-  <h1><a href="/">Michael Evans</a></h1>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" role="banner">
+    <div class="site-identity">
+  <a class="site-name" href="/">Michael Evans</a>
   
-    <h2>A bunch of technobabble.</h2>
+    <p class="site-subtitle">A bunch of technobabble.</p>
   
-</hgroup>
+</div>
 
-</header>
-  <nav role="navigation"><ul class="subscription" data-subscription="rss">
-  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
-  
-</ul>
-  
-<form action="https://google.com/search" method="get">
-  <fieldset role="search">
-    <input type="hidden" name="q" value="site:michaelevans.org" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-  </fieldset>
-</form>
-  
-<ul class="main-navigation">
-  <li><a href="/">Blog</a></li>
+
+    <nav class="site-navigation" aria-label="Main navigation"><ul class="main-navigation">
+  <li><a href="/">Writing</a></li>
   <li><a href="/blog/archives">Archives</a></li>
 </ul>
 
+<ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<div class="navigation-tools">
+  
+  <form action="https://google.com/search" method="get">
+    <fieldset role="search">
+      <input type="hidden" name="q" value="site:michaelevans.org" />
+      <input class="search" type="search" name="q" results="0" placeholder="Search posts…" aria-label="Search posts"/>
+    </fieldset>
+  </form>
+  
+  <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" hidden>
+    <span class="theme-moon">Dark</span><span class="theme-sun">Light</span>
+  </button>
+</div>
 </nav>
-  <div id="main">
+  </header>
+  <main id="main">
     <div id="content">
       <div>
 <article role="article">
@@ -95,13 +109,27 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2026/02/11/custom-scroll-indicators-in-jetpack-compose-foundation/">Adding Scrollbars to Jetpack Compose</a></h1>
-<time datetime="2026-02-11T21:14:16-05:00" pubdate><span class='month'>Feb</span> <span class='day'>11</span> <span class='year'>2026</span></time>
+<h3 class="archive-title"><a href="/blog/2026/05/11/how-to-combine-pagingdata-with-other-flows-using-asitemsnapshotlistflow/">How to Combine PagingData with Other Flows Using asItemSnapshotListFlow</a></h3>
+<p class="archive-meta">
+  <time datetime="2026-05-11T21:01:11-04:00" pubdate>May 11</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/kotlin/'>Kotlin</a></span>
+  
+</p>
 
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/compose/'>Compose</a>, <a class='category' href='/blog/categories/kotlin/'>Kotlin</a></span>
-</footer>
+</article>
 
+
+
+<article>
+  
+<h3 class="archive-title"><a href="/blog/2026/02/11/custom-scroll-indicators-in-jetpack-compose-foundation/">Adding Scrollbars to Jetpack Compose</a></h3>
+<p class="archive-meta">
+  <time datetime="2026-02-11T21:14:16-05:00" pubdate>Feb 11</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/compose/'>Compose</a>, <a class='category' href='/blog/categories/kotlin/'>Kotlin</a></span>
+  
+</p>
 
 </article>
 
@@ -112,13 +140,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2025/07/01/smooth-theme-transitions-in-compose-with-animated-colorschemes/">Smooth Theme Transitions in Compose with Animated ColorSchemes</a></h1>
-<time datetime="2025-07-01T23:38:27-04:00" pubdate><span class='month'>Jul</span> <span class='day'>01</span> <span class='year'>2025</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/compose/'>Compose</a>, <a class='category' href='/blog/categories/kotlin/'>Kotlin</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2025/07/01/smooth-theme-transitions-in-compose-with-animated-colorschemes/">Smooth Theme Transitions in Compose with Animated ColorSchemes</a></h3>
+<p class="archive-meta">
+  <time datetime="2025-07-01T23:38:27-04:00" pubdate>Jul 1</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/compose/'>Compose</a>, <a class='category' href='/blog/categories/kotlin/'>Kotlin</a></span>
+  
+</p>
 
 </article>
 
@@ -126,13 +154,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2025/03/22/turning-any-android-callback-into-a-flow-with-callbackflow/">Turning Any Android Callback into a Flow with callbackFlow</a></h1>
-<time datetime="2025-03-22T23:10:16-04:00" pubdate><span class='month'>Mar</span> <span class='day'>22</span> <span class='year'>2025</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/kotlin/'>Kotlin</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2025/03/22/turning-any-android-callback-into-a-flow-with-callbackflow/">Turning Any Android Callback into a Flow with callbackFlow</a></h3>
+<p class="archive-meta">
+  <time datetime="2025-03-22T23:10:16-04:00" pubdate>Mar 22</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/kotlin/'>Kotlin</a></span>
+  
+</p>
 
 </article>
 
@@ -143,9 +171,11 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2024/12/14/ui-testing-made-easy-the-robot-test-pattern-on-android/">UI Testing Made Easy: The Robot Test Pattern on Android</a></h1>
-<time datetime="2024-12-14T10:52:24-05:00" pubdate><span class='month'>Dec</span> <span class='day'>14</span> <span class='year'>2024</span></time>
-
+<h3 class="archive-title"><a href="/blog/2024/12/14/ui-testing-made-easy-the-robot-test-pattern-on-android/">UI Testing Made Easy: The Robot Test Pattern on Android</a></h3>
+<p class="archive-meta">
+  <time datetime="2024-12-14T10:52:24-05:00" pubdate>Dec 14</time>
+  
+</p>
 
 </article>
 
@@ -153,9 +183,11 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2024/10/10/modernizing-your-android-apps-data-storage-sharedpreferences-to-datastore/">Modernizing Your Android App&#8217;s Data Storage: SharedPreferences to DataStore</a></h1>
-<time datetime="2024-10-10T11:53:57-04:00" pubdate><span class='month'>Oct</span> <span class='day'>10</span> <span class='year'>2024</span></time>
-
+<h3 class="archive-title"><a href="/blog/2024/10/10/modernizing-your-android-apps-data-storage-sharedpreferences-to-datastore/">Modernizing Your Android App&#8217;s Data Storage: SharedPreferences to DataStore</a></h3>
+<p class="archive-meta">
+  <time datetime="2024-10-10T11:53:57-04:00" pubdate>Oct 10</time>
+  
+</p>
 
 </article>
 
@@ -163,9 +195,11 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2024/09/07/mastering-ktlint-a-guide-to-crafting-your-own-rules/">Mastering ktlint: A Guide to Crafting Your Own Rules</a></h1>
-<time datetime="2024-09-07T11:49:37-04:00" pubdate><span class='month'>Sep</span> <span class='day'>07</span> <span class='year'>2024</span></time>
-
+<h3 class="archive-title"><a href="/blog/2024/09/07/mastering-ktlint-a-guide-to-crafting-your-own-rules/">Mastering ktlint: A Guide to Crafting Your Own Rules</a></h3>
+<p class="archive-meta">
+  <time datetime="2024-09-07T11:49:37-04:00" pubdate>Sep 7</time>
+  
+</p>
 
 </article>
 
@@ -173,9 +207,11 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2024/07/29/stop-repeating-yourself-2-using-test-fixtures-with-agp/">Stop Repeating Yourself 2: Using Test Fixtures with AGP</a></h1>
-<time datetime="2024-07-29T19:43:27-04:00" pubdate><span class='month'>Jul</span> <span class='day'>29</span> <span class='year'>2024</span></time>
-
+<h3 class="archive-title"><a href="/blog/2024/07/29/stop-repeating-yourself-2-using-test-fixtures-with-agp/">Stop Repeating Yourself 2: Using Test Fixtures with AGP</a></h3>
+<p class="archive-meta">
+  <time datetime="2024-07-29T19:43:27-04:00" pubdate>Jul 29</time>
+  
+</p>
 
 </article>
 
@@ -183,13 +219,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2024/06/27/understanding-referrals-using-google-play/">Understanding Referrals using Google Play</a></h1>
-<time datetime="2024-06-27T19:41:33-04:00" pubdate><span class='month'>Jun</span> <span class='day'>27</span> <span class='year'>2024</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/play-store/'>Play Store</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2024/06/27/understanding-referrals-using-google-play/">Understanding Referrals using Google Play</a></h3>
+<p class="archive-meta">
+  <time datetime="2024-06-27T19:41:33-04:00" pubdate>Jun 27</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/play-store/'>Play Store</a></span>
+  
+</p>
 
 </article>
 
@@ -197,13 +233,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2024/04/17/accessing-test-resources-using-kotlin-multiplatform/">Accessing Test Resources using Kotlin Multiplatform</a></h1>
-<time datetime="2024-04-17T20:11:01-04:00" pubdate><span class='month'>Apr</span> <span class='day'>17</span> <span class='year'>2024</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2024/04/17/accessing-test-resources-using-kotlin-multiplatform/">Accessing Test Resources using Kotlin Multiplatform</a></h3>
+<p class="archive-meta">
+  <time datetime="2024-04-17T20:11:01-04:00" pubdate>Apr 17</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a></span>
+  
+</p>
 
 </article>
 
@@ -214,13 +250,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2022/09/28/flipper-plugins-for-fun-and-profit/">Building Flipper Plugins for Fun and Profit</a></h1>
-<time datetime="2022-09-28T23:41:17-04:00" pubdate><span class='month'>Sep</span> <span class='day'>28</span> <span class='year'>2022</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2022/09/28/flipper-plugins-for-fun-and-profit/">Building Flipper Plugins for Fun and Profit</a></h3>
+<p class="archive-meta">
+  <time datetime="2022-09-28T23:41:17-04:00" pubdate>Sep 28</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a></span>
+  
+</p>
 
 </article>
 
@@ -231,13 +267,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2020/06/21/android-developer-challenge/">Android Developer Challenge</a></h1>
-<time datetime="2020-06-21T23:41:17-04:00" pubdate><span class='month'>Jun</span> <span class='day'>21</span> <span class='year'>2020</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2020/06/21/android-developer-challenge/">Android Developer Challenge</a></h3>
+<p class="archive-meta">
+  <time datetime="2020-06-21T23:41:17-04:00" pubdate>Jun 21</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a></span>
+  
+</p>
 
 </article>
 
@@ -245,13 +281,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2020/03/10/improving-app-debugging-with-flipper/">Improving App Debugging with Flipper</a></h1>
-<time datetime="2020-03-10T20:10:22-04:00" pubdate><span class='month'>Mar</span> <span class='day'>10</span> <span class='year'>2020</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2020/03/10/improving-app-debugging-with-flipper/">Improving App Debugging with Flipper</a></h3>
+<p class="archive-meta">
+  <time datetime="2020-03-10T20:10:22-04:00" pubdate>Mar 10</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a></span>
+  
+</p>
 
 </article>
 
@@ -259,13 +295,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2020/02/10/dropping-columns-like-its-hot/">Dropping Columns Like It&#8217;s Hot</a></h1>
-<time datetime="2020-02-10T20:03:03-05:00" pubdate><span class='month'>Feb</span> <span class='day'>10</span> <span class='year'>2020</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2020/02/10/dropping-columns-like-its-hot/">Dropping Columns Like It&#8217;s Hot</a></h3>
+<p class="archive-meta">
+  <time datetime="2020-02-10T20:03:03-05:00" pubdate>Feb 10</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a></span>
+  
+</p>
 
 </article>
 
@@ -276,13 +312,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2019/09/21/stop-repeating-yourself-sharing-test-code-across-android-modules/">Stop Repeating Yourself: Sharing test code across Android Modules</a></h1>
-<time datetime="2019-09-21T21:34:52-04:00" pubdate><span class='month'>Sep</span> <span class='day'>21</span> <span class='year'>2019</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/testing/'>Testing</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2019/09/21/stop-repeating-yourself-sharing-test-code-across-android-modules/">Stop Repeating Yourself: Sharing test code across Android Modules</a></h3>
+<p class="archive-meta">
+  <time datetime="2019-09-21T21:34:52-04:00" pubdate>Sep 21</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/testing/'>Testing</a></span>
+  
+</p>
 
 </article>
 
@@ -290,13 +326,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2019/02/07/hands-on-with-viewpager2/">Hands on with ViewPager2</a></h1>
-<time datetime="2019-02-07T21:38:07-05:00" pubdate><span class='month'>Feb</span> <span class='day'>07</span> <span class='year'>2019</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2019/02/07/hands-on-with-viewpager2/">Hands on with ViewPager2</a></h3>
+<p class="archive-meta">
+  <time datetime="2019-02-07T21:38:07-05:00" pubdate>Feb 7</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a></span>
+  
+</p>
 
 </article>
 
@@ -307,13 +343,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2016/08/23/enabling-night-mode-on-android-nougat/">Enabling Night Mode on Android Nougat</a></h1>
-<time datetime="2016-08-23T18:27:01-04:00" pubdate><span class='month'>Aug</span> <span class='day'>23</span> <span class='year'>2016</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2016/08/23/enabling-night-mode-on-android-nougat/">Enabling Night Mode on Android Nougat</a></h3>
+<p class="archive-meta">
+  <time datetime="2016-08-23T18:27:01-04:00" pubdate>Aug 23</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a></span>
+  
+</p>
 
 </article>
 
@@ -321,13 +357,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/">Using Build Types with the Google Services Gradle Plugin</a></h1>
-<time datetime="2016-03-31T21:11:55-04:00" pubdate><span class='month'>Mar</span> <span class='day'>31</span> <span class='year'>2016</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/development/'>Development</a>, <a class='category' href='/blog/categories/gradle/'>Gradle</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2016/03/31/using-build-types-with-the-google-services-gradle-plugin/">Using Build Types with the Google Services Gradle Plugin</a></h3>
+<p class="archive-meta">
+  <time datetime="2016-03-31T21:11:55-04:00" pubdate>Mar 31</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/development/'>Development</a>, <a class='category' href='/blog/categories/gradle/'>Gradle</a></span>
+  
+</p>
 
 </article>
 
@@ -335,13 +371,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2016/03/09/changelog-for-n-support-libraries/">Changelog for N Support Libraries</a></h1>
-<time datetime="2016-03-09T19:38:46-05:00" pubdate><span class='month'>Mar</span> <span class='day'>09</span> <span class='year'>2016</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/development/'>Development</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2016/03/09/changelog-for-n-support-libraries/">Changelog for N Support Libraries</a></h3>
+<p class="archive-meta">
+  <time datetime="2016-03-09T19:38:46-05:00" pubdate>Mar 9</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/development/'>Development</a></span>
+  
+</p>
 
 </article>
 
@@ -349,9 +385,11 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2016/02/17/using-dagger-1-and-kotlin/">Using Dagger 1 and Kotlin</a></h1>
-<time datetime="2016-02-17T13:43:25-05:00" pubdate><span class='month'>Feb</span> <span class='day'>17</span> <span class='year'>2016</span></time>
-
+<h3 class="archive-title"><a href="/blog/2016/02/17/using-dagger-1-and-kotlin/">Using Dagger 1 and Kotlin</a></h3>
+<p class="archive-meta">
+  <time datetime="2016-02-17T13:43:25-05:00" pubdate>Feb 17</time>
+  
+</p>
 
 </article>
 
@@ -359,13 +397,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2016/01/06/android-studio-tips-and-tricks/">Android Studio Tips and Tricks</a></h1>
-<time datetime="2016-01-06T20:25:53-05:00" pubdate><span class='month'>Jan</span> <span class='day'>06</span> <span class='year'>2016</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/development/'>Development</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2016/01/06/android-studio-tips-and-tricks/">Android Studio Tips and Tricks</a></h3>
+<p class="archive-meta">
+  <time datetime="2016-01-06T20:25:53-05:00" pubdate>Jan 6</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/development/'>Development</a></span>
+  
+</p>
 
 </article>
 
@@ -376,13 +414,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2015/09/15/testing-intents-with-espresso-intents/">Testing Intents with Espresso Intents</a></h1>
-<time datetime="2015-09-15T22:03:57-04:00" pubdate><span class='month'>Sep</span> <span class='day'>15</span> <span class='year'>2015</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/development/'>Development</a>, <a class='category' href='/blog/categories/testing/'>Testing</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2015/09/15/testing-intents-with-espresso-intents/">Testing Intents with Espresso Intents</a></h3>
+<p class="archive-meta">
+  <time datetime="2015-09-15T22:03:57-04:00" pubdate>Sep 15</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/development/'>Development</a>, <a class='category' href='/blog/categories/testing/'>Testing</a></span>
+  
+</p>
 
 </article>
 
@@ -390,13 +428,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2015/09/09/droidcon-nyc-2015-at-annotationprocessors-byexample/">Droidcon NYC 2015: @AnnotationProcessors(&#8220;ByExample&#8221;)</a></h1>
-<time datetime="2015-09-09T16:30:48-04:00" pubdate><span class='month'>Sep</span> <span class='day'>09</span> <span class='year'>2015</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/development/'>Development</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2015/09/09/droidcon-nyc-2015-at-annotationprocessors-byexample/">Droidcon NYC 2015: @AnnotationProcessors(&#8220;ByExample&#8221;)</a></h3>
+<p class="archive-meta">
+  <time datetime="2015-09-09T16:30:48-04:00" pubdate>Sep 9</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/development/'>Development</a></span>
+  
+</p>
 
 </article>
 
@@ -404,13 +442,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2015/08/03/using-espresso-for-easy-ui-testing/">Using Espresso for Easy UI Testing</a></h1>
-<time datetime="2015-08-03T22:16:49-04:00" pubdate><span class='month'>Aug</span> <span class='day'>03</span> <span class='year'>2015</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/development/'>Development</a>, <a class='category' href='/blog/categories/testing/'>Testing</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2015/08/03/using-espresso-for-easy-ui-testing/">Using Espresso for Easy UI Testing</a></h3>
+<p class="archive-meta">
+  <time datetime="2015-08-03T22:16:49-04:00" pubdate>Aug 3</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/development/'>Development</a>, <a class='category' href='/blog/categories/testing/'>Testing</a></span>
+  
+</p>
 
 </article>
 
@@ -418,13 +456,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2015/07/14/improving-your-code-with-android-support-annotations/">Improving your code with Android Support Annotations</a></h1>
-<time datetime="2015-07-14T22:46:56-04:00" pubdate><span class='month'>Jul</span> <span class='day'>14</span> <span class='year'>2015</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/development/'>Development</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2015/07/14/improving-your-code-with-android-support-annotations/">Improving your code with Android Support Annotations</a></h3>
+<p class="archive-meta">
+  <time datetime="2015-07-14T22:46:56-04:00" pubdate>Jul 14</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/development/'>Development</a></span>
+  
+</p>
 
 </article>
 
@@ -432,13 +470,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2015/05/07/android-ripples-with-rounded-corners/">Android Ripples with Rounded Corners</a></h1>
-<time datetime="2015-05-07T22:55:36-04:00" pubdate><span class='month'>May</span> <span class='day'>07</span> <span class='year'>2015</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/development/'>Development</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2015/05/07/android-ripples-with-rounded-corners/">Android Ripples with Rounded Corners</a></h3>
+<p class="archive-meta">
+  <time datetime="2015-05-07T22:55:36-04:00" pubdate>May 7</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/development/'>Development</a></span>
+  
+</p>
 
 </article>
 
@@ -449,13 +487,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2014/07/09/blurred-background-effect-for-android/">Blurred background effect for Android</a></h1>
-<time datetime="2014-07-09T23:04:46-04:00" pubdate><span class='month'>Jul</span> <span class='day'>09</span> <span class='year'>2014</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/development/'>Development</a>, <a class='category' href='/blog/categories/github/'>Github</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2014/07/09/blurred-background-effect-for-android/">Blurred background effect for Android</a></h3>
+<p class="archive-meta">
+  <time datetime="2014-07-09T23:04:46-04:00" pubdate>Jul 9</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/development/'>Development</a>, <a class='category' href='/blog/categories/github/'>Github</a></span>
+  
+</p>
 
 </article>
 
@@ -463,13 +501,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2014/06/07/building-obs-studio-for-os-x/">Building OBS Studio for OS X</a></h1>
-<time datetime="2014-06-07T22:59:38-04:00" pubdate><span class='month'>Jun</span> <span class='day'>07</span> <span class='year'>2014</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/guides/'>Guides</a>, <a class='category' href='/blog/categories/os-x/'>OS X</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2014/06/07/building-obs-studio-for-os-x/">Building OBS Studio for OS X</a></h3>
+<p class="archive-meta">
+  <time datetime="2014-06-07T22:59:38-04:00" pubdate>Jun 7</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/guides/'>Guides</a>, <a class='category' href='/blog/categories/os-x/'>OS X</a></span>
+  
+</p>
 
 </article>
 
@@ -477,9 +515,11 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2014/04/13/embedding-google-plus-posts-in-octopress/">Embedding Google+ Posts in Octopress</a></h1>
-<time datetime="2014-04-13T13:46:25-04:00" pubdate><span class='month'>Apr</span> <span class='day'>13</span> <span class='year'>2014</span></time>
-
+<h3 class="archive-title"><a href="/blog/2014/04/13/embedding-google-plus-posts-in-octopress/">Embedding Google+ Posts in Octopress</a></h3>
+<p class="archive-meta">
+  <time datetime="2014-04-13T13:46:25-04:00" pubdate>Apr 13</time>
+  
+</p>
 
 </article>
 
@@ -487,9 +527,11 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2014/03/03/adb-over-wifi/">ADB over WiFi</a></h1>
-<time datetime="2014-03-03T22:30:38-05:00" pubdate><span class='month'>Mar</span> <span class='day'>03</span> <span class='year'>2014</span></time>
-
+<h3 class="archive-title"><a href="/blog/2014/03/03/adb-over-wifi/">ADB over WiFi</a></h3>
+<p class="archive-meta">
+  <time datetime="2014-03-03T22:30:38-05:00" pubdate>Mar 3</time>
+  
+</p>
 
 </article>
 
@@ -500,13 +542,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2013/12/31/2013-in-review/">2013 in Review</a></h1>
-<time datetime="2013-12-31T11:27:05-05:00" pubdate><span class='month'>Dec</span> <span class='day'>31</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/personal/'>Personal</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2013/12/31/2013-in-review/">2013 in Review</a></h3>
+<p class="archive-meta">
+  <time datetime="2013-12-31T11:27:05-05:00" pubdate>Dec 31</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/personal/'>Personal</a></span>
+  
+</p>
 
 </article>
 
@@ -514,13 +556,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android/">ColorArt: a library to do iTunes 11-style color matching for Android</a></h1>
-<time datetime="2013-12-12T00:02:34-05:00" pubdate><span class='month'>Dec</span> <span class='day'>12</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/development/'>Development</a>, <a class='category' href='/blog/categories/github/'>Github</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2013/12/12/colorart-a-library-to-do-itunes-11-style-color-matching-for-android/">ColorArt: a library to do iTunes 11-style color matching for Android</a></h3>
+<p class="archive-meta">
+  <time datetime="2013-12-12T00:02:34-05:00" pubdate>Dec 12</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/development/'>Development</a>, <a class='category' href='/blog/categories/github/'>Github</a></span>
+  
+</p>
 
 </article>
 
@@ -528,13 +570,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2013/11/05/hands-on-with-google-helpouts/">Hands On with Google Helpouts</a></h1>
-<time datetime="2013-11-05T10:38:00-05:00" pubdate><span class='month'>Nov</span> <span class='day'>05</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/development/'>Development</a>, <a class='category' href='/blog/categories/google/'>Google</a>, <a class='category' href='/blog/categories/helpouts/'>Helpouts</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2013/11/05/hands-on-with-google-helpouts/">Hands On with Google Helpouts</a></h3>
+<p class="archive-meta">
+  <time datetime="2013-11-05T10:38:00-05:00" pubdate>Nov 5</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/development/'>Development</a>, <a class='category' href='/blog/categories/google/'>Google</a>, <a class='category' href='/blog/categories/helpouts/'>Helpouts</a></span>
+  
+</p>
 
 </article>
 
@@ -542,13 +584,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2013/10/13/using-a-viewpager-in-a-scrollview/">Using a ViewPager in a ScrollView</a></h1>
-<time datetime="2013-10-13T20:48:00-04:00" pubdate><span class='month'>Oct</span> <span class='day'>13</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/tutorial/'>Tutorial</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2013/10/13/using-a-viewpager-in-a-scrollview/">Using a ViewPager in a ScrollView</a></h3>
+<p class="archive-meta">
+  <time datetime="2013-10-13T20:48:00-04:00" pubdate>Oct 13</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/tutorial/'>Tutorial</a></span>
+  
+</p>
 
 </article>
 
@@ -556,13 +598,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2013/09/16/my-newest-app-bike-finder/">My Newest App: Bike Finder</a></h1>
-<time datetime="2013-09-16T23:11:00-04:00" pubdate><span class='month'>Sep</span> <span class='day'>16</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/app/'>App</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2013/09/16/my-newest-app-bike-finder/">My Newest App: Bike Finder</a></h3>
+<p class="archive-meta">
+  <time datetime="2013-09-16T23:11:00-04:00" pubdate>Sep 16</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/app/'>App</a></span>
+  
+</p>
 
 </article>
 
@@ -570,13 +612,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2013/08/20/parse-android-todo-app-tutorial-part-two-users/">Parse Android To-do App Tutorial - Part Two - Users</a></h1>
-<time datetime="2013-08-20T21:13:00-04:00" pubdate><span class='month'>Aug</span> <span class='day'>20</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/development/'>Development</a>, <a class='category' href='/blog/categories/parse/'>Parse</a>, <a class='category' href='/blog/categories/tutorial/'>Tutorial</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2013/08/20/parse-android-todo-app-tutorial-part-two-users/">Parse Android To-do App Tutorial - Part Two - Users</a></h3>
+<p class="archive-meta">
+  <time datetime="2013-08-20T21:13:00-04:00" pubdate>Aug 20</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/development/'>Development</a>, <a class='category' href='/blog/categories/parse/'>Parse</a>, <a class='category' href='/blog/categories/tutorial/'>Tutorial</a></span>
+  
+</p>
 
 </article>
 
@@ -584,13 +626,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse/">Tutorial: Building an Android To-Do List app using Parse</a></h1>
-<time datetime="2013-08-14T22:08:00-04:00" pubdate><span class='month'>Aug</span> <span class='day'>14</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/development/'>Development</a>, <a class='category' href='/blog/categories/parse/'>Parse</a>, <a class='category' href='/blog/categories/tutorial/'>Tutorial</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2013/08/14/tutorial-building-an-android-to-do-list-app-using-parse/">Tutorial: Building an Android To-Do List app using Parse</a></h3>
+<p class="archive-meta">
+  <time datetime="2013-08-14T22:08:00-04:00" pubdate>Aug 14</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/development/'>Development</a>, <a class='category' href='/blog/categories/parse/'>Parse</a>, <a class='category' href='/blog/categories/tutorial/'>Tutorial</a></span>
+  
+</p>
 
 </article>
 
@@ -598,13 +640,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2013/06/12/getting-mavericks-compressed-memory-feature-in-ubuntu/">Getting Mavericks&#8217; Compressed Memory Feature in Ubuntu</a></h1>
-<time datetime="2013-06-12T00:16:00-04:00" pubdate><span class='month'>Jun</span> <span class='day'>12</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/linux/'>Linux</a>, <a class='category' href='/blog/categories/tutorial/'>Tutorial</a>, <a class='category' href='/blog/categories/ubuntu/'>Ubuntu</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2013/06/12/getting-mavericks-compressed-memory-feature-in-ubuntu/">Getting Mavericks&#8217; Compressed Memory Feature in Ubuntu</a></h3>
+<p class="archive-meta">
+  <time datetime="2013-06-12T00:16:00-04:00" pubdate>Jun 12</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/linux/'>Linux</a>, <a class='category' href='/blog/categories/tutorial/'>Tutorial</a>, <a class='category' href='/blog/categories/ubuntu/'>Ubuntu</a></span>
+  
+</p>
 
 </article>
 
@@ -612,13 +654,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2013/06/11/running-crouton-on-a-chromebook-pixel/">Running Crouton on a Chromebook Pixel</a></h1>
-<time datetime="2013-06-11T21:22:00-04:00" pubdate><span class='month'>Jun</span> <span class='day'>11</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/chromebook/'>Chromebook</a>, <a class='category' href='/blog/categories/google/'>Google</a>, <a class='category' href='/blog/categories/guides/'>Guides</a>, <a class='category' href='/blog/categories/linux/'>Linux</a>, <a class='category' href='/blog/categories/ubuntu/'>Ubuntu</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2013/06/11/running-crouton-on-a-chromebook-pixel/">Running Crouton on a Chromebook Pixel</a></h3>
+<p class="archive-meta">
+  <time datetime="2013-06-11T21:22:00-04:00" pubdate>Jun 11</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/chromebook/'>Chromebook</a>, <a class='category' href='/blog/categories/google/'>Google</a>, <a class='category' href='/blog/categories/guides/'>Guides</a>, <a class='category' href='/blog/categories/linux/'>Linux</a>, <a class='category' href='/blog/categories/ubuntu/'>Ubuntu</a></span>
+  
+</p>
 
 </article>
 
@@ -626,13 +668,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2013/04/29/hands-on-with-google-glass/">Hands On with Google Glass</a></h1>
-<time datetime="2013-04-29T16:36:00-04:00" pubdate><span class='month'>Apr</span> <span class='day'>29</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/google/'>Google</a>, <a class='category' href='/blog/categories/project-glass/'>Project Glass</a>, <a class='category' href='/blog/categories/review/'>Review</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2013/04/29/hands-on-with-google-glass/">Hands On with Google Glass</a></h3>
+<p class="archive-meta">
+  <time datetime="2013-04-29T16:36:00-04:00" pubdate>Apr 29</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/google/'>Google</a>, <a class='category' href='/blog/categories/project-glass/'>Project Glass</a>, <a class='category' href='/blog/categories/review/'>Review</a></span>
+  
+</p>
 
 </article>
 
@@ -640,13 +682,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2013/03/29/clickable-links-in-android-listviews/">Clickable Links in Android ListViews</a></h1>
-<time datetime="2013-03-29T00:14:00-04:00" pubdate><span class='month'>Mar</span> <span class='day'>29</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/tutorial/'>Tutorial</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2013/03/29/clickable-links-in-android-listviews/">Clickable Links in Android ListViews</a></h3>
+<p class="archive-meta">
+  <time datetime="2013-03-29T00:14:00-04:00" pubdate>Mar 29</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/code/'>Code</a>, <a class='category' href='/blog/categories/tutorial/'>Tutorial</a></span>
+  
+</p>
 
 </article>
 
@@ -654,13 +696,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2013/03/28/google-plus-messenger-coming-to-chromeos/">Google Plus Messenger coming to ChromeOS?</a></h1>
-<time datetime="2013-03-28T22:56:00-04:00" pubdate><span class='month'>Mar</span> <span class='day'>28</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/chromeos/'>ChromeOS</a>, <a class='category' href='/blog/categories/google/'>Google,</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2013/03/28/google-plus-messenger-coming-to-chromeos/">Google Plus Messenger coming to ChromeOS?</a></h3>
+<p class="archive-meta">
+  <time datetime="2013-03-28T22:56:00-04:00" pubdate>Mar 28</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/chromeos/'>ChromeOS</a>, <a class='category' href='/blog/categories/google/'>Google,</a></span>
+  
+</p>
 
 </article>
 
@@ -668,13 +710,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2013/03/14/google-io-2013-and-google-reader/">Google IO 2013 and Google Reader</a></h1>
-<time datetime="2013-03-14T23:52:00-04:00" pubdate><span class='month'>Mar</span> <span class='day'>14</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/google/'>Google</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2013/03/14/google-io-2013-and-google-reader/">Google IO 2013 and Google Reader</a></h3>
+<p class="archive-meta">
+  <time datetime="2013-03-14T23:52:00-04:00" pubdate>Mar 14</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/google/'>Google</a></span>
+  
+</p>
 
 </article>
 
@@ -682,13 +724,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2013/02/25/guide-to-google-authorship/">Guide to Google Authorship</a></h1>
-<time datetime="2013-02-25T21:22:00-05:00" pubdate><span class='month'>Feb</span> <span class='day'>25</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/blog/'>Blog</a>, <a class='category' href='/blog/categories/google/'>Google</a>, <a class='category' href='/blog/categories/google-plus/'>Google+</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2013/02/25/guide-to-google-authorship/">Guide to Google Authorship</a></h3>
+<p class="archive-meta">
+  <time datetime="2013-02-25T21:22:00-05:00" pubdate>Feb 25</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/blog/'>Blog</a>, <a class='category' href='/blog/categories/google/'>Google</a>, <a class='category' href='/blog/categories/google-plus/'>Google+</a></span>
+  
+</p>
 
 </article>
 
@@ -696,13 +738,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2013/02/20/sony-unveils-the-playstation-4/">Sony unveils the PlayStation 4</a></h1>
-<time datetime="2013-02-20T22:21:00-05:00" pubdate><span class='month'>Feb</span> <span class='day'>20</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/ps4/'>PS4</a>, <a class='category' href='/blog/categories/playstation-4/'>PlayStation 4</a>, <a class='category' href='/blog/categories/sony/'>Sony</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2013/02/20/sony-unveils-the-playstation-4/">Sony unveils the PlayStation 4</a></h3>
+<p class="archive-meta">
+  <time datetime="2013-02-20T22:21:00-05:00" pubdate>Feb 20</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/ps4/'>PS4</a>, <a class='category' href='/blog/categories/playstation-4/'>PlayStation 4</a>, <a class='category' href='/blog/categories/sony/'>Sony</a></span>
+  
+</p>
 
 </article>
 
@@ -710,13 +752,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2013/02/20/googles-project-glass/">Google&#8217;s Project Glass</a></h1>
-<time datetime="2013-02-20T20:55:00-05:00" pubdate><span class='month'>Feb</span> <span class='day'>20</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/glass/'>Glass</a>, <a class='category' href='/blog/categories/google/'>Google</a>, <a class='category' href='/blog/categories/project-glass/'>Project Glass</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2013/02/20/googles-project-glass/">Google&#8217;s Project Glass</a></h3>
+<p class="archive-meta">
+  <time datetime="2013-02-20T20:55:00-05:00" pubdate>Feb 20</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/glass/'>Glass</a>, <a class='category' href='/blog/categories/google/'>Google</a>, <a class='category' href='/blog/categories/project-glass/'>Project Glass</a></span>
+  
+</p>
 
 </article>
 
@@ -724,13 +766,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2013/01/15/boot-ubuntu-from-an-sd-card-on-your-macbook-air/">Boot Ubuntu from an SD Card on your Macbook Air (or Pro)</a></h1>
-<time datetime="2013-01-15T22:26:00-05:00" pubdate><span class='month'>Jan</span> <span class='day'>15</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/guides/'>Guides</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2013/01/15/boot-ubuntu-from-an-sd-card-on-your-macbook-air/">Boot Ubuntu from an SD Card on your Macbook Air (or Pro)</a></h3>
+<p class="archive-meta">
+  <time datetime="2013-01-15T22:26:00-05:00" pubdate>Jan 15</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/guides/'>Guides</a></span>
+  
+</p>
 
 </article>
 
@@ -738,13 +780,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2013/01/09/a-guide-to-unlocking-and-rooting-your-android-phone/">A Guide to Unlocking and Rooting your Android Phone</a></h1>
-<time datetime="2013-01-09T10:45:00-05:00" pubdate><span class='month'>Jan</span> <span class='day'>09</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/modding/'>Modding</a>, <a class='category' href='/blog/categories/one-v/'>One V</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2013/01/09/a-guide-to-unlocking-and-rooting-your-android-phone/">A Guide to Unlocking and Rooting your Android Phone</a></h3>
+<p class="archive-meta">
+  <time datetime="2013-01-09T10:45:00-05:00" pubdate>Jan 9</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/modding/'>Modding</a>, <a class='category' href='/blog/categories/one-v/'>One V</a></span>
+  
+</p>
 
 </article>
 
@@ -755,13 +797,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2012/12/20/vmware-easy-install-stuck-on-ubuntu-12-dot-04/">VMware &#8216;Easy Install&#8217; stuck on Ubuntu 12.04</a></h1>
-<time datetime="2012-12-20T19:34:00-05:00" pubdate><span class='month'>Dec</span> <span class='day'>20</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/linux/'>Linux</a>, <a class='category' href='/blog/categories/ubuntu-12-dot-04/'>Ubuntu 12.04</a>, <a class='category' href='/blog/categories/vmware/'>VMware</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2012/12/20/vmware-easy-install-stuck-on-ubuntu-12-dot-04/">VMware &#8216;Easy Install&#8217; stuck on Ubuntu 12.04</a></h3>
+<p class="archive-meta">
+  <time datetime="2012-12-20T19:34:00-05:00" pubdate>Dec 20</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/linux/'>Linux</a>, <a class='category' href='/blog/categories/ubuntu-12-dot-04/'>Ubuntu 12.04</a>, <a class='category' href='/blog/categories/vmware/'>VMware</a></span>
+  
+</p>
 
 </article>
 
@@ -769,13 +811,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2012/09/07/nexus-q-review/">Nexus Q Review</a></h1>
-<time datetime="2012-09-07T20:11:00-04:00" pubdate><span class='month'>Sep</span> <span class='day'>07</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/nexus-q/'>Nexus Q</a>, <a class='category' href='/blog/categories/review/'>Review</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2012/09/07/nexus-q-review/">Nexus Q Review</a></h3>
+<p class="archive-meta">
+  <time datetime="2012-09-07T20:11:00-04:00" pubdate>Sep 7</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/nexus-q/'>Nexus Q</a>, <a class='category' href='/blog/categories/review/'>Review</a></span>
+  
+</p>
 
 </article>
 
@@ -783,13 +825,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2012/07/03/nexus-7-review/">Nexus 7 Review</a></h1>
-<time datetime="2012-07-03T13:39:00-04:00" pubdate><span class='month'>Jul</span> <span class='day'>03</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/nexus-7/'>Nexus 7</a>, <a class='category' href='/blog/categories/review/'>Review</a>, <a class='category' href='/blog/categories/tablet/'>Tablet</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2012/07/03/nexus-7-review/">Nexus 7 Review</a></h3>
+<p class="archive-meta">
+  <time datetime="2012-07-03T13:39:00-04:00" pubdate>Jul 3</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/android/'>Android</a>, <a class='category' href='/blog/categories/nexus-7/'>Nexus 7</a>, <a class='category' href='/blog/categories/review/'>Review</a>, <a class='category' href='/blog/categories/tablet/'>Tablet</a></span>
+  
+</p>
 
 </article>
 
@@ -797,13 +839,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2012/06/26/shots-from-outside-io-2012/">Shots from outside Google IO 2012</a></h1>
-<time datetime="2012-06-26T09:42:00-04:00" pubdate><span class='month'>Jun</span> <span class='day'>26</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/google/'>Google</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2012/06/26/shots-from-outside-io-2012/">Shots from outside Google IO 2012</a></h3>
+<p class="archive-meta">
+  <time datetime="2012-06-26T09:42:00-04:00" pubdate>Jun 26</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/google/'>Google</a></span>
+  
+</p>
 
 </article>
 
@@ -811,13 +853,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2012/06/19/microsoft-surface-has-microsoft-nailed-it/">Microsoft Surface: Has Microsoft nailed it?</a></h1>
-<time datetime="2012-06-19T19:44:00-04:00" pubdate><span class='month'>Jun</span> <span class='day'>19</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/microsoft/'>Microsoft</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2012/06/19/microsoft-surface-has-microsoft-nailed-it/">Microsoft Surface: Has Microsoft nailed it?</a></h3>
+<p class="archive-meta">
+  <time datetime="2012-06-19T19:44:00-04:00" pubdate>Jun 19</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/microsoft/'>Microsoft</a></span>
+  
+</p>
 
 </article>
 
@@ -825,13 +867,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2012/06/11/wwdc-recap/">WWDC Recap</a></h1>
-<time datetime="2012-06-11T21:55:00-04:00" pubdate><span class='month'>Jun</span> <span class='day'>11</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/apple/'>Apple</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2012/06/11/wwdc-recap/">WWDC Recap</a></h3>
+<p class="archive-meta">
+  <time datetime="2012-06-11T21:55:00-04:00" pubdate>Jun 11</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/apple/'>Apple</a></span>
+  
+</p>
 
 </article>
 
@@ -839,13 +881,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2012/06/07/my-wwdc-2012-predictions/">My WWDC 2012 Predictions</a></h1>
-<time datetime="2012-06-07T18:02:00-04:00" pubdate><span class='month'>Jun</span> <span class='day'>07</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/apple/'>Apple</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2012/06/07/my-wwdc-2012-predictions/">My WWDC 2012 Predictions</a></h3>
+<p class="archive-meta">
+  <time datetime="2012-06-07T18:02:00-04:00" pubdate>Jun 7</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/apple/'>Apple</a></span>
+  
+</p>
 
 </article>
 
@@ -853,13 +895,13 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2012/06/05/the-raspberry-pi-has-arrived/">The Raspberry Pi Has Arrived!</a></h1>
-<time datetime="2012-06-05T20:08:00-04:00" pubdate><span class='month'>Jun</span> <span class='day'>05</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/review/'>Review</a></span>
-</footer>
-
+<h3 class="archive-title"><a href="/blog/2012/06/05/the-raspberry-pi-has-arrived/">The Raspberry Pi Has Arrived!</a></h3>
+<p class="archive-meta">
+  <time datetime="2012-06-05T20:08:00-04:00" pubdate>Jun 5</time>
+  
+    <span class="archive-categories"><a class='category' href='/blog/categories/review/'>Review</a></span>
+  
+</p>
 
 </article>
 
@@ -867,9 +909,11 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 <article>
   
-<h1><a href="/blog/2012/06/03/everyone-should-learn-to-program/">Everyone should learn to program</a></h1>
-<time datetime="2012-06-03T13:09:00-04:00" pubdate><span class='month'>Jun</span> <span class='day'>03</span> <span class='year'>2012</span></time>
-
+<h3 class="archive-title"><a href="/blog/2012/06/03/everyone-should-learn-to-program/">Everyone should learn to program</a></h3>
+<p class="archive-meta">
+  <time datetime="2012-06-03T13:09:00-04:00" pubdate>Jun 3</time>
+  
+</p>
 
 </article>
 
@@ -887,6 +931,10 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2026/05/11/how-to-combine-pagingdata-with-other-flows-using-asitemsnapshotlistflow/">How to Combine PagingData with Other Flows Using asItemSnapshotListFlow</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2026/02/11/custom-scroll-indicators-in-jetpack-compose-foundation/">Adding Scrollbars to Jetpack Compose</a>
       </li>
     
@@ -900,10 +948,6 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
     
       <li class="post">
         <a href="/blog/2024/12/14/ui-testing-made-easy-the-robot-test-pattern-on-android/">UI Testing Made Easy: The Robot Test Pattern on Android</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2024/10/10/modernizing-your-android-apps-data-storage-sharedpreferences-to-datastore/">Modernizing Your Android App's Data Storage: SharedPreferences to DataStore</a>
       </li>
     
   </ul>
@@ -956,10 +1000,9 @@ Feb 11 2026 posted in Android, Compose, Kotlin 2025 Smooth Theme Transitions in 
 
 
     </div>
-  </div>
+  </main>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2026 - Michael Evans -
-  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+  Copyright &copy; 2026 Michael Evans
 </p>
 
 </footer>
