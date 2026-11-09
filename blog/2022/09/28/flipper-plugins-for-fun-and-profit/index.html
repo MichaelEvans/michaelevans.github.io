@@ -21,7 +21,7 @@
   
   <link rel="canonical" href="http://michaelevans.org/blog/2022/09/28/flipper-plugins-for-fun-and-profit/">
   <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css?v=1792965057" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/screen.css?v=1794190566" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="/javascripts/ender.js"></script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
@@ -37,7 +37,7 @@
     }
   } catch (error) {}
 </script>
-<script src="/javascripts/reading.js?v=1792965057" defer></script>
+<script src="/javascripts/reading.js?v=1794190566" defer></script>
 
   
   <script type="text/javascript">
@@ -134,11 +134,11 @@
 
 <p>As most apps grow, there becomes a need to measure app usage and engagement to better understand user behavior. In order to measure that, we often turn to analytics libraries (like <a href="https://firebase.google.com/docs/analytics">Firebase Analytics</a>) to handle this in-app behavior reporting. However, when implementing these client events, it&rsquo;s often helpful to have a quick feedback loop to ensure that the event and associated payload are correct, without having to check an analytics dashboard (which can often take some time to refresh).</p>
 
-<p>Luckily, most analytics libraries (including Firebase) have different solutions for this problem. In the Firebase Analytics library, the recommended debugging method is <a href="https://firebase.google.com/docs/analytics/events?platform=android#view_events_in_the_android_studio_debug_log">to set a property with ADB</a> to log all the events to logcat. This does provide much faster feedback than checking a dashboard, but it&rsquo;s not the most user friendly &ndash; developers need to set the property at the command line, and need to be monitoring logcat for all of the events (and also doesn&rsquo;t offer much of a search/filter function).</p>
+<p>Luckily, most analytics libraries (including Firebase) have different solutions for this problem. In the Firebase Analytics library, the recommended debugging method is <a href="https://firebase.google.com/docs/analytics/events?platform=android#view_events_in_the_android_studio_debug_log">to set a property with ADB</a> to log all the events to logcat. This does provide much faster feedback than checking a dashboard, but it&rsquo;s not the most user friendly - developers need to set the property at the command line, and need to be monitoring logcat for all of the events (and also doesn&rsquo;t offer much of a search/filter function).</p>
 
 <h2>The Solution</h2>
 
-<p>Rather than sticking to plain text in logcat, we can build a custom Flipper plugin that will display our analytics events in a filterable table. Most Flipper plugins are comprised of two parts &ndash; a client library that runs as part of your Android app, and a desktop plugin that runs inside Flipper for processing and displaying the data sent by the client.</p>
+<p>Rather than sticking to plain text in logcat, we can build a custom Flipper plugin that will display our analytics events in a filterable table. Most Flipper plugins are comprised of two parts - a client library that runs as part of your Android app, and a desktop plugin that runs inside Flipper for processing and displaying the data sent by the client.</p>
 
 <p>All of the code for this example can be found in this example <a href="https://github.com/MichaelEvans/FlipperPluginSample">Github Repository</a>.</p>
 
@@ -301,7 +301,7 @@
 <p>This command will kick off a little bit of a &ldquo;new plugin wizard&rdquo;, asking a few questions about the plugin we&rsquo;ll be creating:</p>
 
 <ol>
-<li>Whether the plugin is a &ldquo;client&rdquo; plugin or a &ldquo;device&rdquo; plugin &ndash; our plugin will require our app to communicate, we&rsquo;ll choose <code>client</code>. (Flipper also supports <code>device</code> plugins that don&rsquo;t need any particular app to be running. For example, Logcat provides logs for the <em>entire</em> device, rather than needing any individual app).</li>
+<li>Whether the plugin is a &ldquo;client&rdquo; plugin or a &ldquo;device&rdquo; plugin - our plugin will require our app to communicate, we&rsquo;ll choose <code>client</code>. (Flipper also supports <code>device</code> plugins that don&rsquo;t need any particular app to be running. For example, Logcat provides logs for the <em>entire</em> device, rather than needing any individual app).</li>
 <li>An ID. This needs to be the same as the ID we specified in the client code, otherwise Flipper will have no way of matching up the two halves of our plugin.</li>
 <li>A title. This is the human readable name of the plugin that will show up in the sidebar.</li>
 </ol>
@@ -311,7 +311,7 @@
 
 <h4>Building the Plugin</h4>
 
-<p>If you&rsquo;re familiar with JavaScript and React (I&rsquo;m not especially), creating the desktop side of the plugin might be easy. However, if you&rsquo;re <em>not</em> experienced with these tools, Flipper includes some <a href="https://fbflipper.com/docs/extending/flipper-plugin/#createtableplugin">very convenient helpers</a> for building a simple table UI. In this example, that&rsquo;s exactly what we&rsquo;ll be doing &ndash; let&rsquo;s get started!</p>
+<p>If you&rsquo;re familiar with JavaScript and React (I&rsquo;m not especially), creating the desktop side of the plugin might be easy. However, if you&rsquo;re <em>not</em> experienced with these tools, Flipper includes some <a href="https://fbflipper.com/docs/extending/flipper-plugin/#createtableplugin">very convenient helpers</a> for building a simple table UI. In this example, that&rsquo;s exactly what we&rsquo;ll be doing - let&rsquo;s get started!</p>
 
 <p>The init command we ran earlier auto-generated some files, one of which is <code>index.tsx</code> inside the <code>src</code> directory. Majority of the changes we&rsquo;ll need to make will be in this file.</p>
 
@@ -329,7 +329,7 @@
 </span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
 
 
-<p>The next thing we need to do is create something called a <code>DataTableColumn</code>, which tells Flipper how to display our data. Each object defined in this section will map to the columns in our table &ndash; we can optionally provide a <code>title</code> to provide a more meaningful label at the top of the table and a <code>width</code> in either pixels, percent or nothing (which will distribute the space evenly).</p>
+<p>The next thing we need to do is create something called a <code>DataTableColumn</code>, which tells Flipper how to display our data. Each object defined in this section will map to the columns in our table - we can optionally provide a <code>title</code> to provide a more meaningful label at the top of the table and a <code>width</code> in either pixels, percent or nothing (which will distribute the space evenly).</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -379,7 +379,7 @@
 
 <p><img class="center" src="/images/2022/09/28/disabled.jpg" width="800"></p>
 
-<p>We can now click &ldquo;+&rdquo; on the plugin row to &ldquo;enable&rdquo; it and start sending those analytics events &ndash; They should start showing up in the Flipper UI immediately!</p>
+<p>We can now click &ldquo;+&rdquo; on the plugin row to &ldquo;enable&rdquo; it and start sending those analytics events - They should start showing up in the Flipper UI immediately!</p>
 
 <p><img class="center" src="/images/2022/09/28/working.jpg" width="800"></p>
 
@@ -393,7 +393,7 @@
 
 <p>The code for both the Desktop Plugin and the Android sample app can be found on <a href="https://github.com/MichaelEvans/FlipperPluginSample">Github here</a>.</p>
 
-<p>As this post demonstrates &ndash; the Flipper SDK is pretty flexible and allows you to build all sorts of custom development tools to help ease everday tasks. Come up with an idea for a cool plugin? Send me a <a href="https://twitter.com/m_evans10">tweet</a>, I&rsquo;d love to hear about it!</p>
+<p>As this post demonstrates - the Flipper SDK is pretty flexible and allows you to build all sorts of custom development tools to help ease everday tasks. Come up with an idea for a cool plugin? Send me a <a href="https://twitter.com/m_evans10">tweet</a>, I&rsquo;d love to hear about it!</p>
 
 <p>(Thanks to <a href="https://twitter.com/zarahjutz">Zarah</a> for the editing and feedback for this post!)</p>
 </div>
@@ -469,6 +469,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2026/09/24/testing-android-backup-and-restore-with-androidx/">Testing Android Backup and Restore with AndroidX</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2026/05/11/how-to-combine-pagingdata-with-other-flows-using-asitemsnapshotlistflow/">How to Combine PagingData with Other Flows Using asItemSnapshotListFlow</a>
       </li>
     
@@ -482,10 +486,6 @@
     
       <li class="post">
         <a href="/blog/2025/03/22/turning-any-android-callback-into-a-flow-with-callbackflow/">Turning Any Android Callback into a Flow with callbackFlow</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2024/12/14/ui-testing-made-easy-the-robot-test-pattern-on-android/">UI Testing Made Easy: The Robot Test Pattern on Android</a>
       </li>
     
   </ul>

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Tutorial | Michael Evans]]></title>
   <link href="http://michaelevans.org/blog/categories/tutorial/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2026-10-25T17:50:57-04:00</updated>
+  <updated>2026-11-08T21:16:06-05:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -25,44 +25,41 @@
 
 <p>A popular solution that I&rsquo;ve seen online is to use the ViewPager&rsquo;s <code>getParent().requestDisallowInterceptTouchEvent(true);</code> method to prevent the ScrollView from scrolling while the ViewPager is being touched or scrolled. The solution that I&rsquo;ve been using is a bit like this, but it provides a little bit of a &ldquo;drag threshold&rdquo;, which is a bit forgiving in the event that the user is trying to drag the ScrollView, but happens to have their finger in the ViewPager. The code I used is as follows:</p>
 
-<p>``` java PagerTouchListener.java
-mPager.setOnTouchListener(new View.OnTouchListener() {</p>
+<pre><code class="java PagerTouchListener.java">mPager.setOnTouchListener(new View.OnTouchListener() { 
 
-<pre><code>int dragthreshold = 30;
-int downX;
-int downY;
+    int dragthreshold = 30;
+    int downX;
+    int downY;
 
-@Override 
-public boolean onTouch(View v, MotionEvent event) {
+    @Override 
+    public boolean onTouch(View v, MotionEvent event) {
 
-    switch (event.getAction()) {
-    case MotionEvent.ACTION_DOWN:
-        downX = (int) event.getRawX();
-        downY = (int) event.getRawY();
-        break; 
-    case MotionEvent.ACTION_MOVE:
-        int distanceX = Math.abs((int) event.getRawX() - downX);
-        int distanceY = Math.abs((int) event.getRawY() - downY);
+        switch (event.getAction()) {
+        case MotionEvent.ACTION_DOWN:
+            downX = (int) event.getRawX();
+            downY = (int) event.getRawY();
+            break; 
+        case MotionEvent.ACTION_MOVE:
+            int distanceX = Math.abs((int) event.getRawX() - downX);
+            int distanceY = Math.abs((int) event.getRawY() - downY);
 
-        if (distanceY &gt; distanceX &amp;&amp; distanceY &gt; dragthreshold) {
-            mPager.getParent().requestDisallowInterceptTouchEvent(false); 
-            mScrollView.getParent().requestDisallowInterceptTouchEvent(true); 
-        } else if (distanceX &gt; distanceY &amp;&amp; distanceX &gt; dragthreshold) {
-            mPager.getParent().requestDisallowInterceptTouchEvent(true); 
+            if (distanceY &gt; distanceX &amp;&amp; distanceY &gt; dragthreshold) {
+                mPager.getParent().requestDisallowInterceptTouchEvent(false); 
+                mScrollView.getParent().requestDisallowInterceptTouchEvent(true); 
+            } else if (distanceX &gt; distanceY &amp;&amp; distanceX &gt; dragthreshold) {
+                mPager.getParent().requestDisallowInterceptTouchEvent(true); 
+                mScrollView.getParent().requestDisallowInterceptTouchEvent(false); 
+            } 
+            break; 
+        case MotionEvent.ACTION_UP:
             mScrollView.getParent().requestDisallowInterceptTouchEvent(false); 
+            mPager.getParent().requestDisallowInterceptTouchEvent(false); 
+            break; 
         } 
-        break; 
-    case MotionEvent.ACTION_UP:
-        mScrollView.getParent().requestDisallowInterceptTouchEvent(false); 
-        mPager.getParent().requestDisallowInterceptTouchEvent(false); 
-        break; 
+        return false; 
     } 
-    return false; 
-} 
+}); 
 </code></pre>
-
-<p>});
-```</p>
 
 <p>I found this very useful solution on <a href="http://stackoverflow.com/questions/8381697/viewpager-inside-a-scrollview-does-not-scroll-correclty/16224484#16224484">StackOverflow</a>, among many other solutions that did work (although not as nicely as this one).</p>
 ]]></content>
@@ -88,73 +85,70 @@ public boolean onTouch(View v, MotionEvent event) {
 
 <p>Here&rsquo;s what my registration layout looks like:</p>
 
-<p>``` xml
-&lt;LinearLayout xmlns:android=&ldquo;<a href="http://schemas.android.com/apk/res/android">http://schemas.android.com/apk/res/android</a>&rdquo;</p>
-
-<pre><code>xmlns:tools="http://schemas.android.com/tools"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:orientation="vertical"
-android:paddingBottom="@dimen/activity_vertical_margin"
-android:paddingLeft="@dimen/activity_horizontal_margin"
-android:paddingRight="@dimen/activity_horizontal_margin"
-android:paddingTop="@dimen/activity_vertical_margin"
-tools:context=".RegisterActivity" &gt;
-
-&lt;LinearLayout
+<pre><code class="xml">&lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="0dp"
-    android:layout_weight="1"
-    android:gravity="center_vertical"
-    android:orientation="vertical" &gt;
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".RegisterActivity" &gt;
 
-    &lt;TextView
+    &lt;LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/username" /&gt;
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:orientation="vertical" &gt;
 
-    &lt;EditText
-        android:id="@+id/register_username"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="text" &gt;
+        &lt;TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/username" /&gt;
 
-        &lt;requestFocus /&gt;
-    &lt;/EditText&gt;
+        &lt;EditText
+            android:id="@+id/register_username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="text" &gt;
 
-    &lt;TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Password:" /&gt;
+            &lt;requestFocus /&gt;
+        &lt;/EditText&gt;
 
-    &lt;EditText
-        android:id="@+id/register_password"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textPassword" /&gt;
+        &lt;TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Password:" /&gt;
+
+        &lt;EditText
+            android:id="@+id/register_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPassword" /&gt;
+
+        &lt;Button
+            android:id="@+id/sign_up"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:onClick="register"
+            android:text="Sign Up" /&gt;
+    &lt;/LinearLayout&gt;
 
     &lt;Button
-        android:id="@+id/sign_up"
-        android:layout_width="wrap_content"
+        android:id="@+id/signInButton"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:onClick="register"
-        android:text="Sign Up" /&gt;
+        android:textSize="17sp"
+        android:onClick="showLogin"
+        android:text="Already Have An Account? Log In!" /&gt;
+
 &lt;/LinearLayout&gt;
-
-&lt;Button
-    android:id="@+id/signInButton"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:textSize="17sp"
-    android:onClick="showLogin"
-    android:text="Already Have An Account? Log In!" /&gt;
 </code></pre>
-
-<p></LinearLayout>
-```</p>
 
 <p>The login screen is very similar to that of the registration screen, with the same widgets in the same places, just different ids and labels, so we&rsquo;re just going to go over the registration screen in this tutorial and leave the login screen up as an exercise to the reader. (The code will be available on <a href="https://github.com/MichaelEvans/Parse-Android-Todo">Github</a> if you get stuck). We&rsquo;re going to want to implement that <code>register</code> function in our RegisterActivity, so let&rsquo;s do that next.</p>
 
@@ -162,34 +156,30 @@ tools:context=".RegisterActivity" &gt;
 
 <p>After declaring and binding variables to the two <code>EditText</code> fields (we&rsquo;ll call those <code>mUsernameField</code> and <code>mPasswordField</code>), we create our register function:</p>
 
-<p>``` java
-public void register(final View v){</p>
+<pre><code class="java">public void register(final View v){
+    if(mUsernameField.getText().length() == 0 || mPasswordField.getText().length() == 0)
+        return;
 
-<pre><code>if(mUsernameField.getText().length() == 0 || mPasswordField.getText().length() == 0)
-    return;
+    v.setEnabled(false);
+    ParseUser user = new ParseUser();
+    user.setUsername(mUsernameField.getText().toString());
+    user.setPassword(mPasswordField.getText().toString());
 
-v.setEnabled(false);
-ParseUser user = new ParseUser();
-user.setUsername(mUsernameField.getText().toString());
-user.setPassword(mPasswordField.getText().toString());
-
-user.signUpInBackground(new SignUpCallback() {
-    @Override
-    public void done(ParseException e) {
-        if (e == null) {
-            Intent intent = new Intent(RegisterActivity.this, TodoActivity.class);
-            startActivity(intent);
-            finish();
-        } else {
-            // Sign up didn't succeed. Look at the ParseException
-            // to figure out what went wrong
-            v.setEnabled(true);
+    user.signUpInBackground(new SignUpCallback() {
+        @Override
+        public void done(ParseException e) {
+            if (e == null) {
+                Intent intent = new Intent(RegisterActivity.this, TodoActivity.class);
+                startActivity(intent);
+                finish();
+            } else {
+                // Sign up didn't succeed. Look at the ParseException
+                // to figure out what went wrong
+                v.setEnabled(true);
+            }
         }
-    }
-});
+    });
 </code></pre>
-
-<p>```</p>
 
 <p><img class="center" src="/images/2013/08/20/registering.png" width="300" height="500" title="Registering" ></p>
 
@@ -208,10 +198,9 @@ query.whereEqualTo("user", ParseUser.getCurrentUser());
 
 <p>We also need to make the Tasks belong to a user where they are created, which we can do by adding the following two statements when we are creating our new Tasks (we&rsquo;re also going to add the setters and getter for the user object on the Task model):</p>
 
-<p><code>java
-t.setACL(new ParseACL(ParseUser.getCurrentUser()));
+<pre><code class="java">t.setACL(new ParseACL(ParseUser.getCurrentUser()));
 t.setUser(ParseUser.getCurrentUser());
-</code></p>
+</code></pre>
 
 <p>These lines will make the Task only read/writeable by the owner, and set the user associated with them to the current user. Take a peek in your Parse console, and you&rsquo;ll see the Tasks now have an owner!</p>
 
@@ -219,50 +208,39 @@ t.setUser(ParseUser.getCurrentUser());
 
 <p>We also want to make it possible for a user to log out. We&rsquo;ll do this by providing an option in the action bar settings menu. We can do this by adding an entry in the <code>res/menu/todo.xml</code> file like the following:</p>
 
-<p>``` xml
-&lt;item</p>
-
-<pre><code>android:id="@+id/action_logout"
-android:orderInCategory="100"
-android:showAsAction="never"
-android:title="@string/action_logout"/&gt;
+<pre><code class="xml">&lt;item
+    android:id="@+id/action_logout"
+    android:orderInCategory="100"
+    android:showAsAction="never"
+    android:title="@string/action_logout"/&gt;
 </code></pre>
-
-<p>```</p>
 
 <p>Then all we need to do is wire up this action bar item. When options items are selected, there&rsquo;s a method that will be called in your activity named <code>onOptionsItemSelected</code>. We&rsquo;ll just fill this function out like this:</p>
 
-<p>``` java
-public boolean onOptionsItemSelected(MenuItem item) {</p>
-
-<pre><code>switch (item.getItemId()) {
-case R.id.action_logout: 
-    ParseUser.logOut();
-    Intent intent = new Intent(this, LoginActivity.class);
-    startActivity(intent);
-    finish();
-    return true; 
-} 
-return false; 
+<pre><code class="java">public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+    case R.id.action_logout: 
+        ParseUser.logOut();
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        finish();
+        return true; 
+    } 
+    return false; 
+}
 </code></pre>
 
-<p>}
-<code>``
-If the user selects the logout option, call the</code>logout()` method, and then send them back to the login screen.</p>
+<p>If the user selects the logout option, call the <code>logout()</code> method, and then send them back to the login screen.</p>
 
 <p>The last thing we need to do in the TodoActivity is prevent a user from accessing this class while no one is logged in. We can do that back up in the <code>onCreate</code> method:</p>
 
-<p>``` java
-ParseUser currentUser = ParseUser.getCurrentUser();
-if(currentUser == null){</p>
-
-<pre><code>Intent intent = new Intent(this, LoginActivity.class);
-startActivity(intent);
-finish();
+<pre><code class="java">ParseUser currentUser = ParseUser.getCurrentUser();
+if(currentUser == null){
+    Intent intent = new Intent(this, LoginActivity.class);
+    startActivity(intent);
+    finish();
+}
 </code></pre>
-
-<p>}
-```</p>
 
 <p>If there is no user currenty logged in, stop the TodoActivity, and forward us to the LoginActivity.</p>
 
@@ -270,49 +248,32 @@ finish();
 
 <p>As I alluded to before, we&rsquo;re also going to want to add error handling. This way, if the user puts in bad credentials, or they try to register a username that&rsquo;s already taken, they&rsquo;ll get an informative error message. Let&rsquo;s do this by adding a <code>TextView</code> in our layout to display the message: (You&rsquo;ll also want to add a <code>colors.xml</code> file that will declare what <code>@color/red</code> is.)</p>
 
-<p>``` xml
-&lt;TextView</p>
-
-<pre><code>android:id="@+id/error_messages"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:layout_gravity="center_horizontal"
-android:textColor="@color/red"
-android:textAppearance="?android:attr/textAppearanceMedium" /&gt;
+<pre><code class="xml">&lt;TextView
+    android:id="@+id/error_messages"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:textColor="@color/red"
+    android:textAppearance="?android:attr/textAppearanceMedium" /&gt;
 </code></pre>
-
-<p>```</p>
 
 <p>Then we&rsquo;ll bind a variable to that view, and add the following error handling to the else statement from our <code>signUpInBackground</code> call:</p>
 
-<p>``` java
-switch(e.getCode()){
-case ParseException.USERNAME_TAKEN:</p>
-
-<pre><code>mErrorField.setText("Sorry, this username has already been taken.");
-break;
-</code></pre>
-
-<p>case ParseException.USERNAME_MISSING:</p>
-
-<pre><code>mErrorField.setText("Sorry, you must supply a username to register.");
-break;
-</code></pre>
-
-<p>case ParseException.PASSWORD_MISSING:</p>
-
-<pre><code>mErrorField.setText("Sorry, you must supply a password to register.");
-break;
-</code></pre>
-
-<p>default:</p>
-
-<pre><code>mErrorField.setText(e.getLocalizedMessage());
-</code></pre>
-
-<p>}
+<pre><code class="java">switch(e.getCode()){
+case ParseException.USERNAME_TAKEN:
+    mErrorField.setText("Sorry, this username has already been taken.");
+    break;
+case ParseException.USERNAME_MISSING:
+    mErrorField.setText("Sorry, you must supply a username to register.");
+    break;
+case ParseException.PASSWORD_MISSING:
+    mErrorField.setText("Sorry, you must supply a password to register.");
+    break;
+default:
+    mErrorField.setText(e.getLocalizedMessage());
+}
 v.setEnabled(true);
-```</p>
+</code></pre>
 
 <p>This will set some nice messages that will explain what the error is, or fall back to the message that Parse sends us, if it&rsquo;s some other type of problem.</p>
 
@@ -367,48 +328,44 @@ v.setEnabled(true);
 Parse.initialize(this, &ldquo;APP_ID&rdquo;, &ldquo;CLIENT_ID&rdquo;);
 ParseAnalytics.trackAppOpened(getIntent());</p>
 
-<p>```</p>
+<pre><code>
+That second line is optional, but it adds analytics tracking to your app, which is a nice feature to get for free. In addition to that initializer code, we'll need to add get some permissions for our app. Add the following two permissions to your AndroidManifest.xml file, above the `&lt;application&gt;` tag:
+</code></pre>
 
-<p>That second line is optional, but it adds analytics tracking to your app, which is a nice feature to get for free. In addition to that initializer code, we&rsquo;ll need to add get some permissions for our app. Add the following two permissions to your AndroidManifest.xml file, above the <code>&lt;application&gt;</code> tag:
-<code>
-&lt;uses-permission android:name="android.permission.INTERNET" /&gt;
-&lt;uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /&gt;
-</code></p>
+<p><uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+```</p>
 
 <h3>Data Model</h3>
 
 <p>Now we&rsquo;re able to interact with Parse using the included library. The next thing we&rsquo;ll want to do is to declare a Task model. This object will represent an individual Task Object in Parse&rsquo;s datastore. Create a new class named Task.java, and fill it out like the following:</p>
 
-<p>``` java Task.java
-import com.parse.ParseClassName;
-import com.parse.ParseObject;</p>
+<pre><code class="java Task.java">import com.parse.ParseClassName;
+import com.parse.ParseObject;
 
-<p>@ParseClassName(&ldquo;Task&rdquo;)
-public class Task extends ParseObject{</p>
+@ParseClassName("Task")
+public class Task extends ParseObject{
+    public Task(){
 
-<pre><code>public Task(){
+    }
 
-}
+    public boolean isCompleted(){
+        return getBoolean("completed");
+    }
 
-public boolean isCompleted(){
-    return getBoolean("completed");
-}
+    public void setCompleted(boolean complete){
+        put("completed", complete);
+    }
 
-public void setCompleted(boolean complete){
-    put("completed", complete);
-}
+    public String getDescription(){
+        return getString("description");
+    }
 
-public String getDescription(){
-    return getString("description");
-}
-
-public void setDescription(String description){
-    put("description", description);
+    public void setDescription(String description){
+        put("description", description);
+    }
 }
 </code></pre>
-
-<p>}
-```</p>
 
 <p>The annotation tells Parse what &ldquo;table&rdquo; that our object corresponds with, and then we are providing methods to get and set two properties: a description, and a completed status. In addition to those, Parse will give us created_at and updated_at fields for free.</p>
 
@@ -421,17 +378,16 @@ ParseObject.registerSubclass(Task.class)
 
 <p>This tells Parse to use the annotation that we declared at the top of the model. The next thing we want to do is set up the layout for our activity. This XML file will represent the UI of our application. Open up the todo_activity.xml file, and replace the contents with this:
 ``` xml
-&lt;LinearLayout xmlns:android=&ldquo;<a href="http://schemas.android.com/apk/res/android">http://schemas.android.com/apk/res/android</a>&rdquo;</p>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    tools:context=".TodoActivity" ></p>
 
-<pre><code>xmlns:tools="http://schemas.android.com/tools"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:orientation="vertical"
-android:paddingLeft="@dimen/activity_horizontal_margin"
-android:paddingRight="@dimen/activity_horizontal_margin"
-tools:context=".TodoActivity" &gt;
-
-&lt;LinearLayout
+<pre><code>&lt;LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal" &gt;
@@ -477,20 +433,17 @@ mListView = (ListView) findViewById(R.id.task_list);
 </code></p>
 
 <p>Then we can create the createTask method:
-``` java
-public void createTask(View v) {</p>
-
-<pre><code>    if (mTaskInput.getText().length() &gt; 0){
-        Task t = new Task();
-        t.setDescription(mTaskInput.getText().toString());
-        t.setCompleted(false);
-        t.saveEventually();
-        mTaskInput.setText("");
+<code>java
+public void createTask(View v) {
+        if (mTaskInput.getText().length() &gt; 0){
+            Task t = new Task();
+            t.setDescription(mTaskInput.getText().toString());
+            t.setCompleted(false);
+            t.saveEventually();
+            mTaskInput.setText("");
+        }
     }
-} 
-</code></pre>
-
-<p>```</p>
+</code></p>
 
 <p>What we are doing here is checking to see if the input has anything in it (don&rsquo;t want to create a task without a description), creating a new Task object, setting its fields, and then calling <code>saveEventually()</code>. This is a convenience method from Parse, that will queue this object to be saved. That way, if the user doesn&rsquo;t have a network connection, the task will be uploaded later when they are back online. Finally, we empty out the input field so that it&rsquo;s ready for another task.</p>
 
@@ -504,67 +457,63 @@ public void createTask(View v) {</p>
 
 <p>First let&rsquo;s set up a TaskAdapter. An adapter is what you add to a ListView to decide what kind of behavior the list will have (layout of each row, etc.) Create a new class called TaskAdapter that extends from ArrayAdapter like the following:</p>
 
-<p>``` java
-import java.util.List;</p>
+<pre><code class="java">import java.util.List;
 
-<p>import android.content.Context;
+import android.content.Context;
 import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.TextView;</p>
+import android.widget.TextView;
 
-<p>public class TaskAdapter extends ArrayAdapter<Task> {</p>
+public class TaskAdapter extends ArrayAdapter&lt;Task&gt; {
+    private Context mContext;
+    private List&lt;Task&gt; mTasks;
 
-<pre><code>private Context mContext;
-private List&lt;Task&gt; mTasks;
-
-public TaskAdapter(Context context, List&lt;Task&gt; objects) {
-    super(context, R.layout.task_row_item, objects);
-    this.mContext = context;
-    this.mTasks = objects;
-}
-
-public View getView(int position, View convertView, ViewGroup parent){
-    if(convertView == null){
-        LayoutInflater mLayoutInflater = LayoutInflater.from(mContext);
-        convertView = mLayoutInflater.inflate(R.layout.task_row_item, null);
+    public TaskAdapter(Context context, List&lt;Task&gt; objects) {
+        super(context, R.layout.task_row_item, objects);
+        this.mContext = context;
+        this.mTasks = objects;
     }
 
-    Task task = mTasks.get(position);
+    public View getView(int position, View convertView, ViewGroup parent){
+        if(convertView == null){
+            LayoutInflater mLayoutInflater = LayoutInflater.from(mContext);
+            convertView = mLayoutInflater.inflate(R.layout.task_row_item, null);
+        }
 
-    TextView descriptionView = (TextView) convertView.findViewById(R.id.task_description);
+        Task task = mTasks.get(position);
 
-    descriptionView.setText(task.getDescription());
+        TextView descriptionView = (TextView) convertView.findViewById(R.id.task_description);
 
-    if(task.isCompleted()){
-        descriptionView.setPaintFlags(descriptionView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-    }else{
-        descriptionView.setPaintFlags(descriptionView.getPaintFlags() &amp; (~Paint.STRIKE_THRU_TEXT_FLAG));
+        descriptionView.setText(task.getDescription());
+
+        if(task.isCompleted()){
+            descriptionView.setPaintFlags(descriptionView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        }else{
+            descriptionView.setPaintFlags(descriptionView.getPaintFlags() &amp; (~Paint.STRIKE_THRU_TEXT_FLAG));
+        }
+
+        return convertView;
     }
 
-    return convertView;
 }
 </code></pre>
-
-<p>}
-```</p>
 
 <p>This class will take an array of Tasks, and for each row in the ListView, set a TextView with the id <code>task_description</code> to the description value, and set a paint flag for Strikethrough if the task is completed. You&rsquo;ll also notice that this class inflates a layout called <code>task_row_item</code>, which we can create now.</p>
 
 <p>In the <code>res/layouts/</code> folder, create a file called &lsquo;task_row_item.xml&rsquo;, and fill it with the following content:
 ``` xml
-&lt;?xml version=&ldquo;1.0&rdquo; encoding=&ldquo;utf-8&rdquo;?>
-&lt;LinearLayout xmlns:android=&ldquo;<a href="http://schemas.android.com/apk/res/android">http://schemas.android.com/apk/res/android</a>&rdquo;</p>
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:orientation="horizontal" ></p>
 
-<pre><code>android:layout_width="match_parent"
-android:layout_height="wrap_content"
-android:paddingTop="@dimen/activity_vertical_margin"
-android:paddingBottom="@dimen/activity_vertical_margin"
-android:orientation="horizontal" &gt;
-
-&lt;TextView
+<pre><code>&lt;TextView
     android:id="@+id/task_description"
     android:layout_width="0dp"
     android:layout_height="wrap_content"
@@ -584,12 +533,11 @@ mListView.setAdapter(mAdapter);
 
 <p>You&rsquo;ll notice that nothing happens if you run the application again, since we didn&rsquo;t yet fetch any data from Parse. Create a new method called <code>updateData()</code> and put in the following code: (be sure to make a call to this method at the end of <code>onCreate()</code>)
 ``` java
-public void updateData(){</p>
+public void updateData(){
+    ParseQuery<Task> query = ParseQuery.getQuery(Task.class);
+    query.findInBackground(new FindCallback<Task>() {</p>
 
-<pre><code>ParseQuery&lt;Task&gt; query = ParseQuery.getQuery(Task.class);
-query.findInBackground(new FindCallback&lt;Task&gt;() {
-
-    @Override
+<pre><code>    @Override
     public void done(List&lt;Task&gt; tasks, ParseException error) {
         if(tasks != null){
             mAdapter.clear();
@@ -625,12 +573,11 @@ mListView.setOnItemClickListener(this);
 <p>Then we just make our Activity implement the <code>OnItemClickListener</code> interface, and override the <code>onItemClick</code> method. We can use some code like this:
 ``` java
 @Override
-public void onItemClick(AdapterView&lt;?> parent, View view, int position, long id) {</p>
+public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    Task task = mAdapter.getItem(position);
+    TextView taskDescription = (TextView) view.findViewById(R.id.task_description);</p>
 
-<pre><code>Task task = mAdapter.getItem(position);
-TextView taskDescription = (TextView) view.findViewById(R.id.task_description);
-
-task.setCompleted(!task.isCompleted());
+<pre><code>task.setCompleted(!task.isCompleted());
 
 if(task.isCompleted()){
     taskDescription.setPaintFlags(taskDescription.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
@@ -688,9 +635,8 @@ Now when you load up the app, you&rsquo;ll see the tasks from last time in the l
 
 <p>Wanna try it out? If you&rsquo;re running Precise or newer (12.04 or later), you&rsquo;re in luck. Just apt-get zram with</p>
 
-<p><code>
-sudo apt-get install zram-config
-</code></p>
+<pre><code>sudo apt-get install zram-config
+</code></pre>
 
 <p>and you&rsquo;re all set.</p>
 
@@ -712,8 +658,7 @@ sudo apt-get install zram-config
 
 <p>The solution I&rsquo;m using is slightly modified from this answer on StackOverflow <a href="http://stackoverflow.com/a/7327332/458603">here</a>.</p>
 
-<p>``` java LinkifiedTextView.java
-import android.content.Context;
+<pre><code class="java LinkifiedTextView.java">import android.content.Context;
 import android.text.Layout;
 import android.text.Selection;
 import android.text.Spannable;
@@ -721,61 +666,58 @@ import android.text.Spanned;
 import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.widget.TextView;</p>
+import android.widget.TextView;
 
-<p>public class LinkifiedTextView extends TextView {</p>
-
-<pre><code>public LinkifiedTextView(Context context, AttributeSet attrs) {
-    super(context, attrs);
-}
-
-@Override
-public boolean onTouchEvent(MotionEvent event) {
-    TextView widget = (TextView) this;
-    Object text = widget.getText();
-    if (text instanceof Spanned) {
-        Spannable buffer = (Spannable) text;
-
-        int action = event.getAction();
-
-        if (action == MotionEvent.ACTION_UP
-                || action == MotionEvent.ACTION_DOWN) {
-            int x = (int) event.getX();
-            int y = (int) event.getY();
-
-            x -= widget.getTotalPaddingLeft();
-            y -= widget.getTotalPaddingTop();
-
-            x += widget.getScrollX();
-            y += widget.getScrollY();
-
-            Layout layout = widget.getLayout();
-            int line = layout.getLineForVertical(y);
-            int off = layout.getOffsetForHorizontal(line, x);
-
-            ClickableSpan[] link = buffer.getSpans(off, off,
-                    ClickableSpan.class);
-
-            if (link.length != 0) {
-                if (action == MotionEvent.ACTION_UP) {
-                    link[0].onClick(widget);
-                } else if (action == MotionEvent.ACTION_DOWN) {
-                    Selection.setSelection(buffer,
-                            buffer.getSpanStart(link[0]),
-                            buffer.getSpanEnd(link[0]));
-                }
-                return true;
-            }
-        }
-
+public class LinkifiedTextView extends TextView {
+    public LinkifiedTextView(Context context, AttributeSet attrs) {
+        super(context, attrs);
     }
 
-    return false;
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        TextView widget = (TextView) this;
+        Object text = widget.getText();
+        if (text instanceof Spanned) {
+            Spannable buffer = (Spannable) text;
+
+            int action = event.getAction();
+
+            if (action == MotionEvent.ACTION_UP
+                    || action == MotionEvent.ACTION_DOWN) {
+                int x = (int) event.getX();
+                int y = (int) event.getY();
+
+                x -= widget.getTotalPaddingLeft();
+                y -= widget.getTotalPaddingTop();
+
+                x += widget.getScrollX();
+                y += widget.getScrollY();
+
+                Layout layout = widget.getLayout();
+                int line = layout.getLineForVertical(y);
+                int off = layout.getOffsetForHorizontal(line, x);
+
+                ClickableSpan[] link = buffer.getSpans(off, off,
+                        ClickableSpan.class);
+
+                if (link.length != 0) {
+                    if (action == MotionEvent.ACTION_UP) {
+                        link[0].onClick(widget);
+                    } else if (action == MotionEvent.ACTION_DOWN) {
+                        Selection.setSelection(buffer,
+                                buffer.getSpanStart(link[0]),
+                                buffer.getSpanEnd(link[0]));
+                    }
+                    return true;
+                }
+            }
+
+        }
+
+        return false;
+    }
 }
 </code></pre>
-
-<p>}
-```</p>
 
 <p>Just drop this in as a replacement for your normal TextView, and you&rsquo;ll have the clicks on links in your text intercepted. Hope this helps a fellow developer!</p>
 

@@ -21,7 +21,7 @@
   
   <link rel="canonical" href="http://michaelevans.org/blog/2016/02/17/using-dagger-1-and-kotlin/">
   <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css?v=1792965057" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/screen.css?v=1794190566" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="/javascripts/ender.js"></script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
@@ -37,7 +37,7 @@
     }
   } catch (error) {}
 </script>
-<script src="/javascripts/reading.js?v=1792965057" defer></script>
+<script src="/javascripts/reading.js?v=1794190566" defer></script>
 
   
   <script type="text/javascript">
@@ -123,7 +123,7 @@
   </header>
 
 
-<div class="entry-content"><p>Unless you&rsquo;ve been hiding from all the news about Android development, you&rsquo;ve <a href="https://medium.com/@CodingDoug/kotlin-android-a-brass-tacks-experiment-part-1-3e5028491bcc#.15w4ypfer">likely</a> <a href="http://antonioleiva.com/kotlin-awesome-tricks-for-android/">heard</a> <a href="http://vishnurajeevan.com/2016/02/13/Using-Kotlin-Extensions-for-Rx-ifying/">about</a> <a href="https://realm.io/news/oredev-jake-wharton-kotlin-advancing-android-dev/">Kotlin</a> (<a href="https://blog.jetbrains.com/kotlin/2016/02/kotlin-1-0-released-pragmatic-language-for-jvm-and-android/">which hit version 1.0 on Monday</a>!). I&rsquo;ve been toying around with it lately (the <a href="https://kotlinlang.org/docs/tutorials/koans.html">Kotlin Koans</a> are a great place to start for a beginner) and wanted to try building an app with it &ndash; that is, until I hit a few road blocks.</p>
+<div class="entry-content"><p>Unless you&rsquo;ve been hiding from all the news about Android development, you&rsquo;ve <a href="https://medium.com/@CodingDoug/kotlin-android-a-brass-tacks-experiment-part-1-3e5028491bcc#.15w4ypfer">likely</a> <a href="http://antonioleiva.com/kotlin-awesome-tricks-for-android/">heard</a> <a href="http://vishnurajeevan.com/2016/02/13/Using-Kotlin-Extensions-for-Rx-ifying/">about</a> <a href="https://realm.io/news/oredev-jake-wharton-kotlin-advancing-android-dev/">Kotlin</a> (<a href="https://blog.jetbrains.com/kotlin/2016/02/kotlin-1-0-released-pragmatic-language-for-jvm-and-android/">which hit version 1.0 on Monday</a>!). I&rsquo;ve been toying around with it lately (the <a href="https://kotlinlang.org/docs/tutorials/koans.html">Kotlin Koans</a> are a great place to start for a beginner) and wanted to try building an app with it - that is, until I hit a few road blocks.</p>
 
 <!-- more -->
 
@@ -142,17 +142,17 @@
 </pre></td><td class='code'><pre><code class=''><span class='line'>Error:Modules must not extend from other classes: org.michaelevans.example.AppModule</span></code></pre></td></tr></table></div></figure>
 
 
-<p>My intial thought was that Kotlin was causing my Module to extend <code>Any</code>, rather than <code>Object</code>. (<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/">Any</a> is the root of the class hierarchy in Kotlin, similar to the way that Object is the root of the Java class hierarchy.) Upon closer inspection, that didn&rsquo;t seem to be the issue, but rather than get hung up on this &ndash; I just converted my modules to Java classes and decided to come back to this issue later.</p>
+<p>My intial thought was that Kotlin was causing my Module to extend <code>Any</code>, rather than <code>Object</code>. (<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/">Any</a> is the root of the class hierarchy in Kotlin, similar to the way that Object is the root of the Java class hierarchy.) Upon closer inspection, that didn&rsquo;t seem to be the issue, but rather than get hung up on this - I just converted my modules to Java classes and decided to come back to this issue later.</p>
 
 <h2>@Inject</h2>
 
-<p>So now I had my modules set up, and I went about trying to <code>@Inject</code> some fields on an Activity or two. This yielded another problem: Kotlin doesn&rsquo;t have fields, and we obviously can&rsquo;t do constructor injection on something for which we don&rsquo;t control the constructor &ndash; like <code>Activity</code>.</p>
+<p>So now I had my modules set up, and I went about trying to <code>@Inject</code> some fields on an Activity or two. This yielded another problem: Kotlin doesn&rsquo;t have fields, and we obviously can&rsquo;t do constructor injection on something for which we don&rsquo;t control the constructor - like <code>Activity</code>.</p>
 
 <p>I thought I&rsquo;d use Dagger to inject a property with &ldquo;method&rdquo; injection like so:</p>
 
 <p><code>lateinit var service : MyService @Inject set</code></p>
 
-<p>But when you try this &ndash; you&rsquo;ll find out that Dagger doesn&rsquo;t support Method injection!</p>
+<p>But when you try this - you&rsquo;ll find out that Dagger doesn&rsquo;t support Method injection!</p>
 
 <p>So what can we do? We can target the <a href="https://kotlinlang.org/docs/reference/annotations.html#annotation-use-site-targets">annotation on the backing field</a> like this:</p>
 
@@ -166,7 +166,7 @@
 
 <h2>Modules (part 2)</h2>
 
-<p>I was pretty pleased that I had Dagger and Kotlin playing nicely enough that I could write things (other than my modules) in Kotlin, and that DI was working. But it did bother me that I was so close to having the ability to use Kotlin for everything with one exception &ndash; why wouldn&rsquo;t these Modules play nicely?</p>
+<p>I was pretty pleased that I had Dagger and Kotlin playing nicely enough that I could write things (other than my modules) in Kotlin, and that DI was working. But it did bother me that I was so close to having the ability to use Kotlin for everything with one exception - why wouldn&rsquo;t these Modules play nicely?</p>
 
 <p>I dug into the Dagger source to find out where this error was coming from and found <a href="https://github.com/square/dagger/blob/2f9579c48e887ffa316f329c12c2fa2abbec27b1/compiler/src/main/java/dagger/internal/codegen/ModuleAdapterProcessor.java#L217">this</a>. The JavaDoc for <a href="https://docs.oracle.com/javase/8/docs/api/javax/lang/model/type/TypeMirror.html#equals-java.lang.Object-">TypeMirror&rsquo;s equals method</a> says, <code>Semantic comparisons of type equality should instead use Types.isSameType(TypeMirror, TypeMirror). The results of t1.equals(t2) and Types.isSameType(t1, t2) may differ.</code></p>
 
@@ -199,7 +199,7 @@
 <hr/>
 <ol>
 <li id="fn:1">
-<p><code>kapt</code> is <a href="http://blog.jetbrains.com/kotlin/2015/06/better-annotation-processing-supporting-stubs-in-kapt/">the annotation processing tool for Kotlin</a><a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<code>kapt</code> is <a href="http://blog.jetbrains.com/kotlin/2015/06/better-annotation-processing-supporting-stubs-in-kapt/">the annotation processing tool for Kotlin</a><a href="#fnref:1" rev="footnote">&#8617;</a></li>
 </ol>
 </div>
 
@@ -270,6 +270,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2026/09/24/testing-android-backup-and-restore-with-androidx/">Testing Android Backup and Restore with AndroidX</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2026/05/11/how-to-combine-pagingdata-with-other-flows-using-asitemsnapshotlistflow/">How to Combine PagingData with Other Flows Using asItemSnapshotListFlow</a>
       </li>
     
@@ -283,10 +287,6 @@
     
       <li class="post">
         <a href="/blog/2025/03/22/turning-any-android-callback-into-a-flow-with-callbackflow/">Turning Any Android Callback into a Flow with callbackFlow</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2024/12/14/ui-testing-made-easy-the-robot-test-pattern-on-android/">UI Testing Made Easy: The Robot Test Pattern on Android</a>
       </li>
     
   </ul>

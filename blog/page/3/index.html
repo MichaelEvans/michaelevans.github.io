@@ -10,7 +10,7 @@
   <meta name="author" content="Michael Evans">
 
   
-  <meta name="description" content="I recently attended Google&rsquo;s Android Dev Summit where the Tools team presented a talk entitled Android Studio For Experts. The room was packed &hellip;">
+  <meta name="description" content="Unless you&rsquo;ve been hiding from all the news about Android development, you&rsquo;ve likely heard about Kotlin (which hit version 1.0 on Monday &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -21,7 +21,7 @@
   
   <link rel="canonical" href="http://michaelevans.org/blog/page/3/">
   <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css?v=1792965057" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/screen.css?v=1794190566" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="/javascripts/ender.js"></script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
@@ -37,7 +37,7 @@
     }
   } catch (error) {}
 </script>
-<script src="/javascripts/reading.js?v=1792965057" defer></script>
+<script src="/javascripts/reading.js?v=1794190566" defer></script>
 
   
   <script type="text/javascript">
@@ -94,6 +94,50 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-02-17T13:43:25-05:00" pubdate data-updated="true">Feb 17<span>th</span>, 2016</time>
+        
+         | <a href="/blog/2016/02/17/using-dagger-1-and-kotlin/#disqus_thread">Comments</a>
+        
+      </p>
+    
+    
+      <h1 class="entry-title"><a href="/blog/2016/02/17/using-dagger-1-and-kotlin/">Using Dagger 1 and Kotlin</a></h1>
+    
+
+  </header>
+
+
+  <div class="entry-content"><p>Unless you&rsquo;ve been hiding from all the news about Android development, you&rsquo;ve <a href="https://medium.com/@CodingDoug/kotlin-android-a-brass-tacks-experiment-part-1-3e5028491bcc#.15w4ypfer">likely</a> <a href="http://antonioleiva.com/kotlin-awesome-tricks-for-android/">heard</a> <a href="http://vishnurajeevan.com/2016/02/13/Using-Kotlin-Extensions-for-Rx-ifying/">about</a> <a href="https://realm.io/news/oredev-jake-wharton-kotlin-advancing-android-dev/">Kotlin</a> (<a href="https://blog.jetbrains.com/kotlin/2016/02/kotlin-1-0-released-pragmatic-language-for-jvm-and-android/">which hit version 1.0 on Monday</a>!). I&rsquo;ve been toying around with it lately (the <a href="https://kotlinlang.org/docs/tutorials/koans.html">Kotlin Koans</a> are a great place to start for a beginner) and wanted to try building an app with it - that is, until I hit a few road blocks.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2016/02/17/using-dagger-1-and-kotlin/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -614,57 +658,6 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-03-03T22:30:38-05:00" pubdate data-updated="true">Mar 3<span>rd</span>, 2014</time>
-        
-         | <a href="/blog/2014/03/03/adb-over-wifi/#disqus_thread">Comments</a>
-        
-      </p>
-    
-    
-      <h1 class="entry-title"><a href="/blog/2014/03/03/adb-over-wifi/">ADB Over WiFi</a></h1>
-    
-
-  </header>
-
-
-  <div class="entry-content"><p>I haven&rsquo;t updated my blog in a while, but this is a tip/trick that&rsquo;s so good that I had to share. It&rsquo;s not a very widely known feature, but once you try it, you&rsquo;ll wonder how you lived with out it: using ADB over WiFi! That&rsquo;s right, no more plugging in all your devices to your computer to debug/etc. Best of all, no root required.</p>
-
-<p>It&rsquo;s also ingeniusly simple. First, connect the device you want to use via a USB cable.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>adb tcpip 5555
-</span><span class='line'>(Feel free to unplug it now)
-</span><span class='line'>adb connect &lt;IP address of your device&gt;</span></code></pre></td></tr></table></div></figure>
-
-
-<p>That&rsquo;s it! Enjoy your tether-free development.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; Older</a>
@@ -682,6 +675,10 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2026/09/24/testing-android-backup-and-restore-with-androidx/">Testing Android Backup and Restore with AndroidX</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2026/05/11/how-to-combine-pagingdata-with-other-flows-using-asitemsnapshotlistflow/">How to Combine PagingData with Other Flows Using asItemSnapshotListFlow</a>
       </li>
     
@@ -695,10 +692,6 @@ Liquid::Template.register_tag(&#39;google_plus&#39;, Jekyll::GooglePlusEmbedTag)
     
       <li class="post">
         <a href="/blog/2025/03/22/turning-any-android-callback-into-a-flow-with-callbackflow/">Turning Any Android Callback into a Flow with callbackFlow</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2024/12/14/ui-testing-made-easy-the-robot-test-pattern-on-android/">UI Testing Made Easy: The Robot Test Pattern on Android</a>
       </li>
     
   </ul>

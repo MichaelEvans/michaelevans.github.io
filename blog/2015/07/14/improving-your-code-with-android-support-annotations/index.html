@@ -21,7 +21,7 @@
   
   <link rel="canonical" href="http://michaelevans.org/blog/2015/07/14/improving-your-code-with-android-support-annotations/">
   <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css?v=1792965057" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/screen.css?v=1794190566" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="/javascripts/ender.js"></script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
@@ -37,7 +37,7 @@
     }
   } catch (error) {}
 </script>
-<script src="/javascripts/reading.js?v=1792965057" defer></script>
+<script src="/javascripts/reading.js?v=1794190566" defer></script>
 
   
   <script type="text/javascript">
@@ -166,7 +166,7 @@
 
 <p>Today I discovered a new support annotation <code>@Keep</code>. According to the support annotation docs, this annotation hasn&rsquo;t been hooked up to the Gradle plugin yet<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>, but it will let you annotate methods and classes that should be retained when minimizing the app.</p>
 
-<p>If you&rsquo;ve ever messed around with the cryptic <code>-keep class com.foo.bar { public static &lt;methods&gt; }</code> incantations that you need to use to summon the Proguard Gods, you&rsquo;ll know how painful it is to rip your hair out, while trying to exclude a particular method or class from being optimized away. This handy annotation will tell Proguard to leave the method or class alone &ndash; like so:</p>
+<p>If you&rsquo;ve ever messed around with the cryptic <code>-keep class com.foo.bar { public static &lt;methods&gt; }</code> incantations that you need to use to summon the Proguard Gods, you&rsquo;ll know how painful it is to rip your hair out, while trying to exclude a particular method or class from being optimized away. This handy annotation will tell Proguard to leave the method or class alone - like so:</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -184,12 +184,12 @@
 </span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
 
 
-<p>The best part is &ndash; if you&rsquo;re using <code>appcompat-v7</code>, you&rsquo;re already including <code>support-annotations</code>, so just start using them already!</p>
+<p>The best part is - if you&rsquo;re using <code>appcompat-v7</code>, you&rsquo;re already including <code>support-annotations</code>, so just start using them already!</p>
 <div class="footnotes">
 <hr/>
 <ol>
 <li id="fn:1">
-<p><a href="https://android-review.googlesource.com/#/c/152983/">Looks like this is merged</a> into the 1.3 version of the plugin<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<a href="https://android-review.googlesource.com/#/c/152983/">Looks like this is merged</a> into the 1.3 version of the plugin<a href="#fnref:1" rev="footnote">&#8617;</a></li>
 </ol>
 </div>
 
@@ -266,6 +266,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2026/09/24/testing-android-backup-and-restore-with-androidx/">Testing Android Backup and Restore with AndroidX</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2026/05/11/how-to-combine-pagingdata-with-other-flows-using-asitemsnapshotlistflow/">How to Combine PagingData with Other Flows Using asItemSnapshotListFlow</a>
       </li>
     
@@ -279,10 +283,6 @@
     
       <li class="post">
         <a href="/blog/2025/03/22/turning-any-android-callback-into-a-flow-with-callbackflow/">Turning Any Android Callback into a Flow with callbackFlow</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2024/12/14/ui-testing-made-easy-the-robot-test-pattern-on-android/">UI Testing Made Easy: The Robot Test Pattern on Android</a>
       </li>
     
   </ul>

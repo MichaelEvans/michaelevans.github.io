@@ -4,7 +4,7 @@
   <title><![CDATA[Michael Evans]]></title>
   <link href="http://michaelevans.org/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2026-10-25T17:50:57-04:00</updated>
+  <updated>2026-11-08T21:16:06-05:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -12,6 +12,578 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Testing Android Backup and Restore with AndroidX]]></title>
+    <link href="http://michaelevans.org/blog/2026/09/24/testing-android-backup-and-restore-with-androidx/"/>
+    <updated>2026-09-24T12:00:00-04:00</updated>
+    <id>http://michaelevans.org/blog/2026/09/24/testing-android-backup-and-restore-with-androidx</id>
+    <content type="html"><![CDATA[<p>Getting a new phone is exciting. You take it out of the box, peel off the protective film, and sign in. Your apps begin downloading, your wallpaper shows up, and before long it looks like your phone again.</p>
+
+<p>You open an app. Sign in. Open another one. Sign in again. What was the password for this one? Now you&rsquo;re digging through your password manager and waiting for verification codes.</p>
+
+<p>Even after you&rsquo;re signed in, things aren&rsquo;t quite right. Your settings are back to their defaults. The book you were reading has forgotten your page. The draft you hadn&rsquo;t finished is gone. The app made it to your new phone, but it doesn&rsquo;t feel like <em>your</em> app anymore.</p>
+
+<p>Google is pushing developers to fix this. Its <a href="https://android-developers.googleblog.com/2026/08/app-quality-memory-optimization-secure-onboarding.html">August app quality announcement</a> says that starting in April 2027, apps with sign-in will need to support restoring sign-in with the <a href="https://developer.android.com/identity/sign-in/restore-credentials">Restore Credentials API</a> to keep Play Store visibility.</p>
+
+<p>Getting the user signed back in is one half of the problem. Getting their data back is the other half, and in my experience it&rsquo;s the half that quietly breaks. Someone adds a new preferences file and forgets to update the backup rules. An installation ID gets copied to a new device, and now two phones look like the same install. Data encrypted with an Android Keystore key gets restored onto a device that doesn&rsquo;t have that key, and the app crashes on first launch. None of these show up in a normal unit test.</p>
+
+<p>Fortunately, AndroidX now has a <a href="https://developer.android.com/jetpack/androidx/releases/test-backup">backup testing library</a> that lets us automate the whole round trip. Let&rsquo;s take a look.</p>
+
+<!-- more -->
+
+
+<h2>Testing it the old way</h2>
+
+<p>Before this library, testing backup meant running a few <code>adb</code> commands by hand, roughly following the <a href="https://developer.android.com/identity/data/testingbackup">backup testing guide</a>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>adb shell bmgr <span class="nb">enable true</span>
+</span><span class='line'>adb shell bmgr backupnow com.example.backupdemo
+</span><span class='line'>adb uninstall com.example.backupdemo
+</span><span class='line'>adb install app-debug.apk
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then you&rsquo;d open the app and poke around to see whether your data came back. That works, but it&rsquo;s manual, it&rsquo;s easy to forget, and &ldquo;poke around&rdquo; isn&rsquo;t a great assertion. It&rsquo;s the kind of check that gets done once when backup is first set up and never again.</p>
+
+<h2>How the library works</h2>
+
+<p>The library splits the test into two halves:</p>
+
+<ul>
+<li><strong><code>backup-host</code></strong> runs on your development machine (or CI) and drives the whole process over ADB: run some code in the app, trigger a backup, wipe the app&rsquo;s data, restore it, run more code.</li>
+<li><strong><code>backup</code></strong> runs inside the app on the device. This is where you write data before the backup and check it afterwards.</li>
+</ul>
+
+
+<p>Why split things up? Clearing app data kills the process that would normally be running your instrumentation test. Keeping the orchestration on your computer lets the test keep going across that wipe and pick back up inside the restored app.</p>
+
+<p>Android decides what gets backed up, based on your app&rsquo;s backup rules. The library doesn&rsquo;t fake any of that; it just gives you a way to test the rules you&rsquo;ve written.</p>
+
+<p><strong>Version note:</strong> This post uses <code>1.0.0-alpha01</code>, released September 23, 2026. It&rsquo;s an early alpha, so expect some of this to change. Check the release notes if you&rsquo;re on a newer version.</p>
+
+<h2>Decide what should come back</h2>
+
+<p>Before writing any test code, it&rsquo;s worth writing down what <em>should</em> survive a restore. It&rsquo;s tempting to check that everything comes back and call it a day, but restoring the wrong thing is a bug too.</p>
+
+<p>For this post, let&rsquo;s use a reading app that lets you take notes:</p>
+
+<ul>
+<li><strong>Should come back:</strong> the current book and page, plus the user&rsquo;s notes.</li>
+<li><strong>Should stay behind:</strong> an installation ID that&rsquo;s generated fresh on each install.</li>
+</ul>
+
+
+<p>When you do this for your own app, a few things almost always belong in the &ldquo;stay behind&rdquo; list:</p>
+
+<ul>
+<li>Installation IDs, push tokens, and other per-device identifiers</li>
+<li>Anything encrypted with a Keystore key, since Keystore keys don&rsquo;t move to the new device</li>
+<li>Auth tokens, which should go through Restore Credentials instead of a file backup</li>
+<li>Caches that can just be rebuilt</li>
+</ul>
+
+
+<p>For an app targeting API 31 or higher, point the manifest at the Android 12+ rules, and keep the legacy rules for older devices:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;application</span>
+</span><span class='line'>    <span class="na">android:allowBackup=</span><span class="s">&quot;true&quot;</span>
+</span><span class='line'>    <span class="na">android:dataExtractionRules=</span><span class="s">&quot;@xml/data_extraction_rules&quot;</span>
+</span><span class='line'>    <span class="na">android:fullBackupContent=</span><span class="s">&quot;@xml/backup_rules&quot;</span> <span class="nt">/&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In res/xml/data_extraction_rules.xml:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;data-extraction-rules&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;cloud-backup&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;include</span> <span class="na">domain=</span><span class="s">&quot;sharedpref&quot;</span> <span class="na">path=</span><span class="s">&quot;.&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;exclude</span> <span class="na">domain=</span><span class="s">&quot;sharedpref&quot;</span> <span class="na">path=</span><span class="s">&quot;device_state.xml&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;include</span> <span class="na">domain=</span><span class="s">&quot;file&quot;</span> <span class="na">path=</span><span class="s">&quot;notes/&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/cloud-backup&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;device-transfer&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;include</span> <span class="na">domain=</span><span class="s">&quot;sharedpref&quot;</span> <span class="na">path=</span><span class="s">&quot;.&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;exclude</span> <span class="na">domain=</span><span class="s">&quot;sharedpref&quot;</span> <span class="na">path=</span><span class="s">&quot;device_state.xml&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;include</span> <span class="na">domain=</span><span class="s">&quot;file&quot;</span> <span class="na">path=</span><span class="s">&quot;notes/&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/device-transfer&gt;</span>
+</span><span class='line'><span class="nt">&lt;/data-extraction-rules&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Cloud backup and device-to-device transfer have separate rule sets, so you need to configure both. One thing that trips people up: once you add an <code>include</code>, <em>only</em> the included locations are backed up for that rule set. The <a href="https://developer.android.com/identity/data/autobackup">Auto Backup documentation</a> covers the defaults and the available domains.</p>
+
+<p>And the legacy version in res/xml/backup_rules.xml:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;full-backup-content&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;include</span> <span class="na">domain=</span><span class="s">&quot;sharedpref&quot;</span> <span class="na">path=</span><span class="s">&quot;.&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;exclude</span> <span class="na">domain=</span><span class="s">&quot;sharedpref&quot;</span> <span class="na">path=</span><span class="s">&quot;device_state.xml&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;include</span> <span class="na">domain=</span><span class="s">&quot;file&quot;</span> <span class="na">path=</span><span class="s">&quot;notes/&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/full-backup-content&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The test below runs on an API 31+ device, so it only exercises the modern rules. If you care about the legacy rules, you&rsquo;ll want to test those on an older device separately.</p>
+
+<h2>Setting up the tests</h2>
+
+<p>You&rsquo;ll need a disposable, unlocked device or emulator running API 31 or higher. And I mean disposable: the test wipes your app&rsquo;s data, including once before it starts. For the cloud and device-transfer modes, use a debuggable build and an emulator image with Google Play services.</p>
+
+<h3>The app module</h3>
+
+<p>In the app module&rsquo;s <code>build.gradle.kts</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='kotlin'><span class='line'><span class="n">android</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">defaultConfig</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">testApplicationId</span> <span class="p">=</span> <span class="s">&quot;com.example.backupdemo.test&quot;</span>
+</span><span class='line'>        <span class="n">testInstrumentationRunner</span> <span class="p">=</span>
+</span><span class='line'>            <span class="s">&quot;androidx.test.backup.BackupRestoreTestRunner&quot;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">dependencies</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">androidTestImplementation</span><span class="p">(</span><span class="s">&quot;androidx.test.backup:backup:1.0.0-alpha01&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Two things to watch out for here:</p>
+
+<ol>
+<li>In alpha01, the host expects the test APK&rsquo;s package to be exactly <code>&lt;applicationId&gt;.test</code>. If your debug build adds an application ID suffix, account for it in both places: <code>testApplicationId</code> here, and <code>@BackupRestoreConfig(applicationId)</code> in the host test.</li>
+<li><code>BackupRestoreTestRunner</code> <em>replaces</em> your normal instrumentation runner. If you already have Espresso or Compose UI tests in this module, you&rsquo;ll probably want a dedicated build variant for backup tests.</li>
+</ol>
+
+
+<h3>The host module</h3>
+
+<p>Next, add a plain Kotlin/JVM module named <code>backup-host-tests</code> and include it in <code>settings.gradle.kts</code>. Here&rsquo;s its <code>build.gradle.kts</code> (if your root build already declares the Kotlin JVM plugin, drop the version here):</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='kotlin'><span class='line'><span class="n">plugins</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">kotlin</span><span class="p">(</span><span class="s">&quot;jvm&quot;</span><span class="p">)</span> <span class="n">version</span> <span class="s">&quot;2.2.21&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">kotlin</span> <span class="p">{</span> <span class="n">jvmToolchain</span><span class="p">(</span><span class="m">17</span><span class="p">)</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">dependencies</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">testImplementation</span><span class="p">(</span><span class="s">&quot;androidx.test.backup:backup-host:1.0.0-alpha01&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">testImplementation</span><span class="p">(</span><span class="s">&quot;org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">testImplementation</span><span class="p">(</span><span class="n">platform</span><span class="p">(</span><span class="s">&quot;org.junit:junit-bom:5.11.4&quot;</span><span class="p">))</span>
+</span><span class='line'>    <span class="n">testImplementation</span><span class="p">(</span><span class="s">&quot;org.junit.jupiter:junit-jupiter&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">testRuntimeOnly</span><span class="p">(</span><span class="s">&quot;org.junit.platform:junit-platform-launcher&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">tasks</span><span class="p">.</span><span class="n">test</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">useJUnitPlatform</span><span class="p">()</span>
+</span><span class='line'>    <span class="n">outputs</span><span class="p">.</span><span class="n">upToDateWhen</span> <span class="p">{</span> <span class="k">false</span> <span class="p">}</span>
+</span><span class='line'>    <span class="n">outputs</span><span class="p">.</span><span class="n">cacheIf</span> <span class="p">{</span> <span class="k">false</span> <span class="p">}</span>
+</span><span class='line'>    <span class="k">val</span> <span class="n">serial</span> <span class="p">=</span> <span class="n">providers</span><span class="p">.</span><span class="n">gradleProperty</span><span class="p">(</span><span class="s">&quot;backupSerial&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">doFirst</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">val</span> <span class="n">value</span> <span class="p">=</span> <span class="n">serial</span><span class="p">.</span><span class="n">orNull</span>
+</span><span class='line'>        <span class="n">require</span><span class="p">(!</span><span class="n">value</span><span class="p">.</span><span class="n">isNullOrBlank</span><span class="p">())</span> <span class="p">{</span> <span class="s">&quot;Pass -PbackupSerial=&lt;serial&gt;&quot;</span> <span class="p">}</span>
+</span><span class='line'>        <span class="n">systemProperty</span><span class="p">(</span><span class="s">&quot;androidx.test.backup.device.serial&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The host tests use JUnit 5, so this module needs the JUnit Platform setup above. I&rsquo;m also doing two things that aren&rsquo;t strictly required, but that I&rsquo;d recommend:</p>
+
+<ul>
+<li><strong>Requiring a device serial.</strong> This test wipes app data, so I&rsquo;d rather it fail loudly than wipe whatever device happens to be plugged in.</li>
+<li><strong>Turning off up-to-date checks and caching.</strong> Changing your backup rules and reinstalling doesn&rsquo;t change anything in this module, so without these lines Gradle will skip the test and report it as passing.</li>
+</ul>
+
+
+<h2>Writing the device actions</h2>
+
+<p>The device side is made up of <em>actions</em>: small classes that the host asks the app to run. Each one needs a public no-argument constructor so the runner can create it, and the <code>Context</code> it gets belongs to your app.</p>
+
+<p>Put these in the app&rsquo;s <code>src/androidTest/java/com/example/backupdemo/BackupActions.kt</code>. First, an action that writes our test data:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='kotlin'><span class='line'><span class="k">package</span> <span class="nn">com.example.backupdemo</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">import</span> <span class="n">android</span><span class="p">.</span><span class="n">content</span><span class="p">.</span><span class="n">Context</span>
+</span><span class='line'><span class="n">import</span> <span class="n">androidx</span><span class="p">.</span><span class="n">test</span><span class="p">.</span><span class="n">backup</span><span class="p">.</span><span class="n">BackupDeviceAction</span>
+</span><span class='line'><span class="n">import</span> <span class="n">androidx</span><span class="p">.</span><span class="n">test</span><span class="p">.</span><span class="n">backup</span><span class="p">.</span><span class="n">BackupDeviceActionArgs</span>
+</span><span class='line'><span class="n">import</span> <span class="n">androidx</span><span class="p">.</span><span class="n">test</span><span class="p">.</span><span class="n">backup</span><span class="p">.</span><span class="n">BackupDeviceActionResult</span>
+</span><span class='line'><span class="n">import</span> <span class="n">java</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="n">File</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">SeedReadingState</span> <span class="p">:</span> <span class="n">BackupDeviceAction</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">override</span> <span class="k">val</span> <span class="n">phase</span> <span class="p">=</span> <span class="n">BackupDeviceAction</span><span class="p">.</span><span class="n">PHASE_POPULATE</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">override</span> <span class="k">fun</span> <span class="nf">execute</span><span class="p">(</span>
+</span><span class='line'>        <span class="n">context</span><span class="p">:</span> <span class="n">Context</span><span class="p">,</span>
+</span><span class='line'>        <span class="n">args</span><span class="p">:</span> <span class="n">BackupDeviceActionArgs</span><span class="p">,</span>
+</span><span class='line'>    <span class="p">):</span> <span class="n">BackupDeviceActionResult</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">check</span><span class="p">(</span><span class="n">context</span><span class="p">.</span><span class="n">getSharedPreferences</span><span class="p">(</span><span class="s">&quot;reading_progress&quot;</span><span class="p">,</span> <span class="m">0</span><span class="p">).</span><span class="n">edit</span><span class="p">()</span>
+</span><span class='line'>            <span class="p">.</span><span class="n">putString</span><span class="p">(</span><span class="s">&quot;book&quot;</span><span class="p">,</span> <span class="s">&quot;the-hobbit&quot;</span><span class="p">)</span>
+</span><span class='line'>            <span class="p">.</span><span class="n">putInt</span><span class="p">(</span><span class="s">&quot;page&quot;</span><span class="p">,</span> <span class="m">137</span><span class="p">)</span>
+</span><span class='line'>            <span class="p">.</span><span class="n">commit</span><span class="p">())</span>
+</span><span class='line'>        <span class="n">check</span><span class="p">(</span><span class="n">context</span><span class="p">.</span><span class="n">getSharedPreferences</span><span class="p">(</span><span class="s">&quot;device_state&quot;</span><span class="p">,</span> <span class="m">0</span><span class="p">).</span><span class="n">edit</span><span class="p">()</span>
+</span><span class='line'>            <span class="p">.</span><span class="n">putString</span><span class="p">(</span><span class="s">&quot;installation_id&quot;</span><span class="p">,</span> <span class="s">&quot;old-installation&quot;</span><span class="p">)</span>
+</span><span class='line'>            <span class="p">.</span><span class="n">commit</span><span class="p">())</span>
+</span><span class='line'>        <span class="k">val</span> <span class="n">note</span> <span class="p">=</span> <span class="n">File</span><span class="p">(</span><span class="n">context</span><span class="p">.</span><span class="n">filesDir</span><span class="p">,</span> <span class="s">&quot;notes/current.txt&quot;</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">check</span><span class="p">(</span><span class="n">note</span><span class="p">.</span><span class="n">parentFile</span><span class="p">!!.</span><span class="n">isDirectory</span> <span class="p">||</span> <span class="n">note</span><span class="p">.</span><span class="n">parentFile</span><span class="p">!!.</span><span class="n">mkdirs</span><span class="p">())</span>
+</span><span class='line'>        <span class="n">note</span><span class="p">.</span><span class="n">writeText</span><span class="p">(</span><span class="s">&quot;Thoughts about chapter seven&quot;</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nf">BackupDeviceActionResult</span><span class="p">()</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Note that we&rsquo;re using <code>commit()</code> instead of <code>apply()</code>, so the data is definitely on disk before the backup starts. In a real app you&rsquo;d use whatever persistence you actually use (Room, DataStore, etc.), but the same rule applies: make sure the writes have finished.</p>
+
+<p>Next, an action that checks the data. We&rsquo;ll run it three times: right after seeding, after wiping, and after restoring. The host tells it which one via a <code>stage</code> argument:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+</pre></td><td class='code'><pre><code class='kotlin'><span class='line'><span class="k">class</span> <span class="nc">VerifyReadingState</span> <span class="p">:</span> <span class="n">BackupDeviceAction</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">override</span> <span class="k">val</span> <span class="n">phase</span> <span class="p">=</span> <span class="n">BackupDeviceAction</span><span class="p">.</span><span class="n">PHASE_VERIFY</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">override</span> <span class="k">fun</span> <span class="nf">execute</span><span class="p">(</span>
+</span><span class='line'>        <span class="n">context</span><span class="p">:</span> <span class="n">Context</span><span class="p">,</span>
+</span><span class='line'>        <span class="n">args</span><span class="p">:</span> <span class="n">BackupDeviceActionArgs</span><span class="p">,</span>
+</span><span class='line'>    <span class="p">):</span> <span class="n">BackupDeviceActionResult</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">val</span> <span class="n">stage</span> <span class="p">=</span> <span class="n">args</span><span class="p">.</span><span class="n">payload</span><span class="p">.</span><span class="n">getValue</span><span class="p">(</span><span class="s">&quot;stage&quot;</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">val</span> <span class="n">progress</span> <span class="p">=</span> <span class="n">context</span><span class="p">.</span><span class="n">getSharedPreferences</span><span class="p">(</span><span class="s">&quot;reading_progress&quot;</span><span class="p">,</span> <span class="m">0</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">val</span> <span class="n">device</span> <span class="p">=</span> <span class="n">context</span><span class="p">.</span><span class="n">getSharedPreferences</span><span class="p">(</span><span class="s">&quot;device_state&quot;</span><span class="p">,</span> <span class="m">0</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">val</span> <span class="n">note</span> <span class="p">=</span> <span class="n">File</span><span class="p">(</span><span class="n">context</span><span class="p">.</span><span class="n">filesDir</span><span class="p">,</span> <span class="s">&quot;notes/current.txt&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">when</span> <span class="p">(</span><span class="n">stage</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="s">&quot;seeded&quot;</span><span class="p">,</span> <span class="s">&quot;restored&quot;</span> <span class="p">-&gt;</span> <span class="p">{</span>
+</span><span class='line'>                <span class="n">check</span><span class="p">(</span><span class="n">progress</span><span class="p">.</span><span class="n">getString</span><span class="p">(</span><span class="s">&quot;book&quot;</span><span class="p">,</span> <span class="k">null</span><span class="p">)</span> <span class="p">==</span> <span class="s">&quot;the-hobbit&quot;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                    <span class="s">&quot;Wrong or missing book at $stage&quot;</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>                <span class="n">check</span><span class="p">(</span><span class="n">progress</span><span class="p">.</span><span class="n">getInt</span><span class="p">(</span><span class="s">&quot;page&quot;</span><span class="p">,</span> <span class="p">-</span><span class="m">1</span><span class="p">)</span> <span class="p">==</span> <span class="m">137</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                    <span class="s">&quot;Wrong or missing page at $stage&quot;</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>                <span class="n">check</span><span class="p">(</span><span class="n">note</span><span class="p">.</span><span class="n">exists</span><span class="p">()</span> <span class="p">&amp;&amp;</span>
+</span><span class='line'>                    <span class="n">note</span><span class="p">.</span><span class="n">readText</span><span class="p">()</span> <span class="p">==</span> <span class="s">&quot;Thoughts about chapter seven&quot;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                    <span class="s">&quot;Wrong or missing note at $stage&quot;</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>            <span class="s">&quot;cleared&quot;</span> <span class="p">-&gt;</span> <span class="p">{</span>
+</span><span class='line'>                <span class="n">check</span><span class="p">(!</span><span class="n">progress</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="s">&quot;book&quot;</span><span class="p">))</span> <span class="p">{</span> <span class="s">&quot;Book survived clear&quot;</span> <span class="p">}</span>
+</span><span class='line'>                <span class="n">check</span><span class="p">(!</span><span class="n">progress</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="s">&quot;page&quot;</span><span class="p">))</span> <span class="p">{</span> <span class="s">&quot;Page survived clear&quot;</span> <span class="p">}</span>
+</span><span class='line'>                <span class="n">check</span><span class="p">(!</span><span class="n">note</span><span class="p">.</span><span class="n">exists</span><span class="p">())</span> <span class="p">{</span> <span class="s">&quot;Note survived clear&quot;</span> <span class="p">}</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>            <span class="k">else</span> <span class="p">-&gt;</span> <span class="n">error</span><span class="p">(</span><span class="s">&quot;Unknown stage: $stage&quot;</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">stage</span> <span class="p">==</span> <span class="s">&quot;seeded&quot;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">check</span><span class="p">(</span><span class="n">device</span><span class="p">.</span><span class="n">getString</span><span class="p">(</span><span class="s">&quot;installation_id&quot;</span><span class="p">,</span> <span class="k">null</span><span class="p">)</span> <span class="p">==</span> <span class="s">&quot;old-installation&quot;</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">check</span><span class="p">(!</span><span class="n">device</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="s">&quot;installation_id&quot;</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>                <span class="s">&quot;Installation ID should be absent at $stage&quot;</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nf">BackupDeviceActionResult</span><span class="p">()</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Checking all three stages might look like overkill, but each one guards against a test that passes for the wrong reason:</p>
+
+<ul>
+<li><strong>Seeded</strong> proves the installation ID existed. Otherwise the &ldquo;it didn&rsquo;t come back&rdquo; check would pass even if we never wrote it.</li>
+<li><strong>Cleared</strong> proves the wipe worked, so whatever we see afterwards really came from the restore.</li>
+<li><strong>Restored</strong> is the one we care about.</li>
+</ul>
+
+
+<p>If your app generates a new installation ID on startup, change the <strong>cleared and restored checks</strong> to assert that the ID isn&rsquo;t <code>"old-installation"</code>, rather than that it&rsquo;s missing.</p>
+
+<h2>Wiring it all together</h2>
+
+<p>Now for the host side. In <code>backup-host-tests/src/test/kotlin/com/example/backupdemo/ReadingStateBackupTest.kt</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+</pre></td><td class='code'><pre><code class='kotlin'><span class='line'><span class="k">package</span> <span class="nn">com.example.backupdemo</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">import</span> <span class="n">androidx</span><span class="p">.</span><span class="n">test</span><span class="p">.</span><span class="n">backup</span><span class="p">.</span><span class="n">host</span><span class="p">.</span><span class="n">BackupActionResult</span>
+</span><span class='line'><span class="n">import</span> <span class="n">androidx</span><span class="p">.</span><span class="n">test</span><span class="p">.</span><span class="n">backup</span><span class="p">.</span><span class="n">host</span><span class="p">.</span><span class="n">BackupRestoreConfig</span>
+</span><span class='line'><span class="n">import</span> <span class="n">androidx</span><span class="p">.</span><span class="n">test</span><span class="p">.</span><span class="n">backup</span><span class="p">.</span><span class="n">host</span><span class="p">.</span><span class="n">BackupRestoreController</span>
+</span><span class='line'><span class="n">import</span> <span class="n">androidx</span><span class="p">.</span><span class="n">test</span><span class="p">.</span><span class="n">backup</span><span class="p">.</span><span class="n">host</span><span class="p">.</span><span class="n">BackupRestoreExtension</span>
+</span><span class='line'><span class="n">import</span> <span class="n">androidx</span><span class="p">.</span><span class="n">test</span><span class="p">.</span><span class="n">backup</span><span class="p">.</span><span class="n">host</span><span class="p">.</span><span class="n">BackupTransportMode</span>
+</span><span class='line'><span class="n">import</span> <span class="n">java</span><span class="p">.</span><span class="n">nio</span><span class="p">.</span><span class="n">file</span><span class="p">.</span><span class="n">Path</span>
+</span><span class='line'><span class="n">import</span> <span class="n">kotlinx</span><span class="p">.</span><span class="n">coroutines</span><span class="p">.</span><span class="n">runBlocking</span>
+</span><span class='line'><span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">junit</span><span class="p">.</span><span class="n">jupiter</span><span class="p">.</span><span class="n">api</span><span class="p">.</span><span class="n">Test</span>
+</span><span class='line'><span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">junit</span><span class="p">.</span><span class="n">jupiter</span><span class="p">.</span><span class="n">api</span><span class="p">.</span><span class="n">extension</span><span class="p">.</span><span class="n">ExtendWith</span>
+</span><span class='line'><span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">junit</span><span class="p">.</span><span class="n">jupiter</span><span class="p">.</span><span class="n">api</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="n">TempDir</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">@ExtendWith</span><span class="p">(</span><span class="n">BackupRestoreExtension</span><span class="p">::</span><span class="n">class</span><span class="p">)</span>
+</span><span class='line'><span class="n">@BackupRestoreConfig</span><span class="p">(</span><span class="n">applicationId</span> <span class="p">=</span> <span class="s">&quot;com.example.backupdemo&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">ReadingStateBackupTest</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">@TempDir</span>
+</span><span class='line'>    <span class="n">lateinit</span> <span class="k">var</span> <span class="n">outputDir</span><span class="p">:</span> <span class="n">Path</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">@Test</span>
+</span><span class='line'>    <span class="k">fun</span> <span class="nf">readingStateSurvives</span><span class="p">(</span><span class="n">controller</span><span class="p">:</span> <span class="n">BackupRestoreController</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">runBlocking</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">suspend</span> <span class="k">fun</span> <span class="nf">action</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="n">String</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="n">String</span> <span class="p">=</span> <span class="s">&quot;&quot;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                <span class="k">val</span> <span class="n">result</span> <span class="p">=</span> <span class="n">controller</span><span class="p">.</span><span class="n">runOnDevice</span><span class="p">(</span>
+</span><span class='line'>                    <span class="n">actionClassName</span> <span class="p">=</span> <span class="s">&quot;com.example.backupdemo.$name&quot;</span><span class="p">,</span>
+</span><span class='line'>                    <span class="n">args</span> <span class="p">=</span> <span class="n">mapOf</span><span class="p">(</span><span class="s">&quot;stage&quot;</span> <span class="n">to</span> <span class="n">stage</span><span class="p">),</span>
+</span><span class='line'>                <span class="p">)</span>
+</span><span class='line'>                <span class="n">check</span><span class="p">(</span><span class="n">result</span> <span class="k">is</span> <span class="n">BackupActionResult</span><span class="p">.</span><span class="n">Success</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                    <span class="s">&quot;$name ($stage) failed: $result&quot;</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="n">action</span><span class="p">(</span><span class="s">&quot;SeedReadingState&quot;</span><span class="p">)</span>
+</span><span class='line'>            <span class="n">action</span><span class="p">(</span><span class="s">&quot;VerifyReadingState&quot;</span><span class="p">,</span> <span class="s">&quot;seeded&quot;</span><span class="p">)</span>
+</span><span class='line'>            <span class="n">controller</span><span class="p">.</span><span class="n">stopApp</span><span class="p">()</span>
+</span><span class='line'>            <span class="k">val</span> <span class="n">archive</span> <span class="p">=</span> <span class="n">controller</span><span class="p">.</span><span class="n">performBackup</span><span class="p">(</span>
+</span><span class='line'>                <span class="n">mode</span> <span class="p">=</span> <span class="n">BackupTransportMode</span><span class="p">.</span><span class="n">CLOUD_ENCRYPTED</span><span class="p">,</span>
+</span><span class='line'>                <span class="n">outputDir</span> <span class="p">=</span> <span class="n">outputDir</span><span class="p">,</span>
+</span><span class='line'>            <span class="p">)</span>
+</span><span class='line'>            <span class="n">controller</span><span class="p">.</span><span class="n">clearAppData</span><span class="p">()</span>
+</span><span class='line'>            <span class="n">action</span><span class="p">(</span><span class="s">&quot;VerifyReadingState&quot;</span><span class="p">,</span> <span class="s">&quot;cleared&quot;</span><span class="p">)</span>
+</span><span class='line'>            <span class="n">controller</span><span class="p">.</span><span class="n">performRestore</span><span class="p">(</span><span class="n">archive</span><span class="p">)</span>
+</span><span class='line'>            <span class="n">action</span><span class="p">(</span><span class="s">&quot;VerifyReadingState&quot;</span><span class="p">,</span> <span class="s">&quot;restored&quot;</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I like how this reads: it&rsquo;s the same sequence as the real thing. Write data, back up, wipe, restore, check. When it fails, the failure message tells you which step and which piece of data went wrong.</p>
+
+<p>A few notes on the details:</p>
+
+<ul>
+<li><code>BackupRestoreExtension</code> injects the <code>BackupRestoreController</code>, and its APIs are suspending, which is why everything is wrapped in <code>runBlocking</code>.</li>
+<li>The little <code>action()</code> helper checks every result. When a <code>check()</code> throws on the device, the host gets back a failure result, <em>not</em> an exception, so if you forget to check the result your test will pass no matter what happened on the device.</li>
+</ul>
+
+
+<h2>Running it (and breaking it)</h2>
+
+<p>Build and install both APKs, then run the host tests. Grab your device&rsquo;s serial from <code>adb devices</code>. These paths assume a standard <code>app</code> module without product flavors:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>./gradlew :app:assembleDebug :app:assembleDebugAndroidTest
+</span><span class='line'>adb -s emulator-5554 install -r app/build/outputs/apk/debug/app-debug.apk
+</span><span class='line'>adb -s emulator-5554 install -r -t app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+</span><span class='line'>./gradlew :backup-host-tests:test -PbackupSerial<span class="o">=</span>emulator-5554
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once it passes, break it on purpose. A test you&rsquo;ve never seen fail hasn&rsquo;t proven much yet.</p>
+
+<ol>
+<li>Add <code>&lt;exclude domain="sharedpref" path="reading_progress.xml" /&gt;</code> to the <code>cloud-backup</code> rules, rebuild, reinstall, and rerun. The book/page check should fail after restore.</li>
+<li>Put that back, then remove the <code>device_state.xml</code> exclusion. Now the installation ID check should fail.</li>
+<li>Restore the original rules.</li>
+</ol>
+
+
+<p>If both of those fail the way you&rsquo;d expect, you can trust the test to catch the regressions you actually care about.</p>
+
+<h3>Other transport modes</h3>
+
+<p>The test above uses <code>CLOUD_ENCRYPTED</code>, but you can swap in <code>CLOUD_UNENCRYPTED</code> or <code>DEVICE_TO_DEVICE</code> to test the other paths. There&rsquo;s also <code>LOCAL</code>, which is handy as a quick smoke test, but the archive it gives you isn&rsquo;t a real portable backup.</p>
+
+<p>It&rsquo;s worth being clear about what these modes don&rsquo;t do: they simulate the backup policies, but they don&rsquo;t send anything to a real Google account or a real second phone.</p>
+
+<h3>Running in CI</h3>
+
+<p>A couple of tips if you want to run this in CI:</p>
+
+<ul>
+<li>Run backup tests one at a time per device. Backup configuration is shared device state, so parallel runs will trip over each other.</li>
+<li>Put a timeout on the whole CI job. The library has its own timeout settings, but it&rsquo;s an alpha, and I wouldn&rsquo;t rely on them alone to keep a hung device from eating your build minutes.</li>
+</ul>
+
+
+<h2>Wrap-up</h2>
+
+<p>Backup is one of those features that&rsquo;s easy to forget about, because nothing tells you it&rsquo;s broken. You usually find out from a one-star review written by someone who just got a new phone.</p>
+
+<p>I wouldn&rsquo;t try to cover every file in your app on day one. I&rsquo;d pick the one or two things your users would be most annoyed to lose (their place in a book, their notes, their settings) and the one or two things that should never follow them (installation IDs, anything tied to the Keystore), and write a test for those. Once that&rsquo;s in place, adding a check is a few lines every time someone adds a new preferences file.</p>
+
+<p>Combined with Restore Credentials for sign-in, that gets you a lot closer to an app that just picks up where the user left off. Hopefully it saves a few of your users an evening of setting things up again!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[How to Combine PagingData with Other Flows Using asItemSnapshotListFlow]]></title>
@@ -661,10 +1233,8 @@
 
 <p>By wrapping your theme setup with some animation, we can achieve <strong>smooth transitions between light and dark themes</strong> that feel much more polished — without rebuilding your entire app structure.</p>
 
-<!-- more -->
+<!-- more --> 
 
-
-<p></p>
 
 <h2>The Idea: Animate the ColorScheme</h2>
 
@@ -1342,7 +1912,7 @@
 </span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
 
 
-<p>Note the <code>schema_version</code> field &ndash; this helps manage schema evolution as your app grows.</p>
+<p>Note the <code>schema_version</code> field - this helps manage schema evolution as your app grows.</p>
 
 <h2>Step 3: Create a Proto DataStore Serializer</h2>
 
@@ -2340,11 +2910,11 @@
 
 <p>As most apps grow, there becomes a need to measure app usage and engagement to better understand user behavior. In order to measure that, we often turn to analytics libraries (like <a href="https://firebase.google.com/docs/analytics">Firebase Analytics</a>) to handle this in-app behavior reporting. However, when implementing these client events, it&rsquo;s often helpful to have a quick feedback loop to ensure that the event and associated payload are correct, without having to check an analytics dashboard (which can often take some time to refresh).</p>
 
-<p>Luckily, most analytics libraries (including Firebase) have different solutions for this problem. In the Firebase Analytics library, the recommended debugging method is <a href="https://firebase.google.com/docs/analytics/events?platform=android#view_events_in_the_android_studio_debug_log">to set a property with ADB</a> to log all the events to logcat. This does provide much faster feedback than checking a dashboard, but it&rsquo;s not the most user friendly &ndash; developers need to set the property at the command line, and need to be monitoring logcat for all of the events (and also doesn&rsquo;t offer much of a search/filter function).</p>
+<p>Luckily, most analytics libraries (including Firebase) have different solutions for this problem. In the Firebase Analytics library, the recommended debugging method is <a href="https://firebase.google.com/docs/analytics/events?platform=android#view_events_in_the_android_studio_debug_log">to set a property with ADB</a> to log all the events to logcat. This does provide much faster feedback than checking a dashboard, but it&rsquo;s not the most user friendly - developers need to set the property at the command line, and need to be monitoring logcat for all of the events (and also doesn&rsquo;t offer much of a search/filter function).</p>
 
 <h2>The Solution</h2>
 
-<p>Rather than sticking to plain text in logcat, we can build a custom Flipper plugin that will display our analytics events in a filterable table. Most Flipper plugins are comprised of two parts &ndash; a client library that runs as part of your Android app, and a desktop plugin that runs inside Flipper for processing and displaying the data sent by the client.</p>
+<p>Rather than sticking to plain text in logcat, we can build a custom Flipper plugin that will display our analytics events in a filterable table. Most Flipper plugins are comprised of two parts - a client library that runs as part of your Android app, and a desktop plugin that runs inside Flipper for processing and displaying the data sent by the client.</p>
 
 <p>All of the code for this example can be found in this example <a href="https://github.com/MichaelEvans/FlipperPluginSample">Github Repository</a>.</p>
 
@@ -2507,7 +3077,7 @@
 <p>This command will kick off a little bit of a &ldquo;new plugin wizard&rdquo;, asking a few questions about the plugin we&rsquo;ll be creating:</p>
 
 <ol>
-<li>Whether the plugin is a &ldquo;client&rdquo; plugin or a &ldquo;device&rdquo; plugin &ndash; our plugin will require our app to communicate, we&rsquo;ll choose <code>client</code>. (Flipper also supports <code>device</code> plugins that don&rsquo;t need any particular app to be running. For example, Logcat provides logs for the <em>entire</em> device, rather than needing any individual app).</li>
+<li>Whether the plugin is a &ldquo;client&rdquo; plugin or a &ldquo;device&rdquo; plugin - our plugin will require our app to communicate, we&rsquo;ll choose <code>client</code>. (Flipper also supports <code>device</code> plugins that don&rsquo;t need any particular app to be running. For example, Logcat provides logs for the <em>entire</em> device, rather than needing any individual app).</li>
 <li>An ID. This needs to be the same as the ID we specified in the client code, otherwise Flipper will have no way of matching up the two halves of our plugin.</li>
 <li>A title. This is the human readable name of the plugin that will show up in the sidebar.</li>
 </ol>
@@ -2517,7 +3087,7 @@
 
 <h4>Building the Plugin</h4>
 
-<p>If you&rsquo;re familiar with JavaScript and React (I&rsquo;m not especially), creating the desktop side of the plugin might be easy. However, if you&rsquo;re <em>not</em> experienced with these tools, Flipper includes some <a href="https://fbflipper.com/docs/extending/flipper-plugin/#createtableplugin">very convenient helpers</a> for building a simple table UI. In this example, that&rsquo;s exactly what we&rsquo;ll be doing &ndash; let&rsquo;s get started!</p>
+<p>If you&rsquo;re familiar with JavaScript and React (I&rsquo;m not especially), creating the desktop side of the plugin might be easy. However, if you&rsquo;re <em>not</em> experienced with these tools, Flipper includes some <a href="https://fbflipper.com/docs/extending/flipper-plugin/#createtableplugin">very convenient helpers</a> for building a simple table UI. In this example, that&rsquo;s exactly what we&rsquo;ll be doing - let&rsquo;s get started!</p>
 
 <p>The init command we ran earlier auto-generated some files, one of which is <code>index.tsx</code> inside the <code>src</code> directory. Majority of the changes we&rsquo;ll need to make will be in this file.</p>
 
@@ -2535,7 +3105,7 @@
 </span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
 
 
-<p>The next thing we need to do is create something called a <code>DataTableColumn</code>, which tells Flipper how to display our data. Each object defined in this section will map to the columns in our table &ndash; we can optionally provide a <code>title</code> to provide a more meaningful label at the top of the table and a <code>width</code> in either pixels, percent or nothing (which will distribute the space evenly).</p>
+<p>The next thing we need to do is create something called a <code>DataTableColumn</code>, which tells Flipper how to display our data. Each object defined in this section will map to the columns in our table - we can optionally provide a <code>title</code> to provide a more meaningful label at the top of the table and a <code>width</code> in either pixels, percent or nothing (which will distribute the space evenly).</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -2585,7 +3155,7 @@
 
 <p><img class="center" src="http://michaelevans.org/images/2022/09/28/disabled.jpg" width="800"></p>
 
-<p>We can now click &ldquo;+&rdquo; on the plugin row to &ldquo;enable&rdquo; it and start sending those analytics events &ndash; They should start showing up in the Flipper UI immediately!</p>
+<p>We can now click &ldquo;+&rdquo; on the plugin row to &ldquo;enable&rdquo; it and start sending those analytics events - They should start showing up in the Flipper UI immediately!</p>
 
 <p><img class="center" src="http://michaelevans.org/images/2022/09/28/working.jpg" width="800"></p>
 
@@ -2599,7 +3169,7 @@
 
 <p>The code for both the Desktop Plugin and the Android sample app can be found on <a href="https://github.com/MichaelEvans/FlipperPluginSample">Github here</a>.</p>
 
-<p>As this post demonstrates &ndash; the Flipper SDK is pretty flexible and allows you to build all sorts of custom development tools to help ease everday tasks. Come up with an idea for a cool plugin? Send me a <a href="https://twitter.com/m_evans10">tweet</a>, I&rsquo;d love to hear about it!</p>
+<p>As this post demonstrates - the Flipper SDK is pretty flexible and allows you to build all sorts of custom development tools to help ease everday tasks. Come up with an idea for a cool plugin? Send me a <a href="https://twitter.com/m_evans10">tweet</a>, I&rsquo;d love to hear about it!</p>
 
 <p>(Thanks to <a href="https://twitter.com/zarahjutz">Zarah</a> for the editing and feedback for this post!)</p>
 ]]></content>
@@ -2662,7 +3232,7 @@
     <id>http://michaelevans.org/blog/2020/03/10/improving-app-debugging-with-flipper</id>
     <content type="html"><![CDATA[<p>Some time last year, Facebook released a new mobile debugging tool, named <a href="https://fbflipper.com/">Flipper</a>. It&rsquo;s essentially the successor to the widely popular <a href="http://facebook.github.io/stetho/">Stetho</a>. Although after talking to many developers, it seems like this newer tool is relatively unknown.</p>
 
-<p>Like Stetho, Flipper has many built-in features &ndash; including a layout inspector, a database inspector and a network inspector. Unlike Stetho though, Flipper has a very extensible API which allows for tons of customization. Over the next few articles, we&rsquo;re going to take a look at Flipper and its plugins, the APIs it provides, and how we can leverage them to help us debug various parts of our app. This post will focus on getting set up with Flipper, as well as taking a look at two of its most useful default plugins.</p>
+<p>Like Stetho, Flipper has many built-in features - including a layout inspector, a database inspector and a network inspector. Unlike Stetho though, Flipper has a very extensible API which allows for tons of customization. Over the next few articles, we&rsquo;re going to take a look at Flipper and its plugins, the APIs it provides, and how we can leverage them to help us debug various parts of our app. This post will focus on getting set up with Flipper, as well as taking a look at two of its most useful default plugins.</p>
 
 <h2>Getting Started</h2>
 
@@ -2753,7 +3323,7 @@
 
 <h2>Database Browser / Plugin</h2>
 
-<p>Something I&rsquo;ve wanted for a long time was a way to view the contents of my database from Android Studio. Right now, if you want to visualize your data or try out some queries &ndash; the best solution is to pull the sqlite database file off your emulator/device and run sqlite locally. But with Flipper, there&rsquo;s a better way!</p>
+<p>Something I&rsquo;ve wanted for a long time was a way to view the contents of my database from Android Studio. Right now, if you want to visualize your data or try out some queries - the best solution is to pull the sqlite database file off your emulator/device and run sqlite locally. But with Flipper, there&rsquo;s a better way!</p>
 
 <p>All we need to do is configure the database plugin, and our tables should show up right away:</p>
 
@@ -2793,7 +3363,7 @@
 </ol>
 
 
-<p>This process seems to make a lot of sense &ndash; since we can’t remove the column on its own, let’s just make a new table with the structure we want and copy over the data that we want to keep. So why does this process not work?</p>
+<p>This process seems to make a lot of sense - since we can’t remove the column on its own, let’s just make a new table with the structure we want and copy over the data that we want to keep. So why does this process not work?</p>
 
 <h3>The Gotcha!</h3>
 
@@ -2825,7 +3395,7 @@
 </ol>
 
 
-<p>Looking at it more visually &ndash; we&rsquo;ll start with the same tables and create a new table named <code>users_new</code> to hold the preserved data:</p>
+<p>Looking at it more visually - we&rsquo;ll start with the same tables and create a new table named <code>users_new</code> to hold the preserved data:</p>
 
 <p><img class="center" src="http://michaelevans.org/images/2020/02/10/after_step1.png" width="400" height="600"></p>
 
@@ -3057,7 +3627,7 @@
 
 <p><img class="center" src="http://michaelevans.org/images/2019/02/07/Vertical.gif" width="600" height="600" title="Vertical ViewPager2" ></p>
 
-<p>Based on the release notes there are a lot of issues left to fix before this moves to a final release &ndash; but this is a long awaited update for one of those oldest support library components.</p>
+<p>Based on the release notes there are a lot of issues left to fix before this moves to a final release - but this is a long awaited update for one of those oldest support library components.</p>
 
 <p>The sample code for this post can be found <a href="https://github.com/MichaelEvans/ViewPager2Sample">here</a>. Thanks to Chris Banes&#8217; <a href="https://github.com/chrisbanes/cheesesquare">CheeseSquare</a> for the sample data for this demo!</p>
 ]]></content>
@@ -3087,7 +3657,7 @@
 
 <p>Long story short, if you pass the right extras to this activity, and you&rsquo;ll get access to the Night Mode settings (as well as the infamous Quick Tile!).</p>
 
-<p>Fortunately for us, this is pretty trivial to accomplish with <code>adb</code> via <code>adb -d shell am start  --ez show_night_mode true com.android.systemui/.tuner.TunerActivity</code>, but not everyone who wants this feature is familiar with <code>adb</code>. So I published an app to the Play Store that does exactly that &ndash; click one button, and get access to those settings! You can find the app on the Play Store <a href="https://play.google.com/store/apps/details?id=org.michaelevans.nightmodeenabler">here</a>.</p>
+<p>Fortunately for us, this is pretty trivial to accomplish with <code>adb</code> via <code>adb -d shell am start  --ez show_night_mode true com.android.systemui/.tuner.TunerActivity</code>, but not everyone who wants this feature is familiar with <code>adb</code>. So I published an app to the Play Store that does exactly that - click one button, and get access to those settings! You can find the app on the Play Store <a href="https://play.google.com/store/apps/details?id=org.michaelevans.nightmodeenabler">here</a>.</p>
 ]]></content>
   </entry>
   
@@ -3134,11 +3704,11 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>For each one of your variants, this code will create a new task &ndash; <code>hackGps{VariantName}</code>, which copies a <code>google-services.json</code> file from a <code>config</code> directory into the root of your app module. Then it finds the corresponding Google Services task, and hooks itself in to run right before that! Now when you assemble your application, the right <code>google-services.json</code> file will be in the right place, ready to be picked up by the plugin.</p>
+<p>For each one of your variants, this code will create a new task - <code>hackGps{VariantName}</code>, which copies a <code>google-services.json</code> file from a <code>config</code> directory into the root of your app module. Then it finds the corresponding Google Services task, and hooks itself in to run right before that! Now when you assemble your application, the right <code>google-services.json</code> file will be in the right place, ready to be picked up by the plugin.</p>
 
 <p><em>You might also want to .gitignore the <code>app/google-services.json</code> file, so that you don&rsquo;t keep committing the changed file to git</em></p>
 
-<p>Hopefully Google will fix this issue in an upcoming release of the Google Services plugin, but until then &ndash; this technique should work!</p>
+<p>Hopefully Google will fix this issue in an upcoming release of the Google Services plugin, but until then - this technique should work!</p>
 ]]></content>
   </entry>
   
@@ -3597,95 +4167,7 @@ diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.Toolbar appc
 +  public boolean onTouchEvent(android.view.MotionEvent);</code></pre></noscript></div>
 
 
-<p>There are no API changes in RecyclerView nor my personal <a href="http://michaelevans.org/blog/2015/07/14/improving-your-code-with-android-support-annotations/">favorite support library</a> &ndash; Support Annotations.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Using Dagger 1 and Kotlin]]></title>
-    <link href="http://michaelevans.org/blog/2016/02/17/using-dagger-1-and-kotlin/"/>
-    <updated>2016-02-17T13:43:25-05:00</updated>
-    <id>http://michaelevans.org/blog/2016/02/17/using-dagger-1-and-kotlin</id>
-    <content type="html"><![CDATA[<p>Unless you&rsquo;ve been hiding from all the news about Android development, you&rsquo;ve <a href="https://medium.com/@CodingDoug/kotlin-android-a-brass-tacks-experiment-part-1-3e5028491bcc#.15w4ypfer">likely</a> <a href="http://antonioleiva.com/kotlin-awesome-tricks-for-android/">heard</a> <a href="http://vishnurajeevan.com/2016/02/13/Using-Kotlin-Extensions-for-Rx-ifying/">about</a> <a href="https://realm.io/news/oredev-jake-wharton-kotlin-advancing-android-dev/">Kotlin</a> (<a href="https://blog.jetbrains.com/kotlin/2016/02/kotlin-1-0-released-pragmatic-language-for-jvm-and-android/">which hit version 1.0 on Monday</a>!). I&rsquo;ve been toying around with it lately (the <a href="https://kotlinlang.org/docs/tutorials/koans.html">Kotlin Koans</a> are a great place to start for a beginner) and wanted to try building an app with it &ndash; that is, until I hit a few road blocks.</p>
-
-<!-- more -->
-
-
-<p>Personally, I&rsquo;m still a fan of Dagger 1 (or as I refer to it, <a href="https://en.wikipedia.org/wiki/New_Coke#New_Coke_after_Coke_Classic">Dagger Classic</a>), and when I started working on my Kotlin app, that&rsquo;s what I was planning to use. I knew Annotation Processing support was a relatively new addition to Kotlin, so I began to search for some information about how to get Dagger to play nicely with the Kotlin compiler. There&rsquo;s a lot of information about using Dagger 2 with Kotlin but not so much about Dagger Classic. Finally, I stumbled upon <a href="http://www.beyondtechnicallycorrect.com/2015/12/30/android-kotlin-dagger/">this article</a>, which said, &ldquo;Unfortunately, Square’s Dagger 1 does not appear to work with Kotlin while Google’s Dagger 2 does&rdquo;.</p>
-
-<p><em>Bummer.</em></p>
-
-<p>This didn&rsquo;t really deter me, however, because I&rsquo;m stubborn like that. So I proceeded to give it a try with <code>kapt</code><sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> anyway (which seemed like it <em>might</em> do what I want).</p>
-
-<h2>Modules</h2>
-
-<p>The first thing I did was try to create the various Dagger Modules that I&rsquo;d need, which is where I hit my first roadblock. Attempting to compile my module gave the following error:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>Error:Modules must not extend from other classes: org.michaelevans.example.AppModule</span></code></pre></td></tr></table></div></figure>
-
-
-<p>My intial thought was that Kotlin was causing my Module to extend <code>Any</code>, rather than <code>Object</code>. (<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/">Any</a> is the root of the class hierarchy in Kotlin, similar to the way that Object is the root of the Java class hierarchy.) Upon closer inspection, that didn&rsquo;t seem to be the issue, but rather than get hung up on this &ndash; I just converted my modules to Java classes and decided to come back to this issue later.</p>
-
-<h2>@Inject</h2>
-
-<p>So now I had my modules set up, and I went about trying to <code>@Inject</code> some fields on an Activity or two. This yielded another problem: Kotlin doesn&rsquo;t have fields, and we obviously can&rsquo;t do constructor injection on something for which we don&rsquo;t control the constructor &ndash; like <code>Activity</code>.</p>
-
-<p>I thought I&rsquo;d use Dagger to inject a property with &ldquo;method&rdquo; injection like so:</p>
-
-<p><code>lateinit var service : MyService @Inject set</code></p>
-
-<p>But when you try this &ndash; you&rsquo;ll find out that Dagger doesn&rsquo;t support Method injection!</p>
-
-<p>So what can we do? We can target the <a href="https://kotlinlang.org/docs/reference/annotations.html#annotation-use-site-targets">annotation on the backing field</a> like this:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>@field:Inject
-</span><span class='line'>lateinit var app : Application</span></code></pre></td></tr></table></div></figure>
-
-
-<p>And now when we compile, our dependencies are injected! Woo, progress.</p>
-
-<h2>Modules (part 2)</h2>
-
-<p>I was pretty pleased that I had Dagger and Kotlin playing nicely enough that I could write things (other than my modules) in Kotlin, and that DI was working. But it did bother me that I was so close to having the ability to use Kotlin for everything with one exception &ndash; why wouldn&rsquo;t these Modules play nicely?</p>
-
-<p>I dug into the Dagger source to find out where this error was coming from and found <a href="https://github.com/square/dagger/blob/2f9579c48e887ffa316f329c12c2fa2abbec27b1/compiler/src/main/java/dagger/internal/codegen/ModuleAdapterProcessor.java#L217">this</a>. The JavaDoc for <a href="https://docs.oracle.com/javase/8/docs/api/javax/lang/model/type/TypeMirror.html#equals-java.lang.Object-">TypeMirror&rsquo;s equals method</a> says, <code>Semantic comparisons of type equality should instead use Types.isSameType(TypeMirror, TypeMirror). The results of t1.equals(t2) and Types.isSameType(t1, t2) may differ.</code></p>
-
-<p>I was pretty proud of myself for finding this potential issue in Dagger, and was about to submit a Pull Request until I noticed&hellip;<a href="https://github.com/square/dagger/commit/61e471df3891cf017755998b83839042f8455c29">that Jake had solved this issue about 18 months ago</a>.</p>
-
-<p>Running the <code>1.3-SNAPSHOT</code> builds of Dagger that include this change allow my Modules to be compiled properly from Kotlin. <em>Success!</em></p>
-
-<h2>In Summary (aka TL;DR)</h2>
-
-<ul>
-<li>Dagger works just fine with Kotlin (as long as you&rsquo;re on 1.3)</li>
-<li>Use annotations on the backing fields to perform injection</li>
-<li>Use <code>kapt</code> instead of <code>apt</code> for the scope of your <code>dagger-compiler</code> dependency</li>
-<li>Make sure to have the following lines in your <code>build.gradle</code></li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>kapt {
-</span><span class='line'>    generateStubs = true
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p></p>
-
-<p>Hopefully this helps others who are still using Dagger Classic and want to try out Kotlin!</p>
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p><code>kapt</code> is <a href="http://blog.jetbrains.com/kotlin/2015/06/better-annotation-processing-supporting-stubs-in-kapt/">the annotation processing tool for Kotlin</a><a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
-
+<p>There are no API changes in RecyclerView nor my personal <a href="http://michaelevans.org/blog/2015/07/14/improving-your-code-with-android-support-annotations/">favorite support library</a> - Support Annotations.</p>
 ]]></content>
   </entry>
   

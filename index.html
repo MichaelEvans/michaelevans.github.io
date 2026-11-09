@@ -10,7 +10,7 @@
   <meta name="author" content="Michael Evans">
 
   
-  <meta name="description" content="If you&rsquo;ve ever tried to combine a Flow&lt;PagingData&lt;T&gt;&gt; with another Flow, you&rsquo;ve probably discovered that PagingData doesn& &hellip;">
+  <meta name="description" content="Getting a new phone is exciting. You take it out of the box, peel off the protective film, and sign in. Your apps begin downloading, your wallpaper &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -21,7 +21,7 @@
   
   <link rel="canonical" href="http://michaelevans.org/">
   <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css?v=1792965057" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/screen.css?v=1794190566" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="/javascripts/ender.js"></script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
@@ -37,7 +37,7 @@
     }
   } catch (error) {}
 </script>
-<script src="/javascripts/reading.js?v=1792965057" defer></script>
+<script src="/javascripts/reading.js?v=1794190566" defer></script>
 
   
   <script type="text/javascript">
@@ -94,6 +94,58 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2026-09-24T12:00:00-04:00" pubdate data-updated="true">Sep 24<span>th</span>, 2026</time>
+        
+      </p>
+    
+    
+      <h1 class="entry-title"><a href="/blog/2026/09/24/testing-android-backup-and-restore-with-androidx/">Testing Android Backup and Restore With AndroidX</a></h1>
+    
+
+  </header>
+
+
+  <div class="entry-content"><p>Getting a new phone is exciting. You take it out of the box, peel off the protective film, and sign in. Your apps begin downloading, your wallpaper shows up, and before long it looks like your phone again.</p>
+
+<p>You open an app. Sign in. Open another one. Sign in again. What was the password for this one? Now you&rsquo;re digging through your password manager and waiting for verification codes.</p>
+
+<p>Even after you&rsquo;re signed in, things aren&rsquo;t quite right. Your settings are back to their defaults. The book you were reading has forgotten your page. The draft you hadn&rsquo;t finished is gone. The app made it to your new phone, but it doesn&rsquo;t feel like <em>your</em> app anymore.</p>
+
+<p>Google is pushing developers to fix this. Its <a href="https://android-developers.googleblog.com/2026/08/app-quality-memory-optimization-secure-onboarding.html">August app quality announcement</a> says that starting in April 2027, apps with sign-in will need to support restoring sign-in with the <a href="https://developer.android.com/identity/sign-in/restore-credentials">Restore Credentials API</a> to keep Play Store visibility.</p>
+
+<p>Getting the user signed back in is one half of the problem. Getting their data back is the other half, and in my experience it&rsquo;s the half that quietly breaks. Someone adds a new preferences file and forgets to update the backup rules. An installation ID gets copied to a new device, and now two phones look like the same install. Data encrypted with an Android Keystore key gets restored onto a device that doesn&rsquo;t have that key, and the app crashes on first launch. None of these show up in a normal unit test.</p>
+
+<p>Fortunately, AndroidX now has a <a href="https://developer.android.com/jetpack/androidx/releases/test-backup">backup testing library</a> that lets us automate the whole round trip. Let&rsquo;s take a look.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2026/09/24/testing-android-backup-and-restore-with-androidx/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -684,7 +736,7 @@
 </span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
 
 
-<p>Note the <code>schema_version</code> field &ndash; this helps manage schema evolution as your app grows.</p>
+<p>Note the <code>schema_version</code> field - this helps manage schema evolution as your app grows.</p>
 
 <h2>Step 3: Create a Proto DataStore Serializer</h2>
 
@@ -1611,185 +1663,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2024-04-17T20:11:01-04:00" pubdate data-updated="true">Apr 17<span>th</span>, 2024</time>
-        
-         | <a href="/blog/2024/04/17/accessing-test-resources-using-kotlin-multiplatform/#disqus_thread">Comments</a>
-        
-      </p>
-    
-    
-      <h1 class="entry-title"><a href="/blog/2024/04/17/accessing-test-resources-using-kotlin-multiplatform/">Accessing Test Resources Using Kotlin Multiplatform</a></h1>
-    
-
-  </header>
-
-
-  <div class="entry-content"><p>Kotlin Multiplatform (KMP) offers a powerful way to share code across platforms like Android, iOS, and the JVM. However, when it comes to testing, you might encounter a common challenge: how to handle test resources such as JSON files, configurations, or other data needed for tests. In this post, we’ll dive into strategies for accessing test resources in KMP projects.</p>
-
-<h3>Why Test Resources Matter</h3>
-
-<p>Test resources are essential for validating your code against real-world scenarios. For example, if you’re writing a library to parse JSON, you’d want to test it against diverse JSON samples representing different edge cases. While resource access is straightforward in single-platform projects, KMP’s multi-target nature requires some additional setup.</p>
-
-<h3>The Challenge in Kotlin Multiplatform</h3>
-
-<p>In KMP, test code resides in the <code>commonTest</code> source set, but resources aren’t directly bundled with it. Each platform manages file paths and resource access differently, so you need platform-specific setups for your resources and shared logic to load them efficiently.</p>
-
-<h3>Organizing Test Resources</h3>
-
-<p>Start by structuring your resources in a way that aligns with your project layout:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>project-root/
-</span><span class='line'>  src/
-</span><span class='line'>    commonTest/
-</span><span class='line'>      kotlin/
-</span><span class='line'>        ...
-</span><span class='line'>    androidTest/
-</span><span class='line'>      resources/
-</span><span class='line'>        test-data.json
-</span><span class='line'>    jvmTest/
-</span><span class='line'>      resources/
-</span><span class='line'>        test-data.json
-</span><span class='line'>    iosTest/
-</span><span class='line'>      resources/
-</span><span class='line'>        test-data.json</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This setup ensures that each target platform can access its respective resources while keeping them logically grouped.</p>
-
-<h3>Loading Resources by Platform</h3>
-
-<p>For Android, place your test resources in the <code>androidTest/resources</code> directory. Use the <code>javaClass.classLoader</code> to load them:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>fun loadTestResource(resourceName: String): String {
-</span><span class='line'>    val inputStream = javaClass.classLoader?.getResourceAsStream(resourceName)
-</span><span class='line'>    return inputStream?.bufferedReader()?.use { it.readText() }
-</span><span class='line'>        ?: throw IllegalArgumentException("Resource not found: $resourceName")
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>For iOS, add your resources to the test target in Xcode. Use platform-specific code to load them:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>import platform.Foundation.*
-</span><span class='line'>
-</span><span class='line'>fun loadTestResource(resourceName: String): String {
-</span><span class='line'>    val bundle = NSBundle.bundleForClass(MyTestClass::class)
-</span><span class='line'>    val path = bundle.pathForResource(resourceName, ofType = null)
-</span><span class='line'>        ?: throw IllegalArgumentException("Resource not found: $resourceName")
-</span><span class='line'>    return NSString.stringWithContentsOfFile(path, encoding = NSUTF8StringEncoding, error = null) as String
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Sharing the Resource Loader</h3>
-
-<p>To avoid duplication, define a common function in <code>commonTest</code> and use the <code>expect/actual</code> pattern for platform-specific implementations:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>// commonTest
-</span><span class='line'>expect fun loadTestResource(resourceName: String): String
-</span><span class='line'>
-</span><span class='line'>// androidTest
-</span><span class='line'>actual fun loadTestResource(resourceName: String): String {
-</span><span class='line'>    val inputStream = javaClass.classLoader?.getResourceAsStream(resourceName)
-</span><span class='line'>    return inputStream?.bufferedReader()?.use { it.readText() }
-</span><span class='line'>        ?: throw IllegalArgumentException("Resource not found: $resourceName")
-</span><span class='line'>}
-</span><span class='line'>
-</span><span class='line'>// iosTest
-</span><span class='line'>actual fun loadTestResource(resourceName: String): String {
-</span><span class='line'>    val bundle = NSBundle.bundleForClass(MyTestClass::class)
-</span><span class='line'>    val path = bundle.pathForResource(resourceName, ofType = null)
-</span><span class='line'>        ?: throw IllegalArgumentException("Resource not found: $resourceName")
-</span><span class='line'>    return NSString.stringWithContentsOfFile(path, encoding = NSUTF8StringEncoding, error = null) as String
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Putting It All Together</p>
-
-<p>With this setup, your <code>commonTest</code> code can seamlessly access resources across platforms. For example:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>@Test
-</span><span class='line'>fun testJsonParsing() {
-</span><span class='line'>    val jsonData = loadTestResource("test-data.json")
-</span><span class='line'>    val parsedData = parseJson(jsonData)
-</span><span class='line'>    assertEquals(expectedData, parsedData)
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Accessing test resources in Kotlin Multiplatform involves a bit of extra setup, but the payoff is a unified testing strategy across platforms. By leveraging the expect/actual pattern, you can create platform-specific resource loaders while keeping your test logic shared and consistent. Dive into KMP’s capabilities, and streamline your tests for every target platform!</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -1805,6 +1678,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2026/09/24/testing-android-backup-and-restore-with-androidx/">Testing Android Backup and Restore with AndroidX</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2026/05/11/how-to-combine-pagingdata-with-other-flows-using-asitemsnapshotlistflow/">How to Combine PagingData with Other Flows Using asItemSnapshotListFlow</a>
       </li>
     
@@ -1818,10 +1695,6 @@
     
       <li class="post">
         <a href="/blog/2025/03/22/turning-any-android-callback-into-a-flow-with-callbackflow/">Turning Any Android Callback into a Flow with callbackFlow</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2024/12/14/ui-testing-made-easy-the-robot-test-pattern-on-android/">UI Testing Made Easy: The Robot Test Pattern on Android</a>
       </li>
     
   </ul>

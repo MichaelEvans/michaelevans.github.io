@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Development | Michael Evans]]></title>
   <link href="http://michaelevans.org/blog/categories/development/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2026-10-25T17:50:57-04:00</updated>
+  <updated>2026-11-08T21:16:06-05:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -33,27 +33,23 @@
 
 <p>This error is thrown by a task named <code>process{VariantName}GoogleServices</code>. What we could do to solve this is swap the file in before that task is run! Using a little Groovy magic, I came up with this:</p>
 
-<p>```groovy
-android.applicationVariants.all { variant &ndash;></p>
-
-<pre><code>def hackTask = task("hackGps${variant.name.capitalize()}") &lt;&lt; {
-    copy {
-        from rootProject.file("config/${variant.buildType.name}/google-services.json")
-        into "${projectDir}"
+<pre><code class="groovy">android.applicationVariants.all { variant -&gt;
+    def hackTask = task("hackGps${variant.name.capitalize()}") &lt;&lt; {
+        copy {
+            from rootProject.file("config/${variant.buildType.name}/google-services.json")
+            into "${projectDir}"
+        }
     }
+    def googleTask = tasks.findByName("process${variant.name.capitalize()}GoogleServices")
+    googleTask.dependsOn hackTask
 }
-def googleTask = tasks.findByName("process${variant.name.capitalize()}GoogleServices")
-googleTask.dependsOn hackTask
 </code></pre>
 
-<p>}
-```</p>
-
-<p>For each one of your variants, this code will create a new task &ndash; <code>hackGps{VariantName}</code>, which copies a <code>google-services.json</code> file from a <code>config</code> directory into the root of your app module. Then it finds the corresponding Google Services task, and hooks itself in to run right before that! Now when you assemble your application, the right <code>google-services.json</code> file will be in the right place, ready to be picked up by the plugin.</p>
+<p>For each one of your variants, this code will create a new task - <code>hackGps{VariantName}</code>, which copies a <code>google-services.json</code> file from a <code>config</code> directory into the root of your app module. Then it finds the corresponding Google Services task, and hooks itself in to run right before that! Now when you assemble your application, the right <code>google-services.json</code> file will be in the right place, ready to be picked up by the plugin.</p>
 
 <p><em>You might also want to .gitignore the <code>app/google-services.json</code> file, so that you don&rsquo;t keep committing the changed file to git</em></p>
 
-<p>Hopefully Google will fix this issue in an upcoming release of the Google Services plugin, but until then &ndash; this technique should work!</p>
+<p>Hopefully Google will fix this issue in an upcoming release of the Google Services plugin, but until then - this technique should work!</p>
 ]]></content>
   </entry>
   
@@ -512,7 +508,7 @@ diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.Toolbar appc
 +  public boolean onTouchEvent(android.view.MotionEvent);</code></pre></noscript></div>
 </p>
 
-<p>There are no API changes in RecyclerView nor my personal <a href="http://michaelevans.org/blog/2015/07/14/improving-your-code-with-android-support-annotations/">favorite support library</a> &ndash; Support Annotations.</p>
+<p>There are no API changes in RecyclerView nor my personal <a href="http://michaelevans.org/blog/2015/07/14/improving-your-code-with-android-support-annotations/">favorite support library</a> - Support Annotations.</p>
 ]]></content>
   </entry>
   
@@ -566,7 +562,7 @@ diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.Toolbar appc
 
 <p><img class="center" src="/images/2016/01/06/productivity_guide.png" width="700" height="500" title="Invalid Regex" ></p>
 
-<h2>Bonus Round &ndash; IntelliJ 15 Only</h2>
+<h2>Bonus Round - IntelliJ 15 Only</h2>
 
 <p>Did you know IntelliJ has <a href="https://www.jetbrains.com/idea/help/testing-restful-web-services.html">its own REST client</a>? Super handy for testing out API calls without something like <a href="https://luckymarmot.com/paw">Paw</a> or <a href="https://chrome.google.com/webstore/detail/postman/fhbjgbiflinjbdggehcddcbncdddomop?hl=en">Postman</a>.</p>
 
@@ -575,7 +571,7 @@ diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.Toolbar appc
 <hr/>
 <ol>
 <li id="fn:1">
-<p><a href="https://www.jetbrains.com/idea/help/intention-actions.html">Intention Actions</a> are those suggestions in the little popup menus that allow you to quick-fix things like classes that haven&rsquo;t been imported, etc.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<a href="https://www.jetbrains.com/idea/help/intention-actions.html">Intention Actions</a> are those suggestions in the little popup menus that allow you to quick-fix things like classes that haven&rsquo;t been imported, etc.<a href="#fnref:1" rev="footnote">&#8617;</a></li>
 </ol>
 </div>
 
@@ -596,9 +592,8 @@ diff -U 0 -N appcompat-v7-23.2.0_ff0f8a1a/android.support.v7.widget.Toolbar appc
 
 <p>Setting up Espresso-Intents is dead simple if you&rsquo;re already using Espresso. Make sure you&rsquo;re already depending on Espresso, the rules, and the runner and then add the dependency:</p>
 
-<p><code>
-androidTestCompile 'com.android.support.test.espresso:espresso-intents:2.2.1'
-</code></p>
+<pre><code>androidTestCompile 'com.android.support.test.espresso:espresso-intents:2.2.1'
+</code></pre>
 
 <h2>The Tests</h2>
 
@@ -606,55 +601,44 @@ androidTestCompile 'com.android.support.test.espresso:espresso-intents:2.2.1'
 
 <p>Here&rsquo;s what that might look like:</p>
 
-<p>```java
-@Before public void stubContactIntent() {</p>
+<pre><code class="java">@Before public void stubContactIntent() {
+    Intent intent = new Intent();
+    intent.setData(Uri.parse(TEST_URI));
+    ActivityResult result = new ActivityResult(Activity.RESULT_OK, intent);
 
-<pre><code>Intent intent = new Intent();
-intent.setData(Uri.parse(TEST_URI));
-ActivityResult result = new ActivityResult(Activity.RESULT_OK, intent);
+    intending(allOf(
+        hasData(ContactsContract.CommonDataKinds.Phone.CONTENT_URI),
+        hasAction(Intent.ACTION_PICK))
+    ).respondWith(result);
+}
 
-intending(allOf(
-    hasData(ContactsContract.CommonDataKinds.Phone.CONTENT_URI),
-    hasAction(Intent.ACTION_PICK))
-).respondWith(result);
+@Test public void pickContact_viewIsSet() {
+    //Check to make sure the Uri field is empty
+    onView(withId(R.id.phone_number)).check(matches(withText("")));
+
+    //Start contact picker
+    onView(withId(R.id.pick_contact)).perform(click());
+
+    //Verify that Uri was set properly.
+    onView(withId(R.id.phone_number)).check(matches(withText(TEST_URI)));
+}
 </code></pre>
-
-<p>}</p>
-
-<p>@Test public void pickContact_viewIsSet() {</p>
-
-<pre><code>//Check to make sure the Uri field is empty
-onView(withId(R.id.phone_number)).check(matches(withText("")));
-
-//Start contact picker
-onView(withId(R.id.pick_contact)).perform(click());
-
-//Verify that Uri was set properly.
-onView(withId(R.id.phone_number)).check(matches(withText(TEST_URI)));
-</code></pre>
-
-<p>}
-```</p>
 
 <p>Using the <code>intending</code> API, we can respond with our mock <code>ActivityResult</code> data. If you&rsquo;ve used <a href="http://mockito.org/">Mockito</a> before, this stubbing will look very familiar to the <code>when</code>/<code>respondWith</code> methods. In this example, we&rsquo;re going to stub any Intents for the <code>ACTION_PICK</code> Intent with the <code>CONTENT_URI</code> data set to return a particular hard-coded Uri.</p>
 
-<p>So this is great &mdash; our test no longer depends on any particular contact picker app, or any contacts even being present on the test device. But what do we do if we want to verify that a particular outgoing intent is launched with some given extras or data?</p>
+<p>So this is great &ndash; our test no longer depends on any particular contact picker app, or any contacts even being present on the test device. But what do we do if we want to verify that a particular outgoing intent is launched with some given extras or data?</p>
 
 <p>Let&rsquo;s say our sample app had an input field that would take a phone number, with a button to start the dialer to call that number. (Yes, I do realize that this application would likely not receive any venture capital funding).</p>
 
 <p>All we have to do is use the <code>intended</code> API, which is most similar to Mockito&rsquo;s <code>verify</code> method. A sample of this might look like the following:</p>
 
-<p>```java
-@Test public void typeNumber_ValidInput_InitiatesCall() {</p>
+<pre><code class="java">@Test public void typeNumber_ValidInput_InitiatesCall() {
+    onView(withId(R.id.number_input)).perform(typeText(VALID_PHONE_NUMBER), closeSoftKeyboard());
+    onView(withId(R.id.dial_button)).perform(click());
 
-<pre><code>onView(withId(R.id.number_input)).perform(typeText(VALID_PHONE_NUMBER), closeSoftKeyboard());
-onView(withId(R.id.dial_button)).perform(click());
-
-intended(allOf(hasAction(Intent.ACTION_DIAL), hasData(INTENT_DATA_PHONE_NUMBER)));
+    intended(allOf(hasAction(Intent.ACTION_DIAL), hasData(INTENT_DATA_PHONE_NUMBER)));
+}
 </code></pre>
-
-<p>}
-```</p>
 
 <p>In this case, we&rsquo;re just going to verify that the intended Intent had the right action and the right data that we&rsquo;d expect to hand off to the dialer.</p>
 

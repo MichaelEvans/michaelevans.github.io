@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Github | Michael Evans]]></title>
   <link href="http://michaelevans.org/blog/categories/github/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2026-10-25T17:50:57-04:00</updated>
+  <updated>2026-11-08T21:16:06-05:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -31,14 +31,11 @@
 <p>In my sample tests, using Renderscript to blur the image took on average about ~175ms, vs ~2 seconds doing the blur using Java code. (The required code is also only a tiny fraction of the length of the Renderscript one).</p>
 
 <p>Renderscript is extremely easy to add to your project, just throw
-```</p>
-
-<pre><code>    renderscriptTargetApi 19
-    renderscriptSupportMode true
-</code></pre>
-
-<p><code>``
-in your</code>build.gradle` and you should be ready to roll.</p>
+<code>
+        renderscriptTargetApi 19
+        renderscriptSupportMode true
+</code>
+in your <code>build.gradle</code> and you should be ready to roll.</p>
 
 <p>Once you have the blurring, the rest of the process is fairly straight forward. When you plan to leave an activity, create a bitmap of the current view and write it to disk. When you start your new activity (which should have a transparent background), you override the transition (otherwise you&rsquo;ll get the default zoom), and set the background to the blurred image you saved earlier. Add a fade in for the alpha and you get a nice little effect!</p>
 
@@ -64,25 +61,22 @@ in your</code>build.gradle` and you should be ready to roll.</p>
 
 <p>ColorArt is pretty easy to use, and can add a cool effect to any app. In order to add it to your project, add the dependency to your <code>build.gradle</code> file:</p>
 
-<p><code>
-compile 'org.michaelevans.colorart:library:0.0.1'﻿
-</code></p>
+<pre><code>compile 'org.michaelevans.colorart:library:0.0.1'﻿
+</code></pre>
 
 <p>The next thing you need is to take a Bitmap that you want to use, and pass it to a ColorArt object:</p>
 
-<p><code>
-Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.album);
+<pre><code>Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.album);
 ColorArt colorArt = new ColorArt(bitmap);
-</code></p>
+</code></pre>
 
 <p>After that, it&rsquo;s as simple as calling some getter methods in order to get the colors that make up the image:</p>
 
-<p><code>
-colorArt.getBackgroundColor()
+<pre><code>colorArt.getBackgroundColor()
 colorArt.getPrimaryColor()
 colorArt.getSecondaryColor()
 colorArt.getDetailColor()
-</code></p>
+</code></pre>
 
 <p>Voilà! Now you can make cool themed image/text display using Bitmaps as part of your application.</p>
 

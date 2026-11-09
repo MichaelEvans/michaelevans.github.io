@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Linux | Michael Evans]]></title>
   <link href="http://michaelevans.org/blog/categories/linux/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2026-10-25T17:50:57-04:00</updated>
+  <updated>2026-11-08T21:16:06-05:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -29,9 +29,8 @@
 
 <p>Wanna try it out? If you&rsquo;re running Precise or newer (12.04 or later), you&rsquo;re in luck. Just apt-get zram with</p>
 
-<p><code>
-sudo apt-get install zram-config
-</code></p>
+<pre><code>sudo apt-get install zram-config
+</code></pre>
 
 <p>and you&rsquo;re all set.</p>
 

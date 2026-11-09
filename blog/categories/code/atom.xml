@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Code | Michael Evans]]></title>
   <link href="http://michaelevans.org/blog/categories/code/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2026-10-25T17:50:57-04:00</updated>
+  <updated>2026-11-08T21:16:06-05:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -27,9 +27,8 @@
 
 <p>Setting up Espresso-Intents is dead simple if you&rsquo;re already using Espresso. Make sure you&rsquo;re already depending on Espresso, the rules, and the runner and then add the dependency:</p>
 
-<p><code>
-androidTestCompile 'com.android.support.test.espresso:espresso-intents:2.2.1'
-</code></p>
+<pre><code>androidTestCompile 'com.android.support.test.espresso:espresso-intents:2.2.1'
+</code></pre>
 
 <h2>The Tests</h2>
 
@@ -37,55 +36,44 @@ androidTestCompile 'com.android.support.test.espresso:espresso-intents:2.2.1'
 
 <p>Here&rsquo;s what that might look like:</p>
 
-<p>```java
-@Before public void stubContactIntent() {</p>
+<pre><code class="java">@Before public void stubContactIntent() {
+    Intent intent = new Intent();
+    intent.setData(Uri.parse(TEST_URI));
+    ActivityResult result = new ActivityResult(Activity.RESULT_OK, intent);
 
-<pre><code>Intent intent = new Intent();
-intent.setData(Uri.parse(TEST_URI));
-ActivityResult result = new ActivityResult(Activity.RESULT_OK, intent);
+    intending(allOf(
+        hasData(ContactsContract.CommonDataKinds.Phone.CONTENT_URI),
+        hasAction(Intent.ACTION_PICK))
+    ).respondWith(result);
+}
 
-intending(allOf(
-    hasData(ContactsContract.CommonDataKinds.Phone.CONTENT_URI),
-    hasAction(Intent.ACTION_PICK))
-).respondWith(result);
+@Test public void pickContact_viewIsSet() {
+    //Check to make sure the Uri field is empty
+    onView(withId(R.id.phone_number)).check(matches(withText("")));
+
+    //Start contact picker
+    onView(withId(R.id.pick_contact)).perform(click());
+
+    //Verify that Uri was set properly.
+    onView(withId(R.id.phone_number)).check(matches(withText(TEST_URI)));
+}
 </code></pre>
-
-<p>}</p>
-
-<p>@Test public void pickContact_viewIsSet() {</p>
-
-<pre><code>//Check to make sure the Uri field is empty
-onView(withId(R.id.phone_number)).check(matches(withText("")));
-
-//Start contact picker
-onView(withId(R.id.pick_contact)).perform(click());
-
-//Verify that Uri was set properly.
-onView(withId(R.id.phone_number)).check(matches(withText(TEST_URI)));
-</code></pre>
-
-<p>}
-```</p>
 
 <p>Using the <code>intending</code> API, we can respond with our mock <code>ActivityResult</code> data. If you&rsquo;ve used <a href="http://mockito.org/">Mockito</a> before, this stubbing will look very familiar to the <code>when</code>/<code>respondWith</code> methods. In this example, we&rsquo;re going to stub any Intents for the <code>ACTION_PICK</code> Intent with the <code>CONTENT_URI</code> data set to return a particular hard-coded Uri.</p>
 
-<p>So this is great &mdash; our test no longer depends on any particular contact picker app, or any contacts even being present on the test device. But what do we do if we want to verify that a particular outgoing intent is launched with some given extras or data?</p>
+<p>So this is great &ndash; our test no longer depends on any particular contact picker app, or any contacts even being present on the test device. But what do we do if we want to verify that a particular outgoing intent is launched with some given extras or data?</p>
 
 <p>Let&rsquo;s say our sample app had an input field that would take a phone number, with a button to start the dialer to call that number. (Yes, I do realize that this application would likely not receive any venture capital funding).</p>
 
 <p>All we have to do is use the <code>intended</code> API, which is most similar to Mockito&rsquo;s <code>verify</code> method. A sample of this might look like the following:</p>
 
-<p>```java
-@Test public void typeNumber_ValidInput_InitiatesCall() {</p>
+<pre><code class="java">@Test public void typeNumber_ValidInput_InitiatesCall() {
+    onView(withId(R.id.number_input)).perform(typeText(VALID_PHONE_NUMBER), closeSoftKeyboard());
+    onView(withId(R.id.dial_button)).perform(click());
 
-<pre><code>onView(withId(R.id.number_input)).perform(typeText(VALID_PHONE_NUMBER), closeSoftKeyboard());
-onView(withId(R.id.dial_button)).perform(click());
-
-intended(allOf(hasAction(Intent.ACTION_DIAL), hasData(INTENT_DATA_PHONE_NUMBER)));
+    intended(allOf(hasAction(Intent.ACTION_DIAL), hasData(INTENT_DATA_PHONE_NUMBER)));
+}
 </code></pre>
-
-<p>}
-```</p>
 
 <p>In this case, we&rsquo;re just going to verify that the intended Intent had the right action and the right data that we&rsquo;d expect to hand off to the dialer.</p>
 
@@ -112,22 +100,21 @@ intended(allOf(hasAction(Intent.ACTION_DIAL), hasData(INTENT_DATA_PHONE_NUMBER))
 <p>Espresso tests are dead simple to write. They come in three parts.</p>
 
 <ol>
-<li>ViewMatchers &ndash; something to find the view to act upon/assert something about</li>
-<li>ViewActions &ndash; something to perform an action (type text, click a button)</li>
-<li>ViewAssertions &ndash; something to verify what you expect</li>
+<li>ViewMatchers - something to find the view to act upon/assert something about</li>
+<li>ViewActions - something to perform an action (type text, click a button)</li>
+<li>ViewAssertions - something to verify what you expect</li>
 </ol>
 
 
 <p>For example, the following test would type the name &ldquo;Steve&rdquo; into an EditText with the id <code>name_field</code>, click a Button with the id <code>greet_button</code> and then verify that the text &ldquo;Hello Steve!&rdquo; appears on the screen:</p>
 
-<p><code>java
-@Test
+<pre><code class="java">@Test
 public void testSayHello() {
   onView(withId(R.id.name_field)).perform(typeText("Steve"));
   onView(withId(R.id.greet_button)).perform(click());
   onView(withText("Hello Steve!")).check(matches(isDisplayed()));
 }
-</code></p>
+</code></pre>
 
 <p>Seems simple enough right? But what about when other threads are involved?</p>
 
@@ -141,71 +128,68 @@ public void testSayHello() {
 
 <p>With this knowledge, one way you might approach this is to implement a mock version of your Retrofit interface, and then use something like this:</p>
 
-<p>```java
-public class MockApiService implements ApiService, IdlingResource {</p>
+<pre><code class="java">public class MockApiService implements ApiService, IdlingResource {
 
-<pre><code>private final ApiService api;
-private final AtomicInteger counter;
-private final List&lt;ResourceCallback&gt; callbacks;
+    private final ApiService api;
+    private final AtomicInteger counter;
+    private final List&lt;ResourceCallback&gt; callbacks;
 
-public MockApiService(ApiService api) {
-    this.api = api;
-    this.callbacks = new ArrayList&lt;&gt;(); 
-    this.counter = new AtomicInteger(0);
-}
+    public MockApiService(ApiService api) {
+        this.api = api;
+        this.callbacks = new ArrayList&lt;&gt;(); 
+        this.counter = new AtomicInteger(0);
+    }
 
-@Override
-public Response doWork() {
-    counter.incrementAndGet();
-    return decrementAndNotify(api.doWork());
-}
+    @Override
+    public Response doWork() {
+        counter.incrementAndGet();
+        return decrementAndNotify(api.doWork());
+    }
 
-@Override
-public String getName() {
-    return this.getClass().getName();
-}
+    @Override
+    public String getName() {
+        return this.getClass().getName();
+    }
 
-@Override
-public boolean isIdleNow() {
-    return counter.get() == 0;
-}
+    @Override
+    public boolean isIdleNow() {
+        return counter.get() == 0;
+    }
 
-@Override
-public void registerIdleTransitionCallback(ResourceCallback resourceCallback) {
-    callbacks.add(resourceCallback);
-}
+    @Override
+    public void registerIdleTransitionCallback(ResourceCallback resourceCallback) {
+        callbacks.add(resourceCallback);
+    }
 
-private &lt;T&gt; T decrementAndNotify(T data) {
-    counter.decrementAndGet();
-    notifyIdle();
-    return data;
-}
+    private &lt;T&gt; T decrementAndNotify(T data) {
+        counter.decrementAndGet();
+        notifyIdle();
+        return data;
+    }
 
-private void notifyIdle() {
-    if (counter.get() == 0) {
-        for (ResourceCallback cb : callbacks) {
-            cb.onTransitionToIdle();
+    private void notifyIdle() {
+        if (counter.get() == 0) {
+            for (ResourceCallback cb : callbacks) {
+                cb.onTransitionToIdle();
+            }
         }
     }
+
 }
 </code></pre>
 
-<p>}
-```</p>
-
-<p>This tells Espresso that your app is idle after the methods are called. But you should immediately see the problem here &ndash; you&rsquo;ll end up writing a TON of boilerplate. As you have more methods in your interface, and lot of repeated increment and decrement code&hellip;there must be a better way. (There is!)</p>
+<p>This tells Espresso that your app is idle after the methods are called. But you should immediately see the problem here - you&rsquo;ll end up writing a TON of boilerplate. As you have more methods in your interface, and lot of repeated increment and decrement code&hellip;there must be a better way. (There is!)</p>
 
 <p>The &ldquo;trick&rdquo; lies right in the selling point in the Espresso documentation, &ldquo;Espresso waits for UI events&hellip; and default <em><strong>AsyncTasks</strong></em> to complete&rdquo;. If we could somehow execute our Retrofit requests on the AsyncTasks' ThreadPoolExecutor, we&rsquo;d get sychronization for free!</p>
 
 <p>Fortunately, Retrofit&rsquo;s <code>RestAdapter.Builder</code> class has just such a method!</p>
 
-<p><code>java
-new RestAdapter.Builder()
+<pre><code class="java">new RestAdapter.Builder()
    .setExecutors(AsyncTask.THREAD_POOL_EXECUTOR, new MainThreadExecutor())
    .build();
-</code></p>
+</code></pre>
 
-<p>And it&rsquo;s that simple &ndash; Now you have no excuse not to write some Espresso tests!</p>
+<p>And it&rsquo;s that simple - Now you have no excuse not to write some Espresso tests!</p>
 
 <h4>More Resources</h4>
 
@@ -249,14 +233,10 @@ new RestAdapter.Builder()
 
 <p>Have you ever attempted to call <code>setText</code> on a TextView, and gotten a somewhat mysterious <code>android.content.res.Resources$NotFoundException: String resource ID #0x3039</code> exception? If you pass an integer to setText, TextView assumes it&rsquo;s a String resource id, and will look it up in order to set the text. If only there were a way to denote that integers are not valid ids for this method&hellip;<code>@StringRes</code> to the rescue!</p>
 
-<p>```
-public void setText(@StringRes int id) {</p>
-
-<pre><code>// Do something like getString(id), etc.
+<pre><code>public void setText(@StringRes int id) {
+    // Do something like getString(id), etc.
+}
 </code></pre>
-
-<p>}
-```</p>
 
 <p>Now if you try to pass a non-String resource id to this method, you get something like this:</p>
 
@@ -268,27 +248,23 @@ public void setText(@StringRes int id) {</p>
 
 <p>Today I discovered a new support annotation <code>@Keep</code>. According to the support annotation docs, this annotation hasn&rsquo;t been hooked up to the Gradle plugin yet<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>, but it will let you annotate methods and classes that should be retained when minimizing the app.</p>
 
-<p>If you&rsquo;ve ever messed around with the cryptic <code>-keep class com.foo.bar { public static &lt;methods&gt; }</code> incantations that you need to use to summon the Proguard Gods, you&rsquo;ll know how painful it is to rip your hair out, while trying to exclude a particular method or class from being optimized away. This handy annotation will tell Proguard to leave the method or class alone &ndash; like so:</p>
+<p>If you&rsquo;ve ever messed around with the cryptic <code>-keep class com.foo.bar { public static &lt;methods&gt; }</code> incantations that you need to use to summon the Proguard Gods, you&rsquo;ll know how painful it is to rip your hair out, while trying to exclude a particular method or class from being optimized away. This handy annotation will tell Proguard to leave the method or class alone - like so:</p>
 
-<p>```
-public class Example {</p>
-
-<pre><code>@Keep
-public void doSomething() {
-    // hopefully this method does something
+<pre><code>public class Example {
+    @Keep
+    public void doSomething() {
+        // hopefully this method does something
+    }
+    ...
 }
-...
 </code></pre>
 
-<p>}
-```</p>
-
-<p>The best part is &ndash; if you&rsquo;re using <code>appcompat-v7</code>, you&rsquo;re already including <code>support-annotations</code>, so just start using them already!</p>
+<p>The best part is - if you&rsquo;re using <code>appcompat-v7</code>, you&rsquo;re already including <code>support-annotations</code>, so just start using them already!</p>
 <div class="footnotes">
 <hr/>
 <ol>
 <li id="fn:1">
-<p><a href="https://android-review.googlesource.com/#/c/152983/">Looks like this is merged</a> into the 1.3 version of the plugin<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<a href="https://android-review.googlesource.com/#/c/152983/">Looks like this is merged</a> into the 1.3 version of the plugin<a href="#fnref:1" rev="footnote">&#8617;</a></li>
 </ol>
 </div>
 
@@ -302,20 +278,16 @@ public void doSomething() {
     <id>http://michaelevans.org/blog/2015/05/07/android-ripples-with-rounded-corners</id>
     <content type="html"><![CDATA[<p>So recently I was trying to add a ripple to a view that had rounded corners. Simple enough right? Let&rsquo;s just say I have a FrameLayout with the background similar to this one:</p>
 
-<p>```
-&lt;?xml version=&ldquo;1.0&rdquo; encoding=&ldquo;utf-8&rdquo;?>
-&lt;shape xmlns:android=&ldquo;<a href="http://schemas.android.com/apk/res/android">http://schemas.android.com/apk/res/android</a>&rdquo;</p>
-
-<pre><code>android:shape="rectangle"&gt;
-&lt;solid android:color="@android:color/transparent"/&gt;
-&lt;corners android:radius="15dp" /&gt;
-&lt;stroke
-    android:width="1px"
-    android:color="#000000" /&gt;
+<pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle"&gt;
+    &lt;solid android:color="@android:color/transparent"/&gt;
+    &lt;corners android:radius="15dp" /&gt;
+    &lt;stroke
+        android:width="1px"
+        android:color="#000000" /&gt;
+&lt;/shape&gt;
 </code></pre>
-
-<p></shape>
-```</p>
 
 <p>It&rsquo;s not quite as simple as setting the foreground to <code>?attr/selectableItemBackground</code>, or else you&rsquo;ll see the ripple surpasses the corners (which doesn&rsquo;t look <em>so</em> bad when your border radius is small, but this would look terrible with a circlular view):</p>
 
@@ -323,22 +295,18 @@ public void doSomething() {
 
 <p>The solution for this lies in the special mask layer of the <a href="https://developer.android.com/reference/android/graphics/drawable/RippleDrawable.html">RippleDrawable</a>. You specify the mask layer via the <code>android:id</code> value set to <code>@android:id/mask</code>. For the example above, you can set the mask to the same size/shape as the view you&rsquo;re masking, and then the ripple will only show for that area. For something like our example above, you&rsquo;d use something like this:</p>
 
-<p>```
-&lt;?xml version=&ldquo;1.0&rdquo; encoding=&ldquo;utf-8&rdquo;?>
-&lt;ripple xmlns:android=&ldquo;<a href="http://schemas.android.com/apk/res/android">http://schemas.android.com/apk/res/android</a>&rdquo;</p>
-
-<pre><code>android:color="?android:attr/colorControlHighlight"&gt;
-&lt;item android:id="@android:id/mask"&gt;
-    &lt;shape android:shape="rectangle"&gt;
-        &lt;solid android:color="#000000" /&gt;
-        &lt;corners android:radius="15dp" /&gt;
-    &lt;/shape&gt;
-&lt;/item&gt;
-&lt;item android:drawable="@drawable/rounded_corners" /&gt;
+<pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="?android:attr/colorControlHighlight"&gt;
+    &lt;item android:id="@android:id/mask"&gt;
+        &lt;shape android:shape="rectangle"&gt;
+            &lt;solid android:color="#000000" /&gt;
+            &lt;corners android:radius="15dp" /&gt;
+        &lt;/shape&gt;
+    &lt;/item&gt;
+    &lt;item android:drawable="@drawable/rounded_corners" /&gt;
+&lt;/ripple&gt;
 </code></pre>
-
-<p></ripple>
-```</p>
 
 <p>Now when you tap on the view, you&rsquo;ll see something like this:</p>
 
@@ -368,14 +336,11 @@ public void doSomething() {
 <p>In my sample tests, using Renderscript to blur the image took on average about ~175ms, vs ~2 seconds doing the blur using Java code. (The required code is also only a tiny fraction of the length of the Renderscript one).</p>
 
 <p>Renderscript is extremely easy to add to your project, just throw
-```</p>
-
-<pre><code>    renderscriptTargetApi 19
-    renderscriptSupportMode true
-</code></pre>
-
-<p><code>``
-in your</code>build.gradle` and you should be ready to roll.</p>
+<code>
+        renderscriptTargetApi 19
+        renderscriptSupportMode true
+</code>
+in your <code>build.gradle</code> and you should be ready to roll.</p>
 
 <p>Once you have the blurring, the rest of the process is fairly straight forward. When you plan to leave an activity, create a bitmap of the current view and write it to disk. When you start your new activity (which should have a transparent background), you override the transition (otherwise you&rsquo;ll get the default zoom), and set the background to the blurred image you saved earlier. Add a fade in for the alpha and you get a nice little effect!</p>
 

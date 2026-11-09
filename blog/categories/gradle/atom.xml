@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Gradle | Michael Evans]]></title>
   <link href="http://michaelevans.org/blog/categories/gradle/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2026-10-25T17:50:57-04:00</updated>
+  <updated>2026-11-08T21:16:06-05:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -33,27 +33,23 @@
 
 <p>This error is thrown by a task named <code>process{VariantName}GoogleServices</code>. What we could do to solve this is swap the file in before that task is run! Using a little Groovy magic, I came up with this:</p>
 
-<p>```groovy
-android.applicationVariants.all { variant &ndash;></p>
-
-<pre><code>def hackTask = task("hackGps${variant.name.capitalize()}") &lt;&lt; {
-    copy {
-        from rootProject.file("config/${variant.buildType.name}/google-services.json")
-        into "${projectDir}"
+<pre><code class="groovy">android.applicationVariants.all { variant -&gt;
+    def hackTask = task("hackGps${variant.name.capitalize()}") &lt;&lt; {
+        copy {
+            from rootProject.file("config/${variant.buildType.name}/google-services.json")
+            into "${projectDir}"
+        }
     }
+    def googleTask = tasks.findByName("process${variant.name.capitalize()}GoogleServices")
+    googleTask.dependsOn hackTask
 }
-def googleTask = tasks.findByName("process${variant.name.capitalize()}GoogleServices")
-googleTask.dependsOn hackTask
 </code></pre>
 
-<p>}
-```</p>
-
-<p>For each one of your variants, this code will create a new task &ndash; <code>hackGps{VariantName}</code>, which copies a <code>google-services.json</code> file from a <code>config</code> directory into the root of your app module. Then it finds the corresponding Google Services task, and hooks itself in to run right before that! Now when you assemble your application, the right <code>google-services.json</code> file will be in the right place, ready to be picked up by the plugin.</p>
+<p>For each one of your variants, this code will create a new task - <code>hackGps{VariantName}</code>, which copies a <code>google-services.json</code> file from a <code>config</code> directory into the root of your app module. Then it finds the corresponding Google Services task, and hooks itself in to run right before that! Now when you assemble your application, the right <code>google-services.json</code> file will be in the right place, ready to be picked up by the plugin.</p>
 
 <p><em>You might also want to .gitignore the <code>app/google-services.json</code> file, so that you don&rsquo;t keep committing the changed file to git</em></p>
 
-<p>Hopefully Google will fix this issue in an upcoming release of the Google Services plugin, but until then &ndash; this technique should work!</p>
+<p>Hopefully Google will fix this issue in an upcoming release of the Google Services plugin, but until then - this technique should work!</p>
 ]]></content>
   </entry>
   

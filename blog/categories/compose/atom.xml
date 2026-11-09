@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Compose | Michael Evans]]></title>
   <link href="http://michaelevans.org/blog/categories/compose/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2026-10-25T17:50:57-04:00</updated>
+  <updated>2026-11-08T21:16:06-05:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -63,36 +63,32 @@
 
 <p>Adding a scroll indicator is surprisingly straightforward. Here&rsquo;s a minimal example:</p>
 
-<p>```
-@Composable
-fun ScrollableList(modifier: Modifier = Modifier) {</p>
+<pre><code>@Composable
+fun ScrollableList(modifier: Modifier = Modifier) {
+    val listState = rememberLazyListState()
 
-<pre><code>val listState = rememberLazyListState()
-
-val scrollbarModifier = listState.scrollIndicatorState?.let {
-    Modifier.scrollIndicator(
-        state = it,
-        orientation = Orientation.Vertical
-    )
-} ?: Modifier
-
-LazyColumn(
-    state = listState,
-    modifier = modifier
-        .fillMaxSize()
-        .then(scrollbarModifier)
-) {
-    items(100) { index -&gt;
-        Text(
-            text = "Item $index",
-            modifier = Modifier.padding(16.dp)
+    val scrollbarModifier = listState.scrollIndicatorState?.let {
+        Modifier.scrollIndicator(
+            state = it,
+            orientation = Orientation.Vertical
         )
+    } ?: Modifier
+
+    LazyColumn(
+        state = listState,
+        modifier = modifier
+            .fillMaxSize()
+            .then(scrollbarModifier)
+    ) {
+        items(100) { index -&gt;
+            Text(
+                text = "Item $index",
+                modifier = Modifier.padding(16.dp)
+            )
+        }
     }
 }
 </code></pre>
-
-<p>}
-```</p>
 
 <p>That&rsquo;s it! Since <code>scrollIndicatorState</code> is nullable, we use <code>?.let</code> to conditionally create the scroll indicator modifier, then apply it with <code>.then()</code>. The default factory (when no factory is specified) provides a simple, functional scrollbar. The same pattern works for regular scrollable containers like <code>Column</code> or <code>Row</code> — just use <code>rememberScrollState()</code> instead of <code>rememberLazyListState()</code>.</p>
 
@@ -102,150 +98,139 @@ LazyColumn(
 
 <p>The default scroll indicator is functional but basic. If you want something that matches Material 3&rsquo;s scrollbar design (like what you&rsquo;d see in Views), you&rsquo;ll need to create a custom <code>ScrollIndicatorFactory</code>. Here&rsquo;s an implementation that approximates the Material 3 scrollbar, matching the constants from Android&rsquo;s <a href="https://cs.android.com/android/platform/superproject/main/+/main:frameworks/base/core/java/android/view/ViewConfiguration.java;l=50"><code>ViewConfiguration</code></a>:</p>
 
-<p>```
-data class MaterialScrollIndicatorFactory(</p>
+<pre><code>data class MaterialScrollIndicatorFactory(
+    val thumbThickness: Dp = 4.dp,
+    val padding: Dp = 2.dp,
+    val thumbColor: Color = Color.Black,
+    val thumbAlpha: Float = 0.5f,
+    val fadeDelay: Int = 300, // milliseconds, matches SCROLL_BAR_DEFAULT_DELAY
+    val fadeDuration: Int = 250, // milliseconds, matches SCROLL_BAR_FADE_DURATION
+) : ScrollIndicatorFactory {
+    override fun createNode(
+        state: ScrollIndicatorState,
+        orientation: Orientation
+    ): DelegatableNode {
+        return object : Modifier.Node(), DrawModifierNode {
+            private val alpha = Animatable(0f)
+            private var fadeOutJob: Job? = null
 
-<pre><code>val thumbThickness: Dp = 4.dp,
-val padding: Dp = 2.dp,
-val thumbColor: Color = Color.Black,
-val thumbAlpha: Float = 0.5f,
-val fadeDelay: Int = 300, // milliseconds, matches SCROLL_BAR_DEFAULT_DELAY
-val fadeDuration: Int = 250, // milliseconds, matches SCROLL_BAR_FADE_DURATION
-</code></pre>
+            override fun onAttach() {
+                super.onAttach()
 
-<p>) : ScrollIndicatorFactory {</p>
+                // Monitor scroll offset changes to trigger fade animations
+                coroutineScope.launch {
+                    snapshotFlow { state.scrollOffset }
+                        .collect { _ -&gt;
+                            // Cancel any pending fade-out
+                            fadeOutJob?.cancel()
 
-<pre><code>override fun createNode(
-    state: ScrollIndicatorState,
-    orientation: Orientation
-): DelegatableNode {
-    return object : Modifier.Node(), DrawModifierNode {
-        private val alpha = Animatable(0f)
-        private var fadeOutJob: Job? = null
-
-        override fun onAttach() {
-            super.onAttach()
-
-            // Monitor scroll offset changes to trigger fade animations
-            coroutineScope.launch {
-                snapshotFlow { state.scrollOffset }
-                    .collect { _ -&gt;
-                        // Cancel any pending fade-out
-                        fadeOutJob?.cancel()
-
-                        // Fade in immediately when scrolling
-                        launch {
-                            alpha.animateTo(
-                                targetValue = thumbAlpha,
-                                animationSpec = tween(
-                                    durationMillis = 150,
-                                    easing = FastOutSlowInEasing
+                            // Fade in immediately when scrolling
+                            launch {
+                                alpha.animateTo(
+                                    targetValue = thumbAlpha,
+                                    animationSpec = tween(
+                                        durationMillis = 150,
+                                        easing = FastOutSlowInEasing
+                                    )
                                 )
-                            )
+                            }
+
+                            // Schedule fade-out with delay
+                            fadeOutJob = launch {
+                                delay(fadeDelay.toLong())
+                                alpha.animateTo(
+                                    targetValue = 0f,
+                                    animationSpec = tween(
+                                        durationMillis = fadeDuration,
+                                        easing = FastOutSlowInEasing
+                                    )
+                                )
+                            }
                         }
+                }
+            }
 
-                        // Schedule fade-out with delay
-                        fadeOutJob = launch {
-                            delay(fadeDelay.toLong())
-                            alpha.animateTo(
-                                targetValue = 0f,
-                                animationSpec = tween(
-                                    durationMillis = fadeDuration,
-                                    easing = FastOutSlowInEasing
-                                )
-                            )
+            override fun ContentDrawScope.draw() {
+                // Draw the original content.
+                drawContent()
+
+                // Don't draw the scrollbar if the content fits within the viewport.
+                if (state.contentSize &lt;= state.viewportSize) return
+
+                // Don't draw if fully transparent
+                if (alpha.value &lt;= 0f) return
+
+                val visibleContentRatio = state.viewportSize.toFloat() / state.contentSize
+
+                // Calculate the thumb's size and position along the scrolling axis.
+                val thumbLength = state.viewportSize * visibleContentRatio
+                val thumbPosition = state.scrollOffset * visibleContentRatio
+
+                val thumbThicknessPx = thumbThickness.toPx()
+                val paddingPx = padding.toPx()
+
+                // Determine the scrollbar size and thumb position based on the orientation.
+                val (topLeft, size) =
+                    when (orientation) {
+                        Orientation.Vertical -&gt; {
+                            val x = size.width - thumbThicknessPx - paddingPx
+                            Offset(x, thumbPosition) to Size(thumbThicknessPx, thumbLength)
+                        }
+                        Orientation.Horizontal -&gt; {
+                            val y = size.height - thumbThicknessPx - paddingPx
+                            Offset(thumbPosition, y) to Size(thumbLength, thumbThicknessPx)
                         }
                     }
+
+                // Draw the scrollbar thumb with rounded corners using animated alpha.
+                val cornerRadius = thumbThickness.toPx() / 2f
+                drawRoundRect(
+                    color = thumbColor,
+                    topLeft = topLeft,
+                    size = size,
+                    alpha = alpha.value,
+                    cornerRadius = CornerRadius(cornerRadius, cornerRadius)
+                )
             }
         }
+    }
+}
+</code></pre>
 
-        override fun ContentDrawScope.draw() {
-            // Draw the original content.
-            drawContent()
+<p>Then use it like this:</p>
 
-            // Don't draw the scrollbar if the content fits within the viewport.
-            if (state.contentSize &lt;= state.viewportSize) return
+<pre><code>@Composable
+fun ScrollableList(modifier: Modifier = Modifier) {
+    val listState = rememberLazyListState()
+    val scrollbarFactory = remember { 
+        MaterialScrollIndicatorFactory(
+            thumbColor = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
 
-            // Don't draw if fully transparent
-            if (alpha.value &lt;= 0f) return
+    val scrollbarModifier = listState.scrollIndicatorState?.let {
+        Modifier.scrollIndicator(
+            factory = scrollbarFactory,
+            state = it,
+            orientation = Orientation.Vertical
+        )
+    } ?: Modifier
 
-            val visibleContentRatio = state.viewportSize.toFloat() / state.contentSize
-
-            // Calculate the thumb's size and position along the scrolling axis.
-            val thumbLength = state.viewportSize * visibleContentRatio
-            val thumbPosition = state.scrollOffset * visibleContentRatio
-
-            val thumbThicknessPx = thumbThickness.toPx()
-            val paddingPx = padding.toPx()
-
-            // Determine the scrollbar size and thumb position based on the orientation.
-            val (topLeft, size) =
-                when (orientation) {
-                    Orientation.Vertical -&gt; {
-                        val x = size.width - thumbThicknessPx - paddingPx
-                        Offset(x, thumbPosition) to Size(thumbThicknessPx, thumbLength)
-                    }
-                    Orientation.Horizontal -&gt; {
-                        val y = size.height - thumbThicknessPx - paddingPx
-                        Offset(thumbPosition, y) to Size(thumbLength, thumbThicknessPx)
-                    }
-                }
-
-            // Draw the scrollbar thumb with rounded corners using animated alpha.
-            val cornerRadius = thumbThickness.toPx() / 2f
-            drawRoundRect(
-                color = thumbColor,
-                topLeft = topLeft,
-                size = size,
-                alpha = alpha.value,
-                cornerRadius = CornerRadius(cornerRadius, cornerRadius)
+    LazyColumn(
+        state = listState,
+        modifier = modifier
+            .fillMaxSize()
+            .then(scrollbarModifier)
+    ) {
+        items(100) { index -&gt;
+            Text(
+                text = "Item $index",
+                modifier = Modifier.padding(16.dp)
             )
         }
     }
 }
 </code></pre>
-
-<p>}
-```</p>
-
-<p>Then use it like this:</p>
-
-<p>```
-@Composable
-fun ScrollableList(modifier: Modifier = Modifier) {</p>
-
-<pre><code>val listState = rememberLazyListState()
-val scrollbarFactory = remember { 
-    MaterialScrollIndicatorFactory(
-        thumbColor = MaterialTheme.colorScheme.onSurfaceVariant
-    )
-}
-
-val scrollbarModifier = listState.scrollIndicatorState?.let {
-    Modifier.scrollIndicator(
-        factory = scrollbarFactory,
-        state = it,
-        orientation = Orientation.Vertical
-    )
-} ?: Modifier
-
-LazyColumn(
-    state = listState,
-    modifier = modifier
-        .fillMaxSize()
-        .then(scrollbarModifier)
-) {
-    items(100) { index -&gt;
-        Text(
-            text = "Item $index",
-            modifier = Modifier.padding(16.dp)
-        )
-    }
-}
-</code></pre>
-
-<p>}
-```</p>
 
 <p>This implementation includes several Material 3 design characteristics:</p>
 
@@ -291,10 +276,8 @@ LazyColumn(
 
 <p>By wrapping your theme setup with some animation, we can achieve <strong>smooth transitions between light and dark themes</strong> that feel much more polished — without rebuilding your entire app structure.</p>
 
-<!-- more -->
+<!-- more --> 
 
-
-<p></p>
 
 <h2>The Idea: Animate the ColorScheme</h2>
 
@@ -302,36 +285,29 @@ LazyColumn(
 
 <p>Here’s a simplified example:</p>
 
-<p>```
-@Composable
-fun AnimatedTheme(</p>
+<pre><code>@Composable
+fun AnimatedTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -&gt; Unit
+) {
+    val targetScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
-<pre><code>darkTheme: Boolean = isSystemInDarkTheme(),
-content: @Composable () -&gt; Unit
+    val animatedScheme = targetScheme.copy(
+        primary = animateColorAsState(targetScheme.primary).value,
+        background = animateColorAsState(targetScheme.background).value,
+        surface = animateColorAsState(targetScheme.surface).value,
+        onPrimary = animateColorAsState(targetScheme.onPrimary).value,
+        // Add more swatches as needed...
+    )
+
+    MaterialTheme(
+        colorScheme = animatedScheme,
+        typography = Typography,
+        shapes = Shapes,
+        content = content
+    )
+}
 </code></pre>
-
-<p>) {</p>
-
-<pre><code>val targetScheme = if (darkTheme) DarkColorScheme else LightColorScheme
-
-val animatedScheme = targetScheme.copy(
-    primary = animateColorAsState(targetScheme.primary).value,
-    background = animateColorAsState(targetScheme.background).value,
-    surface = animateColorAsState(targetScheme.surface).value,
-    onPrimary = animateColorAsState(targetScheme.onPrimary).value,
-    // Add more swatches as needed...
-)
-
-MaterialTheme(
-    colorScheme = animatedScheme,
-    typography = Typography,
-    shapes = Shapes,
-    content = content
-)
-</code></pre>
-
-<p>}
-```</p>
 
 <p>You can expand this to include all 20+ color swatches if you want — but we’ll show a better way shortly.</p>
 
@@ -354,48 +330,39 @@ MaterialTheme(
 
 <p>A cleaner solution is to animate all properties as part of a single <code>Transition</code>. That way, Compose shares the animation clock and easing, and you&rsquo;re not scattering a dozen independent animation calls.</p>
 
-<p>```
-private fun defaultColorTransitionSpec(): FiniteAnimationSpec<Color> =</p>
+<pre><code>private fun defaultColorTransitionSpec(): FiniteAnimationSpec&lt;Color&gt; =
+    tween(durationMillis = 500, easing = LinearOutSlowInEasing)
 
-<pre><code>tween(durationMillis = 500, easing = LinearOutSlowInEasing)
+@Composable
+fun AnimatedTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -&gt; Unit
+) {
+    val targetScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+    val transition = updateTransition(targetScheme, label = "themeTransition")
+
+    val primary by transition.animateColor(
+        label = "primary",
+        transitionSpec = { defaultColorTransitionSpec() }) { it.primary }
+    val background by transition.animateColor(
+        label = "background",
+        transitionSpec = { defaultColorTransitionSpec() }) { it.background }
+    val surface by transition.animateColor(
+        label = "surface",
+        transitionSpec = { defaultColorTransitionSpec() }) { it.surface }
+    val onPrimary by transition.animateColor(
+        label = "onPrimary",
+        transitionSpec = { defaultColorTransitionSpec() }) { it.onPrimary }
+
+    val animatedScheme = targetScheme.copy(
+        primary = primary,
+        background = background,
+        surface = surface,
+        onPrimary = onPrimary
+    )
+    MaterialTheme(colorScheme = animatedScheme, content = content)
+}
 </code></pre>
-
-<p>@Composable
-fun AnimatedTheme(</p>
-
-<pre><code>darkTheme: Boolean = isSystemInDarkTheme(),
-content: @Composable () -&gt; Unit
-</code></pre>
-
-<p>) {</p>
-
-<pre><code>val targetScheme = if (darkTheme) DarkColorScheme else LightColorScheme
-val transition = updateTransition(targetScheme, label = "themeTransition")
-
-val primary by transition.animateColor(
-    label = "primary",
-    transitionSpec = { defaultColorTransitionSpec() }) { it.primary }
-val background by transition.animateColor(
-    label = "background",
-    transitionSpec = { defaultColorTransitionSpec() }) { it.background }
-val surface by transition.animateColor(
-    label = "surface",
-    transitionSpec = { defaultColorTransitionSpec() }) { it.surface }
-val onPrimary by transition.animateColor(
-    label = "onPrimary",
-    transitionSpec = { defaultColorTransitionSpec() }) { it.onPrimary }
-
-val animatedScheme = targetScheme.copy(
-    primary = primary,
-    background = background,
-    surface = surface,
-    onPrimary = onPrimary
-)
-MaterialTheme(colorScheme = animatedScheme, content = content)
-</code></pre>
-
-<p>}
-```</p>
 
 <p>This version:</p>
 

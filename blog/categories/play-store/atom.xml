@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Play Store | Michael Evans]]></title>
   <link href="http://michaelevans.org/blog/categories/play-store/atom.xml" rel="self"/>
   <link href="http://michaelevans.org/"/>
-  <updated>2026-10-25T17:50:57-04:00</updated>
+  <updated>2026-11-08T21:16:06-05:00</updated>
   <id>http://michaelevans.org/</id>
   <author>
     <name><![CDATA[Michael Evans]]></name>
@@ -41,86 +41,77 @@
 
 <p>First, include the Install Referrer library in your build.gradle file:</p>
 
-<p><code>
-implementation 'com.android.installreferrer:installreferrer:2.2'
-</code></p>
+<pre><code>implementation 'com.android.installreferrer:installreferrer:2.2'
+</code></pre>
 
 <p>Step 2: Use <code>callbackFlow</code> for our implementation</p>
 
 <p>The InstallReferrerClient is callback-based, but Kotlin’s <code>callbackFlow</code> lets you handle this more elegantly. Here’s an example:</p>
 
-<p>```
-import com.android.installreferrer.api.InstallReferrerClient
+<pre><code>import com.android.installreferrer.api.InstallReferrerClient
 import com.android.installreferrer.api.InstallReferrerStateListener
 import com.android.installreferrer.api.ReferrerDetails
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.callbackFlow</p>
+import kotlinx.coroutines.flow.callbackFlow
 
-<p>fun fetchInstallReferrer(context: Context) = callbackFlow {</p>
+fun fetchInstallReferrer(context: Context) = callbackFlow {
+    val referrerClient = InstallReferrerClient.newBuilder(context).build()
 
-<pre><code>val referrerClient = InstallReferrerClient.newBuilder(context).build()
-
-val listener = object : InstallReferrerStateListener {
-    override fun onInstallReferrerSetupFinished(responseCode: Int) {
-        when (responseCode) {
-            InstallReferrerClient.InstallReferrerResponse.OK -&gt; {
-                try {
-                    val response: ReferrerDetails = referrerClient.installReferrer
-                    trySend(Result.success(response))
-                } catch (e: Exception) {
-                    trySend(Result.failure(e))
-                } finally {
-                    referrerClient.endConnection()
+    val listener = object : InstallReferrerStateListener {
+        override fun onInstallReferrerSetupFinished(responseCode: Int) {
+            when (responseCode) {
+                InstallReferrerClient.InstallReferrerResponse.OK -&gt; {
+                    try {
+                        val response: ReferrerDetails = referrerClient.installReferrer
+                        trySend(Result.success(response))
+                    } catch (e: Exception) {
+                        trySend(Result.failure(e))
+                    } finally {
+                        referrerClient.endConnection()
+                    }
+                }
+                InstallReferrerClient.InstallReferrerResponse.FEATURE_NOT_SUPPORTED -&gt; {
+                    trySend(Result.failure(UnsupportedOperationException("Feature not supported")))
+                }
+                InstallReferrerClient.InstallReferrerResponse.SERVICE_UNAVAILABLE -&gt; {
+                    trySend(Result.failure(IllegalStateException("Service unavailable")))
                 }
             }
-            InstallReferrerClient.InstallReferrerResponse.FEATURE_NOT_SUPPORTED -&gt; {
-                trySend(Result.failure(UnsupportedOperationException("Feature not supported")))
-            }
-            InstallReferrerClient.InstallReferrerResponse.SERVICE_UNAVAILABLE -&gt; {
-                trySend(Result.failure(IllegalStateException("Service unavailable")))
-            }
+        }
+
+        override fun onInstallReferrerServiceDisconnected() {
+            // Handle service disconnection if needed
         }
     }
 
-    override fun onInstallReferrerServiceDisconnected() {
-        // Handle service disconnection if needed
+    referrerClient.startConnection(listener)
+
+    awaitClose {
+        referrerClient.endConnection()
     }
 }
-
-referrerClient.startConnection(listener)
-
-awaitClose {
-    referrerClient.endConnection()
-}
 </code></pre>
-
-<p>}
-```</p>
 
 <p>Step 3: Consuming the Flow</p>
 
 <p>Collect the flow to retrieve and process the install referrer details:</p>
 
-<p>```
-fetchInstallReferrer(context).collect { result &ndash;></p>
+<pre><code>fetchInstallReferrer(context).collect { result -&gt;
+        result.onSuccess { referrerDetails -&gt;
+            val referrerUrl = referrerDetails.installReferrer
+            val clickTimestamp = referrerDetails.referrerClickTimestampSeconds
+            val installTimestamp = referrerDetails.installBeginTimestampSeconds
 
-<pre><code>    result.onSuccess { referrerDetails -&gt;
-        val referrerUrl = referrerDetails.installReferrer
-        val clickTimestamp = referrerDetails.referrerClickTimestampSeconds
-        val installTimestamp = referrerDetails.installBeginTimestampSeconds
+            println("Referrer URL: $referrerUrl")
+            println("Click Time: $clickTimestamp")
+            println("Install Time: $installTimestamp")
+        }
 
-        println("Referrer URL: $referrerUrl")
-        println("Click Time: $clickTimestamp")
-        println("Install Time: $installTimestamp")
+        result.onFailure { exception -&gt;
+            println("Error: ${exception.message}")
+        }
     }
-
-    result.onFailure { exception -&gt;
-        println("Error: ${exception.message}")
-    }
-}
 </code></pre>
-
-<p>```</p>
 
 <h3>Wrapping Up</h3>
 

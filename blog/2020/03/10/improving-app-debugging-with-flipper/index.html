@@ -21,7 +21,7 @@
   
   <link rel="canonical" href="http://michaelevans.org/blog/2020/03/10/improving-app-debugging-with-flipper/">
   <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css?v=1792965057" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/screen.css?v=1794190566" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="/javascripts/ender.js"></script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
@@ -37,7 +37,7 @@
     }
   } catch (error) {}
 </script>
-<script src="/javascripts/reading.js?v=1792965057" defer></script>
+<script src="/javascripts/reading.js?v=1794190566" defer></script>
 
   
   <script type="text/javascript">
@@ -125,7 +125,7 @@
 
 <div class="entry-content"><p>Some time last year, Facebook released a new mobile debugging tool, named <a href="https://fbflipper.com/">Flipper</a>. It&rsquo;s essentially the successor to the widely popular <a href="http://facebook.github.io/stetho/">Stetho</a>. Although after talking to many developers, it seems like this newer tool is relatively unknown.</p>
 
-<p>Like Stetho, Flipper has many built-in features &ndash; including a layout inspector, a database inspector and a network inspector. Unlike Stetho though, Flipper has a very extensible API which allows for tons of customization. Over the next few articles, we&rsquo;re going to take a look at Flipper and its plugins, the APIs it provides, and how we can leverage them to help us debug various parts of our app. This post will focus on getting set up with Flipper, as well as taking a look at two of its most useful default plugins.</p>
+<p>Like Stetho, Flipper has many built-in features - including a layout inspector, a database inspector and a network inspector. Unlike Stetho though, Flipper has a very extensible API which allows for tons of customization. Over the next few articles, we&rsquo;re going to take a look at Flipper and its plugins, the APIs it provides, and how we can leverage them to help us debug various parts of our app. This post will focus on getting set up with Flipper, as well as taking a look at two of its most useful default plugins.</p>
 
 <h2>Getting Started</h2>
 
@@ -216,7 +216,7 @@
 
 <h2>Database Browser / Plugin</h2>
 
-<p>Something I&rsquo;ve wanted for a long time was a way to view the contents of my database from Android Studio. Right now, if you want to visualize your data or try out some queries &ndash; the best solution is to pull the sqlite database file off your emulator/device and run sqlite locally. But with Flipper, there&rsquo;s a better way!</p>
+<p>Something I&rsquo;ve wanted for a long time was a way to view the contents of my database from Android Studio. Right now, if you want to visualize your data or try out some queries - the best solution is to pull the sqlite database file off your emulator/device and run sqlite locally. But with Flipper, there&rsquo;s a better way!</p>
 
 <p>All we need to do is configure the database plugin, and our tables should show up right away:</p>
 
@@ -304,6 +304,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2026/09/24/testing-android-backup-and-restore-with-androidx/">Testing Android Backup and Restore with AndroidX</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2026/05/11/how-to-combine-pagingdata-with-other-flows-using-asitemsnapshotlistflow/">How to Combine PagingData with Other Flows Using asItemSnapshotListFlow</a>
       </li>
     
@@ -317,10 +321,6 @@
     
       <li class="post">
         <a href="/blog/2025/03/22/turning-any-android-callback-into-a-flow-with-callbackflow/">Turning Any Android Callback into a Flow with callbackFlow</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2024/12/14/ui-testing-made-easy-the-robot-test-pattern-on-android/">UI Testing Made Easy: The Robot Test Pattern on Android</a>
       </li>
     
   </ul>
